@@ -1,0 +1,100 @@
+{
+  "schemaVersion": "1.0.0",
+  "projectStateVersion": 4,
+  "summary": "Story-based web app/2D game to help people set and reach goals through an interactive narrative. Includes scripted intro story screens with UI interactions (start button, slider/submit with branching text), and a vertical-scrolling 2D segment featuring a controllable character (arrow keys) and spacebar-triggered random joke speech balloons.",
+  "existing_features": [
+    {
+      "id": "feature-implement-the-intro-narrative-flow-exactly-as-provided-by-the-user-preserving-the-story-text-verbatim-including-punctuation-and-line-breaks-as-closely-as-practical-and-present-it-as-sequential-story-screens-steps-the-player-progresses-through",
+      "title": "Implement the intro narrative flow exactly as provided by the user, preserving the story text verbatim (including punctuation and line breaks as closely as practical), and present it as sequential story screens/steps the player progresses through.",
+      "reqIds": [
+        "REQ-1"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-create-a-fun-soft-color-gradient-background-no-images-for-the-opening-story-section-and-then-gradually-transition-the-background-to-a-darker-gloomier-color-scheme-as-each-new-text-appears-during-the-specified-portion-of-the-story",
+      "title": "Create a fun, soft color gradient background (no images) for the opening story section, and then gradually transition the background to a darker, gloomier color scheme as each new text appears during the specified portion of the story.",
+      "reqIds": [
+        "REQ-2"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-a-colorful-bouncy-start-now-button-that-appears-at-the-specified-point-in-the-story-and-must-be-clicked-to-continue-the-narrative",
+      "title": "Add a colorful, bouncy \"Start now!\" button that appears at the specified point in the story and must be clicked to continue the narrative.",
+      "reqIds": [
+        "REQ-3"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-the-do-you-know-how-many-people-stick-to-their-goals-interaction-with-a-1-100-slider-and-a-submit-button-after-submission-show-conditional-feedback-if-the-selected-value-is-between-5-and-10-inclusive-show-the-that-s-correct-message-otherwise-show-the-alternate-that-s-a-good-guess-message-then-continue-the-story-and-emphasize-the-line-only-about-8-of-people-manage-to-fulfill-their-goals",
+      "title": "Implement the \"Do you know how many people stick to their goals?\" interaction with a 1–100% slider and a \"Submit\" button. After submission, show conditional feedback: if the selected value is between 5% and 10% inclusive, show the \"That’s correct...\" message; otherwise show the alternate \"That’s a good guess...\" message. Then continue the story and emphasize the line \"Only about 8% of people manage to fulfill their goals.\"",
+      "reqIds": [
+        "REQ-4"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-after-the-intro-narrative-transition-into-a-2d-gameplay-segment-where-a-player-controls-a-character-on-a-mostly-vertical-playfield-the-map-scrolls-from-top-to-bottom-over-time-and-the-map-s-color-scheme-is-brown",
+      "title": "After the intro narrative, transition into a 2D gameplay segment where a player controls a character on a mostly vertical playfield; the map scrolls from top to bottom over time, and the map’s color scheme is brown.",
+      "reqIds": [
+        "REQ-5"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-keyboard-controls-in-the-2d-segment-arrow-keys-move-the-character-pressing-space-triggers-a-random-joke-chosen-from-an-in-app-array-of-5-jokes-and-displays-the-joke-as-a-speech-balloon-emerging-from-the-character",
+      "title": "Implement keyboard controls in the 2D segment: arrow keys move the character. Pressing Space triggers a random joke chosen from an in-app array of 5 jokes, and displays the joke as a speech balloon emerging from the character.",
+      "reqIds": [
+        "REQ-6"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-establish-a-coherent-distinct-visual-theme-for-the-entire-app-colors-typography-spacing-and-component-styling-that-fits-a-reflective-story-based-self-improvement-game-and-is-applied-consistently-across-the-intro-narrative-ui-and-the-2d-segment-ui-overlay-do-not-use-a-blue-purple-primary-palette",
+      "title": "Establish a coherent, distinct visual theme for the entire app (colors, typography, spacing, and component styling) that fits a reflective, story-based self-improvement game and is applied consistently across the intro narrative UI and the 2D segment UI overlay. Do not use a blue/purple primary palette.",
+      "reqIds": [
+        "REQ-7"
+      ],
+      "version": 1
+    }
+  ],
+  "new_feature_requests": [
+    {
+      "id": "AR-1",
+      "summary": "Implement the intro story exactly as provided, including soft gradient background, progressive darker background transitions per text, and a clickable 'Start now!' button to advance.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-2",
+      "summary": "Add goal-retention slider interaction (1–100%) with Submit button and branching response text (special case for 5–10%; otherwise alternate message), then continue the scripted narrative about 'Only about 8%' and introducing Donald.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-3",
+      "summary": "Create a 2D vertical-scrolling gameplay segment (map moves top-to-bottom) with a brown color scheme and player-controlled character.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-4",
+      "summary": "Implement controls: arrow keys move character; spacebar tells a random joke chosen from an array of 5 and displays it as a speech balloon from the character.",
+      "reqIds": [],
+      "status": "pending"
+    }
+  ],
+  "architecturalNotes": [
+    "Implementation approach: use React + TypeScript with Tailwind CSS for UI/visual styling; keep story text exactly as written and structure game flow for future expansion."
+  ],
+  "knownIssues": [],
+  "isFixRequest": false,
+  "gameProjectType": "2d",
+  "projectName": "Story-based goal-setting game intro flow + vertical-scrolling 2D segment with jokes",
+  "clarification_mode": "pro",
+  "clarification_rounds": 0,
+  "requiresBackendChanges": false,
+  "requiresFrontendChanges": true
+}

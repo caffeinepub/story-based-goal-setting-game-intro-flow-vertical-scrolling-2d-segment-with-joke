@@ -1,0 +1,198 @@
+{
+  "kind": "implementation_plan",
+  "version": "1.0",
+  "title": "Story intro flow + vertical-scrolling 2D segment with jokes (frontend)",
+  "requirements": [
+    {
+      "id": "REQ-1",
+      "summary": "Implement the intro narrative as sequential story steps with verbatim user-provided text and clear progression gates.",
+      "acceptanceCriteria": [
+        "All story lines shown to the player match the user-provided text exactly (no rewording).",
+        "The narrative is displayed in the same order as provided.",
+        "The app provides a clear progression mechanism so the user can advance through the story steps where specified (e.g., via the Start button and the slider submit)."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/content/story.ts",
+          "operation": "create",
+          "description": "Create a single source of truth for the intro narrative steps and gate markers; paste the user-provided story text from msg-1 verbatim (preserving punctuation and line breaks as closely as practical)."
+        },
+        {
+          "path": "frontend/src/App.tsx",
+          "operation": "create",
+          "description": "Create the app shell that renders the intro narrative flow first and then transitions into the gameplay view when the narrative sequence completes."
+        },
+        {
+          "path": "frontend/src/features/intro/IntroFlow.tsx",
+          "operation": "create",
+          "description": "Implement the sequential story screens/steps renderer that reads from frontend/src/content/story.ts and advances step-by-step while respecting progression gates (including a hard stop where the Start button and slider submit are required)."
+        }
+      ]
+    },
+    {
+      "id": "REQ-2",
+      "summary": "Add a soft gradient intro background and smoothly transition it to darker/gloomier tones during the specified story portion as new text appears.",
+      "acceptanceCriteria": [
+        "The intro starts with a soft gradient background and contains no background images.",
+        "During the \"So many ambitions to satisfy...\" section, the background becomes progressively darker/gloomier with each newly revealed line (or step) of text.",
+        "The transition is visibly gradual (animated or smoothly interpolated), not an abrupt color swap."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/features/intro/introBackground.ts",
+          "operation": "create",
+          "description": "Add a small helper that maps intro step indices (or a labeled subset for the \"So many ambitions to satisfy...\" portion) to gradient color stops and computes interpolated values for smooth transitions."
+        },
+        {
+          "path": "frontend/src/features/intro/IntroFlow.tsx",
+          "operation": "modify",
+          "description": "Apply a no-image gradient background to the intro container and animate/interpolate gradient parameters so the background darkens progressively with each newly revealed step during the specified portion."
+        }
+      ]
+    },
+    {
+      "id": "REQ-3",
+      "summary": "Add a colorful, bouncy \"Start now!\" button that appears only at the specified story point and gates progression.",
+      "acceptanceCriteria": [
+        "The \"Start now!\" button is not shown before the point indicated in the story.",
+        "Clicking the button advances the story to the next text (\"So many goals to accomplish.\").",
+        "The button has an obvious colorful style and a bouncy animation (e.g., subtle bounce/scale on idle and/or interaction)."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/features/intro/IntroFlow.tsx",
+          "operation": "modify",
+          "description": "Render the gated \"Start now!\" control only on the specified step; use the shadcn-ui Button component for consistent styling and implement a bouncy animation via Tailwind utility classes. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/index.css",
+          "operation": "create",
+          "description": "Add global Tailwind layer styles (and, if needed, minimal custom keyframes/classes) to support the bouncy button animation while maintaining consistent theme styling across the app."
+        }
+      ]
+    },
+    {
+      "id": "REQ-4",
+      "summary": "Implement the 1–100% slider + Submit interaction with conditional feedback, then continue story and emphasize the 8% line.",
+      "acceptanceCriteria": [
+        "A slider allows selecting an integer (or whole-percent) value from 1 to 100 and does not advance the story until the user clicks \"Submit\".",
+        "If the submitted value is 5–10 inclusive, the UI shows: \"That’s correct, I see you have some experience with setting goals.\"",
+        "If the submitted value is outside 5–10 inclusive, the UI shows: \"That’s a good guess, but not exactly right. Don’t worry, it’s a tricky question and we’re all just learning. No mistake is irreversible.\"",
+        "After the feedback, the story continues and the line \"Only about 8% of people manage to fulfill their goals.\" is visually emphasized (e.g., bold/large/contrast) relative to surrounding text.",
+        "The story then continues into the \"Well, meet Donald.\" paragraph sequence as provided."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/features/intro/GoalStickinessQuestion.tsx",
+          "operation": "create",
+          "description": "Create the slider + Submit gated interaction UI for the question, including local state for selected value, submitted state, and conditional feedback rendering."
+        },
+        {
+          "path": "frontend/src/features/intro/IntroFlow.tsx",
+          "operation": "modify",
+          "description": "Wire the GoalStickinessQuestion gate into the narrative step sequence so the story cannot advance until Submit is clicked; after submission, inject the correct conditional feedback text and then continue the narrative with visual emphasis on the specified 8% line."
+        },
+        {
+          "path": "frontend/src/features/intro/GoalStickinessQuestion.tsx",
+          "operation": "modify",
+          "description": "Use shadcn-ui Slider and Button components to implement the 1–100 whole-percent selection and Submit action with accessible, consistent styling. Verify the component's usage instructions before implementing."
+        }
+      ]
+    },
+    {
+      "id": "REQ-5",
+      "summary": "Transition from the completed intro narrative into a 2D game view with a mostly vertical playfield, downward-scrolling brown map, and distinct gameplay presentation.",
+      "acceptanceCriteria": [
+        "A distinct gameplay view appears after the Donald intro text sequence finishes.",
+        "The play area is oriented vertically (taller than wide in layout emphasis).",
+        "The environment/map scrolls downward (top-to-bottom movement of the map relative to the player) to create forward progression.",
+        "The predominant map palette is brown (background/tiles/terrain)."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/features/game/GameView.tsx",
+          "operation": "create",
+          "description": "Create the 2D game view container with a vertically oriented playfield (layout emphasized as tall), and a HUD/overlay region that will share the app theme."
+        },
+        {
+          "path": "frontend/src/features/game/useGameLoop.ts",
+          "operation": "create",
+          "description": "Add a requestAnimationFrame-based game loop hook to update time, scrolling offset (map moving top-to-bottom over time), and render triggers for the game view."
+        },
+        {
+          "path": "frontend/src/features/game/renderBrownMap.ts",
+          "operation": "create",
+          "description": "Implement map rendering logic for a predominantly brown palette and a downward scrolling effect (e.g., repeating terrain pattern/tiles) without relying on images."
+        },
+        {
+          "path": "frontend/src/App.tsx",
+          "operation": "modify",
+          "description": "Wire the end of the intro flow to switch to (render) the GameView as the next distinct view after the narrative finishes."
+        }
+      ]
+    },
+    {
+      "id": "REQ-6",
+      "summary": "Add keyboard controls: arrow keys move the character; Space triggers a random joke from exactly five client-side jokes and shows a speech balloon near the character.",
+      "acceptanceCriteria": [
+        "Arrow keys move the character smoothly within the playfield bounds.",
+        "Pressing Space selects a joke randomly from exactly 5 predefined jokes stored client-side.",
+        "Each Space press can produce any of the 5 jokes (random selection) and displays it in a speech balloon positioned near/above the character.",
+        "The speech balloon appears visually connected to the character (e.g., bubble with tail) and is readable against the brown map background."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/features/game/jokes.ts",
+          "operation": "create",
+          "description": "Define an in-app array of exactly 5 jokes (client-side only) to be used for Space-triggered random selection."
+        },
+        {
+          "path": "frontend/src/features/game/useKeyboardControls.ts",
+          "operation": "create",
+          "description": "Implement keyboard listeners for Arrow keys (continuous movement) and Space (trigger action) with proper cleanup; expose movement intents and a Space-pressed callback to the game view."
+        },
+        {
+          "path": "frontend/src/features/game/GameView.tsx",
+          "operation": "modify",
+          "description": "Add a controllable character entity with bounded movement, integrate useKeyboardControls, and on Space press select a random joke from frontend/src/features/game/jokes.ts and display it as a speech balloon anchored near/above the character."
+        },
+        {
+          "path": "frontend/src/features/game/SpeechBalloon.tsx",
+          "operation": "create",
+          "description": "Create a speech balloon overlay component (bubble + tail) that can be positioned relative to the character and styled for readability over the brown map."
+        }
+      ]
+    },
+    {
+      "id": "REQ-7",
+      "summary": "Create and apply a coherent reflective theme (colors/typography/spacing) consistently across intro and gameplay overlays, avoiding a blue/purple primary palette.",
+      "acceptanceCriteria": [
+        "Typography, spacing, and UI component styling feel consistent across story screens and gameplay UI.",
+        "The chosen theme avoids blue/purple as the primary palette and aligns with the app’s reflective tone (while still supporting the \"fun and soft\" intro gradient).",
+        "Interactive elements (button, slider, submit) are clearly styled and accessible/legible against background transitions."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/index.css",
+          "operation": "modify",
+          "description": "Define app-wide theme tokens (CSS variables) and base typography/spacing defaults using Tailwind layers; set a non-blue/non-purple primary palette (e.g., warm amber/earth/forest neutrals) and ensure text contrast works for both the soft intro gradient and the darker gloom transitions."
+        },
+        {
+          "path": "frontend/src/App.tsx",
+          "operation": "modify",
+          "description": "Apply consistent layout primitives (max widths, vertical rhythm, type scale) and shared wrapper styling so the intro UI and gameplay UI overlay feel like one coherent reflective, story-based self-improvement game."
+        },
+        {
+          "path": "frontend/src/features/intro/IntroFlow.tsx",
+          "operation": "modify",
+          "description": "Align intro typography, spacing, and interactive styling with the global theme (including legibility during background transitions) without introducing a blue/purple primary look."
+        },
+        {
+          "path": "frontend/src/features/game/GameView.tsx",
+          "operation": "modify",
+          "description": "Apply the same theme tokens to gameplay overlay elements (e.g., speech balloon, any HUD text) to match intro styling and maintain readability over the brown scrolling map."
+        }
+      ]
+    }
+  ]
+}

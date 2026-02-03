@@ -1,0 +1,14 @@
+{
+  "frontend/src/App.tsx": "Main application component that manages the state transition between the intro narrative flow and the 2D gameplay segment.",
+  "frontend/src/content/story.ts": "Contains all story text and step definitions for the intro narrative, preserving the exact user-provided text verbatim with proper string escaping for apostrophes.",
+  "frontend/src/features/intro/IntroFlow.tsx": "Renders the sequential story screens with progressive background darkening, handles the Start button and slider interactions, and manages narrative progression with Tailwind v3 compatible classes.",
+  "frontend/src/features/intro/GoalStickinessQuestion.tsx": "Implements the 1-100% slider question with conditional feedback based on whether the user selects 5-10% or another value.",
+  "frontend/src/features/intro/introBackground.ts": "Helper function that calculates smooth gradient transitions from soft/fun colors to darker/gloomier tones as the story progresses.",
+  "frontend/src/features/game/GameView.tsx": "Main 2D game component with canvas rendering, brown scrolling map, controllable character (Donald), and speech balloon display for jokes.",
+  "frontend/src/features/game/useGameLoop.ts": "Custom hook that manages the game loop using requestAnimationFrame and updates the scrolling offset for downward map movement with proper React 19 ref initialization.",
+  "frontend/src/features/game/useKeyboardControls.ts": "Custom hook that handles keyboard input for arrow key movement and spacebar joke triggering with proper event cleanup.",
+  "frontend/src/features/game/jokes.ts": "Array of exactly 5 predefined jokes that are randomly selected when the player presses Space.",
+  "frontend/src/features/game/SpeechBalloon.tsx": "Component that renders a speech balloon with tail positioned above the character to display jokes.",
+  "frontend/src/index.css": "Global styles with warm earth-tone OKLCH color system (avoiding blue/purple), custom animations, and typography settings for the reflective game theme.",
+  "frontend/tailwind.config.js": "Tailwind configuration with extended color tokens, custom font family, and animation utilities matching the warm, reflective design system."
+}
