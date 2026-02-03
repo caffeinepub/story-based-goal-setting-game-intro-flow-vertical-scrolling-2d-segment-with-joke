@@ -1,153 +1,76 @@
 {
   "kind": "build_request",
-  "title": "Story-based goal-setting game intro flow + vertical-scrolling 2D segment with jokes",
+  "title": "Intro spacing + unified Continue/Submit button style + Zelda-like top-down movement/camera feel",
   "priority": "normal",
   "requirements": [
     {
       "id": "REQ-1",
-      "text": "Implement the intro narrative flow exactly as provided by the user, preserving the story text verbatim (including punctuation and line breaks as closely as practical), and present it as sequential story screens/steps the player progresses through.",
+      "text": "Add an additional 25vh top offset to the intro narrative layout (on top of the existing fixed top padding) so that all IntroFlow stages (opening, goals, slider question, stat, Donald blocks) start lower on the screen while remaining top-aligned and stable (no layout shifting between stages).",
       "target": "frontend",
       "source": {
         "messageIds": [
           "msg-1"
         ],
         "quotes": [
-          "Here’s the start of the story, please implement the story exactly as it is written here:"
+          "1. Cool, now just add a `25 vh` margin from top",
+          "1. add on top of that"
         ]
       },
       "acceptanceCriteria": [
-        "All story lines shown to the player match the user-provided text exactly (no rewording).",
-        "The narrative is displayed in the same order as provided.",
-        "The app provides a clear progression mechanism so the user can advance through the story steps where specified (e.g., via the Start button and the slider submit)."
+        "All intro stages rendered by `frontend/src/features/intro/IntroFlow.tsx` have an additional 25vh spacing from the top in addition to the existing top padding.",
+        "The top offset is applied consistently across stages including the slider question stage (`GoalStickinessQuestion`).",
+        "No stage introduces extra vertical jumping/shifting compared to the current stable layout behavior."
       ]
     },
     {
       "id": "REQ-2",
-      "text": "Create a fun, soft color gradient background (no images) for the opening story section, and then gradually transition the background to a darker, gloomier color scheme as each new text appears during the specified portion of the story.",
+      "text": "Update styling for (a) every button labeled \"Continue\" across the intro flow and (b) the \"Submit\" button on the slider question screen to use a unified pill style: border-radius 100px, transparent background, 1px solid border, with the border color matching the current text color.",
       "target": "frontend",
       "source": {
         "messageIds": [
           "msg-1"
         ],
         "quotes": [
-          "// Fun and soft color gradient background, without any image",
-          "// Background gradually transitions to a darker and gloomier color scheme with each new text appearing"
+          "Change the style of the \"Continue\" buttons (unified style for all butons) - border-radius: 100px, background: transparent, border: 1px solid, border color: {same as font color}",
+          "2. only \"continue\" buttons and \"Submit\" button in the question screen"
         ]
       },
       "acceptanceCriteria": [
-        "The intro starts with a soft gradient background and contains no background images.",
-        "During the \"So many ambitions to satisfy...\" section, the background becomes progressively darker/gloomier with each newly revealed line (or step) of text.",
-        "The transition is visibly gradual (animated or smoothly interpolated), not an abrupt color swap."
+        "All \"Continue\" buttons in `frontend/src/features/intro/IntroFlow.tsx` use the unified pill style (rounded 100px, transparent background, 1px solid border using current text color).",
+        "\"Submit\" in `frontend/src/features/intro/GoalStickinessQuestion.tsx` uses the same unified pill style.",
+        "Other CTAs (e.g., the start CTA in the opening lines) are not changed by this requirement."
       ]
     },
     {
       "id": "REQ-3",
-      "text": "Add a colorful, bouncy \"Start now!\" button that appears at the specified point in the story and must be clicked to continue the narrative.",
+      "text": "Adjust the 2D canvas game movement and camera feel to be closer to classic Zelda-style top-down movement while keeping the map progressing top-to-bottom. Scope is movement + camera feel only: do not add enemies, combat, collisions, or obstacle handling. Keep a Zelda-inspired brown terrain aesthetic.",
       "target": "frontend",
       "source": {
         "messageIds": [
           "msg-1"
         ],
         "quotes": [
-          "// Button appears, player has to click for the story to continue",
-          "[Colorful, bouncy button - Start now!]"
+          "The gameplay mechanics should be something similar to old Legend of Zelda gameplay. Just that the map progresses and makes the player move from top to bottom.",
+          "only movement + camera feel. Also terrain could be something similar to zelda's but in brown color scheme. No need for enemies, collision/obstacle handling."
         ]
       },
       "acceptanceCriteria": [
-        "The \"Start now!\" button is not shown before the point indicated in the story.",
-        "Clicking the button advances the story to the next text (\"So many goals to accomplish.\").",
-        "The button has an obvious colorful style and a bouncy animation (e.g., subtle bounce/scale on idle and/or interaction)."
-      ]
-    },
-    {
-      "id": "REQ-4",
-      "text": "Implement the \"Do you know how many people stick to their goals?\" interaction with a 1–100% slider and a \"Submit\" button. After submission, show conditional feedback: if the selected value is between 5% and 10% inclusive, show the \"That’s correct...\" message; otherwise show the alternate \"That’s a good guess...\" message. Then continue the story and emphasize the line \"Only about 8% of people manage to fulfill their goals.\"",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-1"
-        ],
-        "quotes": [
-          "Do you know how many people stick to their goals?",
-          "// Slider, user has to slide 1 - 100% and then click [Submit] button",
-          "// If user picked 5 - 10% That’s correct, I see you have some experience with setting goals.",
-          "// Else That’s a good guess, but not exactly right. Don’t worry, it’s a tricky question and we’re all just learning. No mistake is irreversible.",
-          "// Emphasized Only about 8% of people manage to fulfill their goals."
-        ]
-      },
-      "acceptanceCriteria": [
-        "A slider allows selecting an integer (or whole-percent) value from 1 to 100 and does not advance the story until the user clicks \"Submit\".",
-        "If the submitted value is 5–10 inclusive, the UI shows: \"That’s correct, I see you have some experience with setting goals.\"",
-        "If the submitted value is outside 5–10 inclusive, the UI shows: \"That’s a good guess, but not exactly right. Don’t worry, it’s a tricky question and we’re all just learning. No mistake is irreversible.\"",
-        "After the feedback, the story continues and the line \"Only about 8% of people manage to fulfill their goals.\" is visually emphasized (e.g., bold/large/contrast) relative to surrounding text.",
-        "The story then continues into the \"Well, meet Donald.\" paragraph sequence as provided."
-      ]
-    },
-    {
-      "id": "REQ-5",
-      "text": "After the intro narrative, transition into a 2D gameplay segment where a player controls a character on a mostly vertical playfield; the map scrolls from top to bottom over time, and the map’s color scheme is brown.",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-1"
-        ],
-        "quotes": [
-          "// 2D game where player controls a character pops up",
-          "// The game is mostly played vertically - map moves from top to bottom.",
-          "// Make the color scheme of the map brown"
-        ]
-      },
-      "acceptanceCriteria": [
-        "A distinct gameplay view appears after the Donald intro text sequence finishes.",
-        "The play area is oriented vertically (taller than wide in layout emphasis).",
-        "The environment/map scrolls downward (top-to-bottom movement of the map relative to the player) to create forward progression.",
-        "The predominant map palette is brown (background/tiles/terrain)."
-      ]
-    },
-    {
-      "id": "REQ-6",
-      "text": "Implement keyboard controls in the 2D segment: arrow keys move the character. Pressing Space triggers a random joke chosen from an in-app array of 5 jokes, and displays the joke as a speech balloon emerging from the character.",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-1"
-        ],
-        "quotes": [
-          "// Use arrow keys to move the character, space to tell a joke (prepare array of 5 jokes and randomly pick one each time. The joke pops up as a balloon from the character)"
-        ]
-      },
-      "acceptanceCriteria": [
-        "Arrow keys move the character smoothly within the playfield bounds.",
-        "Pressing Space selects a joke randomly from exactly 5 predefined jokes stored client-side.",
-        "Each Space press can produce any of the 5 jokes (random selection) and displays it in a speech balloon positioned near/above the character.",
-        "The speech balloon appears visually connected to the character (e.g., bubble with tail) and is readable against the brown map background."
-      ]
-    },
-    {
-      "id": "REQ-7",
-      "text": "Establish a coherent, distinct visual theme for the entire app (colors, typography, spacing, and component styling) that fits a reflective, story-based self-improvement game and is applied consistently across the intro narrative UI and the 2D segment UI overlay. Do not use a blue/purple primary palette.",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-1"
-        ]
-      },
-      "acceptanceCriteria": [
-        "Typography, spacing, and UI component styling feel consistent across story screens and gameplay UI.",
-        "The chosen theme avoids blue/purple as the primary palette and aligns with the app’s reflective tone (while still supporting the \"fun and soft\" intro gradient).",
-        "Interactive elements (button, slider, submit) are clearly styled and accessible/legible against background transitions."
+        "Character movement is continuous while an arrow key is held (not dependent on OS key-repeat), and movement updates smoothly during gameplay.",
+        "Map scrolling/progression remains top-to-bottom and feels camera-like (i.e., the scene progression feels like a moving world rather than a static screen with occasional jumps).",
+        "The terrain remains brown and Zelda-inspired; no enemy/combat systems are introduced.",
+        "No collision/obstacle physics or blocking behavior is introduced (visual terrain details are allowed but must not block movement)."
       ]
     }
   ],
   "constraints": [
-    "Use React + TypeScript with Tailwind CSS and compose (do not edit) any components under frontend/src/components/ui.",
-    "Do not modify files in frontend immutablePaths (frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useInternetIdentity.tsx, frontend/src/hooks/useActor.ts, frontend/src/main.tsx, frontend/src/components/ui).",
-    "Keep all user-facing story text in English and render the story text exactly as provided by the user."
+    "Do not edit any files under `frontend/immutablePaths` as defined in SYSTEM_CONTEXT (compose existing UI components instead).",
+    "Backend must remain a single Motoko actor; do not introduce additional backend services.",
+    "Use English for any user-facing text."
   ],
   "nonGoals": [
-    "Persisting user progress, slider results, or gameplay state to the backend.",
-    "Adding additional story branches beyond the specified slider feedback condition (5–10% vs else).",
-    "Adding third-party authentication beyond Internet Identity."
+    "Adding enemies, combat, quests, inventory, or item pickups.",
+    "Implementing collision detection or obstacle blocking behavior.",
+    "Changing non-specified buttons (e.g., Start/Start now CTA styling) beyond what is required for Continue/Submit."
   ],
   "imageRequirements": {
     "required": [],

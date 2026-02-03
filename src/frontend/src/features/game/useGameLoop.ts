@@ -1,19 +1,23 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 
-export function useGameLoop() {
-  const [scrollOffset, setScrollOffset] = useState(0);
+interface GameLoopCallbacks {
+  onUpdate: (deltaTime: number) => void;
+}
+
+export function useGameLoop(callbacks?: GameLoopCallbacks) {
   const animationFrameRef = useRef<number | null>(null);
   const lastTimeRef = useRef<number>(0);
 
   useEffect(() => {
-    const SCROLL_SPEED = 1; // pixels per frame
-
     const gameLoop = (currentTime: number) => {
-      const deltaTime = currentTime - lastTimeRef.current;
+      // Calculate delta time in seconds
+      const deltaTime = lastTimeRef.current === 0 ? 0 : (currentTime - lastTimeRef.current) / 1000;
       lastTimeRef.current = currentTime;
 
-      // Update scroll offset (map moves downward)
-      setScrollOffset((prev) => prev + SCROLL_SPEED);
+      // Call update callback if provided
+      if (callbacks?.onUpdate && deltaTime > 0) {
+        callbacks.onUpdate(deltaTime);
+      }
 
       animationFrameRef.current = requestAnimationFrame(gameLoop);
     };
@@ -25,7 +29,7 @@ export function useGameLoop() {
         cancelAnimationFrame(animationFrameRef.current);
       }
     };
-  }, []);
+  }, [callbacks]);
 
-  return { scrollOffset };
+  return {};
 }

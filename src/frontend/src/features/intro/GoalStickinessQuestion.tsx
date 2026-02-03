@@ -6,10 +6,14 @@ interface GoalStickinessQuestionProps {
   onSubmit: () => void;
 }
 
+// Match the intro flow timing - 50% of previous 2000ms
+const FEEDBACK_DELAY = 1000;
+
 export default function GoalStickinessQuestion({ onSubmit }: GoalStickinessQuestionProps) {
   const [value, setValue] = useState([50]);
   const [submitted, setSubmitted] = useState(false);
   const [feedback, setFeedback] = useState('');
+  const [showContinue, setShowContinue] = useState(false);
 
   const handleSubmit = () => {
     const selectedValue = value[0];
@@ -21,9 +25,15 @@ export default function GoalStickinessQuestion({ onSubmit }: GoalStickinessQuest
       );
     }
     setSubmitted(true);
+    
+    // Show Continue button after feedback delay
     setTimeout(() => {
-      onSubmit();
-    }, 3000);
+      setShowContinue(true);
+    }, FEEDBACK_DELAY);
+  };
+
+  const handleContinue = () => {
+    onSubmit();
   };
 
   return (
@@ -49,16 +59,29 @@ export default function GoalStickinessQuestion({ onSubmit }: GoalStickinessQuest
             <Button
               onClick={handleSubmit}
               size="lg"
-              className="bg-amber-600 hover:bg-amber-700 text-white font-semibold px-8"
+              className="rounded-[100px] bg-transparent border border-current text-foreground/90 hover:bg-foreground/5 px-8"
             >
               Submit
             </Button>
           </div>
         </>
       ) : (
-        <p className="text-center text-lg text-foreground/90 animate-in fade-in duration-700">
-          {feedback}
-        </p>
+        <>
+          <p className="text-center text-lg text-foreground/90 animate-in fade-in slide-in-from-bottom-4 duration-500">
+            {feedback}
+          </p>
+          {showContinue && (
+            <div className="flex justify-center pt-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
+              <Button
+                onClick={handleContinue}
+                size="lg"
+                className="rounded-[100px] bg-transparent border border-current text-foreground/90 hover:bg-foreground/5 px-8"
+              >
+                Continue
+              </Button>
+            </div>
+          )}
+        </>
       )}
     </div>
   );

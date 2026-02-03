@@ -1,61 +1,307 @@
 {
   "schemaVersion": "1.0.0",
-  "projectStateVersion": 4,
-  "summary": "Story-based web app/2D game to help people set and reach goals through an interactive narrative. Includes scripted intro story screens with UI interactions (start button, slider/submit with branching text), and a vertical-scrolling 2D segment featuring a controllable character (arrow keys) and spacebar-triggered random joke speech balloons.",
+  "projectStateVersion": 3,
+  "summary": "A React + TypeScript single-page app that presents a multi-stage, story-driven intro experience (timed line-by-line narrative reveals with bottom-up fade-in, gated Continue/Start interactions, a goal “stickiness” slider question with conditional feedback, an emphasized “8%” statistic, colder progressively darkening/cooling background gradients, and a fixed top-aligned layout with additional ~25vh top offset) and then transitions into a simple 2D canvas game. The game currently shows a vertically progressing, brown, Zelda-inspired top-down terrain with a camera-like feel; the player controls a redesigned humanoid pixel-art character with the arrow keys and can press Space to display a random joke in a speech balloon. The codebase also contains scaffolding for Dfinity Internet Identity authentication and React Query-based backend actor creation/caching, while the Motoko backend canister is currently empty.",
   "existing_features": [
     {
-      "id": "feature-implement-the-intro-narrative-flow-exactly-as-provided-by-the-user-preserving-the-story-text-verbatim-including-punctuation-and-line-breaks-as-closely-as-practical-and-present-it-as-sequential-story-screens-steps-the-player-progresses-through",
-      "title": "Implement the intro narrative flow exactly as provided by the user, preserving the story text verbatim (including punctuation and line breaks as closely as practical), and present it as sequential story screens/steps the player progresses through.",
+      "id": "IF-1",
+      "title": "App flow: intro narrative transitions into gameplay",
+      "synonyms": [
+        "intro-to-game transition",
+        "gameStarted toggle"
+      ],
+      "description": "The root App component conditionally renders IntroFlow until completion, then switches to GameView via local state toggled by the IntroFlow onComplete callback.",
+      "reqIds": [],
+      "version": 1
+    },
+    {
+      "id": "IF-2",
+      "title": "Centralized typed story content for intro stages",
+      "synonyms": [
+        "story configuration",
+        "StoryStep",
+        "content/story.ts"
+      ],
+      "description": "Exports typed story steps and text blocks for the opening sequence, goals blocks, slider question, emphasized statistic, and Donald narrative blocks.",
+      "reqIds": [],
+      "version": 1
+    },
+    {
+      "id": "IF-3",
+      "title": "Stage-based intro state machine with gated progression",
+      "synonyms": [
+        "FlowStage",
+        "Continue gating",
+        "Start CTA stage"
+      ],
+      "description": "IntroFlow advances through explicit stages (opening, opening lines, goals blocks, slider, stat, Donald blocks, complete) and gates progress with Continue/Start buttons rather than auto-advancing between major stages.",
+      "reqIds": [],
+      "version": 1
+    },
+    {
+      "id": "IF-4",
+      "title": "Timed line-by-line reveal for intro text blocks (1000ms)",
+      "synonyms": [
+        "sequential reveal",
+        "LINE_REVEAL_DELAY"
+      ],
+      "description": "Narrative lines are appended to displayedText with a shared 1000ms delay to create a paced reveal across opening lines, goals blocks, and Donald blocks.",
+      "reqIds": [],
+      "version": 1
+    },
+    {
+      "id": "IF-5",
+      "title": "Per-line entrance animation for revealed intro text",
+      "synonyms": [
+        "fade-in + slide-in",
+        "tailwindcss-animate"
+      ],
+      "description": "Each rendered narrative line uses animate-in classes (fade-in, slide-in-from-bottom) to visually emphasize progression as lines appear.",
+      "reqIds": [],
+      "version": 1
+    },
+    {
+      "id": "IF-6",
+      "title": "Opening sequence with initial single line then Continue",
+      "synonyms": [
+        "opening line reveal",
+        "opening-continue"
+      ],
+      "description": "Shows an initial opening line after a short delay, then reveals a Continue button after LINE_REVEAL_DELAY to move into the multi-line opening sequence.",
+      "reqIds": [],
+      "version": 1
+    },
+    {
+      "id": "IF-7",
+      "title": "Opening lines culminate in an in-place “Start now!” CTA",
+      "synonyms": [
+        "merged start CTA",
+        "opening-lines-start"
+      ],
+      "description": "After the final opening line reveals, the flow shows the Start now button on the same screen (after one extra delay), rather than using a separate start stage screen.",
+      "reqIds": [],
+      "version": 1
+    },
+    {
+      "id": "IF-8",
+      "title": "Goals narrative split into two blocks with progressive darkening index",
+      "synonyms": [
+        "goalsBlockA/goalsBlockB",
+        "darkeningIndex progression"
+      ],
+      "description": "Presents two sequential goals text blocks (A then B). Lines marked darkening increment darkeningIndex to drive mood changes, and each block ends with a gated Continue stage.",
+      "reqIds": [],
+      "version": 1
+    },
+    {
+      "id": "IF-9",
+      "title": "Goal stickiness slider question with conditional feedback and delayed Continue",
+      "synonyms": [
+        "1–100 slider",
+        "GoalStickinessQuestion"
+      ],
+      "description": "Renders a slider question; on submit, displays feedback depending on whether the value is between 5–10%, then reveals a Continue button after 1000ms and advances only when pressed.",
+      "reqIds": [],
+      "version": 1
+    },
+    {
+      "id": "IF-10",
+      "title": "Emphasized “8%” statistic stage with Continue gate",
+      "synonyms": [
+        "stat stage",
+        "emphasized copy"
+      ],
+      "description": "Displays the statistic (“Only about 8%…”) in emphasized styling and reveals a Continue button after LINE_REVEAL_DELAY.",
+      "reqIds": [],
+      "version": 1
+    },
+    {
+      "id": "IF-11",
+      "title": "Donald narrative in two timed blocks with selective character image display",
+      "synonyms": [
+        "donald-block-a/b",
+        "stage-specific image"
+      ],
+      "description": "Reveals Donald narrative in two line-by-line blocks, each ending with Continue gating; the Donald image is shown only during donald-block-a stages and hidden during donald-block-b stages.",
+      "reqIds": [],
+      "version": 1
+    },
+    {
+      "id": "IF-12",
+      "title": "Stable intro layout with fixed top padding and top-aligned narrative content",
+      "synonyms": [
+        "top-aligned reveal container",
+        "fixed top margin"
+      ],
+      "description": "Intro content uses a consistent top padding (pt-24) and a top-aligned text container so previously revealed lines remain visually stationary as new lines appear (layout-only behavior).",
+      "reqIds": [],
+      "version": 1
+    },
+    {
+      "id": "IF-13",
+      "title": "Progressive intro background gradients with smooth crossfade transitions",
+      "synonyms": [
+        "OKLCH gradient progression",
+        "introBackground crossfade"
+      ],
+      "description": "Computes a background gradient from darkeningIndex/total steps and crossfades between previous and next gradients using layered divs and opacity transitions.",
+      "reqIds": [],
+      "version": 1
+    },
+    {
+      "id": "IF-14",
+      "title": "Intro completion triggers delayed transition into the game",
+      "synonyms": [
+        "complete stage",
+        "delayed onComplete"
+      ],
+      "description": "After the final Donald block Continue, the flow enters a complete stage and calls onComplete after ~2 seconds to switch into gameplay.",
+      "reqIds": [],
+      "version": 1
+    },
+    {
+      "id": "IF-15",
+      "title": "Canvas-based 2D vertical-scrolling terrain renderer",
+      "synonyms": [
+        "2D canvas scene",
+        "striped scrolling background"
+      ],
+      "description": "GameView renders a 500×600 canvas and draws a vertically scrolling striped brown background plus looping rock obstacles based on scrollOffset.",
+      "reqIds": [],
+      "version": 1
+    },
+    {
+      "id": "IF-16",
+      "title": "requestAnimationFrame game loop producing scroll offset",
+      "synonyms": [
+        "useGameLoop",
+        "RAF loop"
+      ],
+      "description": "useGameLoop runs a requestAnimationFrame loop that increments scrollOffset continuously to drive background/terrain scrolling.",
+      "reqIds": [],
+      "version": 1
+    },
+    {
+      "id": "IF-17",
+      "title": "Pixel-art sprite loading and rendering with smoothing disabled",
+      "synonyms": [
+        "Donald sprite",
+        "pixelated rendering"
+      ],
+      "description": "Loads /assets/generated/donald-pixel.dim_64x64.png and renders it at 64×64 with imageSmoothingEnabled disabled for crisp pixel art.",
+      "reqIds": [],
+      "version": 1
+    },
+    {
+      "id": "IF-18",
+      "title": "Keyboard controls: arrow-key movement + Space action callback",
+      "synonyms": [
+        "useKeyboardControls",
+        "movement flags"
+      ],
+      "description": "Tracks arrow key pressed state via keydown/keyup events and triggers a provided callback on Space (with preventDefault). Event listeners are cleaned up on unmount.",
+      "reqIds": [],
+      "version": 1
+    },
+    {
+      "id": "IF-19",
+      "title": "Bounded character movement within the canvas",
+      "synonyms": [
+        "movement clamp",
+        "player bounds"
+      ],
+      "description": "Updates the character position based on movement flags while clamping to canvas boundaries so the sprite remains fully visible.",
+      "reqIds": [],
+      "version": 1
+    },
+    {
+      "id": "IF-20",
+      "title": "Random joke speech balloon triggered by Space",
+      "synonyms": [
+        "spacebar jokes",
+        "jokes list"
+      ],
+      "description": "Pressing Space selects a random joke from a fixed list and displays it in a speech balloon above the character for ~3 seconds.",
+      "reqIds": [],
+      "version": 1
+    },
+    {
+      "id": "IF-21",
+      "title": "Speech balloon component with bounds-aware positioning and tail",
+      "synonyms": [
+        "speech bubble",
+        "balloon clamp"
+      ],
+      "description": "SpeechBalloon absolutely positions itself over the canvas area, clamps horizontal placement to remain within canvas bounds, and draws a tail aligned to the character position.",
+      "reqIds": [],
+      "version": 1
+    },
+    {
+      "id": "IF-22",
+      "title": "Tailwind theming with OKLCH tokens and pixelated utility",
+      "synonyms": [
+        "design tokens",
+        "CSS variables theme"
+      ],
+      "description": "Tailwind is configured to use OKLCH CSS variables for theming; global CSS defines light/dark tokens, a custom bounce animation, and a pixelated image-rendering utility.",
+      "reqIds": [],
+      "version": 1
+    },
+    {
+      "id": "IF-23",
+      "title": "Internet Identity authentication provider and hook",
+      "synonyms": [
+        "II auth",
+        "AuthClient context",
+        "useInternetIdentity"
+      ],
+      "description": "InternetIdentityProvider initializes and restores AuthClient identity, supports login/logout, validates delegation, and exposes identity and status flags through context and the useInternetIdentity hook.",
+      "reqIds": [],
+      "version": 1
+    },
+    {
+      "id": "IF-24",
+      "title": "Backend actor creation and caching via React Query",
+      "synonyms": [
+        "useActor",
+        "actor factory/caching"
+      ],
+      "description": "useActor creates an anonymous actor when unauthenticated or an identity-bound actor when authenticated; caches it indefinitely keyed by principal and invalidates/refetches other queries when the actor changes.",
+      "reqIds": [],
+      "version": 1
+    },
+    {
+      "id": "IF-25",
+      "title": "App bootstrap with React Query and Internet Identity providers",
+      "synonyms": [
+        "main.tsx providers",
+        "QueryClientProvider"
+      ],
+      "description": "main.tsx mounts the app into #root, wrapping it with QueryClientProvider and InternetIdentityProvider and importing global styles.",
+      "reqIds": [],
+      "version": 1
+    },
+    {
+      "id": "feature-add-an-additional-25vh-top-offset-to-the-intro-narrative-layout-on-top-of-the-existing-fixed-top-padding-so-that-all-introflow-stages-opening-goals-slider-question-stat-donald-blocks-start-lower-on-the-screen-while-remaining-top-aligned-and-stable-no-layout-shifting-between-stages",
+      "title": "Add an additional 25vh top offset to the intro narrative layout (on top of the existing fixed top padding) so that all IntroFlow stages (opening, goals, slider question, stat, Donald blocks) start lower on the screen while remaining top-aligned and stable (no layout shifting between stages).",
       "reqIds": [
         "REQ-1"
       ],
       "version": 1
     },
     {
-      "id": "feature-create-a-fun-soft-color-gradient-background-no-images-for-the-opening-story-section-and-then-gradually-transition-the-background-to-a-darker-gloomier-color-scheme-as-each-new-text-appears-during-the-specified-portion-of-the-story",
-      "title": "Create a fun, soft color gradient background (no images) for the opening story section, and then gradually transition the background to a darker, gloomier color scheme as each new text appears during the specified portion of the story.",
+      "id": "feature-update-styling-for-a-every-button-labeled-continue-across-the-intro-flow-and-b-the-submit-button-on-the-slider-question-screen-to-use-a-unified-pill-style-border-radius-100px-transparent-background-1px-solid-border-with-the-border-color-matching-the-current-text-color",
+      "title": "Update styling for (a) every button labeled \"Continue\" across the intro flow and (b) the \"Submit\" button on the slider question screen to use a unified pill style: border-radius 100px, transparent background, 1px solid border, with the border color matching the current text color.",
       "reqIds": [
         "REQ-2"
       ],
       "version": 1
     },
     {
-      "id": "feature-add-a-colorful-bouncy-start-now-button-that-appears-at-the-specified-point-in-the-story-and-must-be-clicked-to-continue-the-narrative",
-      "title": "Add a colorful, bouncy \"Start now!\" button that appears at the specified point in the story and must be clicked to continue the narrative.",
+      "id": "feature-adjust-the-2d-canvas-game-movement-and-camera-feel-to-be-closer-to-classic-zelda-style-top-down-movement-while-keeping-the-map-progressing-top-to-bottom-scope-is-movement-camera-feel-only-do-not-add-enemies-combat-collisions-or-obstacle-handling-keep-a-zelda-inspired-brown-terrain-aesthetic",
+      "title": "Adjust the 2D canvas game movement and camera feel to be closer to classic Zelda-style top-down movement while keeping the map progressing top-to-bottom. Scope is movement + camera feel only: do not add enemies, combat, collisions, or obstacle handling. Keep a Zelda-inspired brown terrain aesthetic.",
       "reqIds": [
         "REQ-3"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-implement-the-do-you-know-how-many-people-stick-to-their-goals-interaction-with-a-1-100-slider-and-a-submit-button-after-submission-show-conditional-feedback-if-the-selected-value-is-between-5-and-10-inclusive-show-the-that-s-correct-message-otherwise-show-the-alternate-that-s-a-good-guess-message-then-continue-the-story-and-emphasize-the-line-only-about-8-of-people-manage-to-fulfill-their-goals",
-      "title": "Implement the \"Do you know how many people stick to their goals?\" interaction with a 1–100% slider and a \"Submit\" button. After submission, show conditional feedback: if the selected value is between 5% and 10% inclusive, show the \"That’s correct...\" message; otherwise show the alternate \"That’s a good guess...\" message. Then continue the story and emphasize the line \"Only about 8% of people manage to fulfill their goals.\"",
-      "reqIds": [
-        "REQ-4"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-after-the-intro-narrative-transition-into-a-2d-gameplay-segment-where-a-player-controls-a-character-on-a-mostly-vertical-playfield-the-map-scrolls-from-top-to-bottom-over-time-and-the-map-s-color-scheme-is-brown",
-      "title": "After the intro narrative, transition into a 2D gameplay segment where a player controls a character on a mostly vertical playfield; the map scrolls from top to bottom over time, and the map’s color scheme is brown.",
-      "reqIds": [
-        "REQ-5"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-implement-keyboard-controls-in-the-2d-segment-arrow-keys-move-the-character-pressing-space-triggers-a-random-joke-chosen-from-an-in-app-array-of-5-jokes-and-displays-the-joke-as-a-speech-balloon-emerging-from-the-character",
-      "title": "Implement keyboard controls in the 2D segment: arrow keys move the character. Pressing Space triggers a random joke chosen from an in-app array of 5 jokes, and displays the joke as a speech balloon emerging from the character.",
-      "reqIds": [
-        "REQ-6"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-establish-a-coherent-distinct-visual-theme-for-the-entire-app-colors-typography-spacing-and-component-styling-that-fits-a-reflective-story-based-self-improvement-game-and-is-applied-consistently-across-the-intro-narrative-ui-and-the-2d-segment-ui-overlay-do-not-use-a-blue-purple-primary-palette",
-      "title": "Establish a coherent, distinct visual theme for the entire app (colors, typography, spacing, and component styling) that fits a reflective, story-based self-improvement game and is applied consistently across the intro narrative UI and the 2D segment UI overlay. Do not use a blue/purple primary palette.",
-      "reqIds": [
-        "REQ-7"
       ],
       "version": 1
     }
@@ -63,38 +309,48 @@
   "new_feature_requests": [
     {
       "id": "AR-1",
-      "summary": "Implement the intro story exactly as provided, including soft gradient background, progressive darker background transitions per text, and a clickable 'Start now!' button to advance.",
+      "summary": "Intro: add additional 25vh top margin/offset on top of existing top-aligned padding for all narrative text screens",
       "reqIds": [],
       "status": "pending"
     },
     {
       "id": "AR-2",
-      "summary": "Add goal-retention slider interaction (1–100%) with Submit button and branching response text (special case for 5–10%; otherwise alternate message), then continue the scripted narrative about 'Only about 8%' and introducing Donald.",
+      "summary": "UI: unify styling for Continue buttons and the slider question Submit button (pill radius 100px, transparent bg, 1px solid border matching font color)",
       "reqIds": [],
       "status": "pending"
     },
     {
       "id": "AR-3",
-      "summary": "Create a 2D vertical-scrolling gameplay segment (map moves top-to-bottom) with a brown color scheme and player-controlled character.",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-4",
-      "summary": "Implement controls: arrow keys move character; spacebar tells a random joke chosen from an array of 5 and displays it as a speech balloon from the character.",
+      "summary": "Game: adjust 2D gameplay feel toward classic Zelda-style top-down movement + camera feel while keeping vertical top-to-bottom progression and brown Zelda-inspired terrain; no enemies/combat/collisions/obstacles",
       "reqIds": [],
       "status": "pending"
     }
   ],
-  "architecturalNotes": [
-    "Implementation approach: use React + TypeScript with Tailwind CSS for UI/visual styling; keep story text exactly as written and structure game flow for future expansion."
+  "architectural_notes": [
+    "React + TypeScript SPA organized by feature folders (features/intro, features/game) with shared hooks (hooks/*) and centralized story content (content/story.ts).",
+    "IntroFlow is implemented as a stage-based UI state machine (FlowStage union) driven by multiple useEffect timers for sequential line reveals and gated progression.",
+    "Story copy and metadata are centralized in typed data (StoryStep and exported step arrays) and consumed by IntroFlow.",
+    "Intro background mood progression uses OKLCH linear-gradients computed by getBackgroundGradient() and crossfaded via layered absolutely-positioned divs with CSS opacity transitions.",
+    "Game rendering is imperative HTML canvas drawing in GameView, driven by a requestAnimationFrame loop exposed by useGameLoop().",
+    "Keyboard input is encapsulated in useKeyboardControls(), attaching window-level keydown/keyup listeners and exposing movement booleans plus a Space callback.",
+    "UI styling uses Tailwind CSS with CSS-variable OKLCH tokens, shadcn/ui components (Button, Slider), and tailwindcss-animate for reveal animations.",
+    "ICP scaffolding: InternetIdentityProvider manages AuthClient lifecycle, identity restore, login/logout, and status flags; useActor creates an anonymous vs authenticated actor and caches it with React Query, invalidating other queries when identity changes.",
+    "UI change request: apply a unified pill-outline button style specifically to all Continue CTAs and the slider question Submit button (not to other CTAs like Start now!).",
+    "Gameplay direction change: evolve the canvas game from simple vertical scroller toward a Zelda-like top-down movement + camera feel while retaining a vertically progressing world and brown terrain palette."
   ],
-  "knownIssues": [],
+  "known_issues": [
+    "Game movement is updated only when movement state changes (keydown/keyup). Continuous movement speed can depend on OS key-repeat behavior; movement is not updated per animation frame while a key is held.",
+    "useGameLoop computes deltaTime but does not use it; scrolling speed is frame-rate dependent (pixels per frame) rather than time-based.",
+    "GameView joke display uses setTimeout without canceling prior timers; repeated Space presses can cause earlier timers to clear newer jokes unexpectedly.",
+    "Keyboard listeners are attached to window; input is not scoped to canvas focus despite the canvas having tabIndex, and preventDefault on arrow keys/space can interfere with page-level behavior.",
+    "IntroFlow opening stage nests a setTimeout and returns a cleanup function inside the timeout callback (ineffective); the inner continueTimer may not be cleared on stage change/unmount.",
+    "Duplicate global CSS files exist (frontend/index.css and frontend/src/index.css) with different token sets; only src/index.css is imported, but the extra file can cause confusion.",
+    "Backend canister (backend/main.mo) is an empty actor with no methods; frontend actor/auth scaffolding exists but has nothing to call.",
+    "Internet Identity configuration depends on process.env.II_URL; if unset/misconfigured, login may not work as expected."
+  ],
   "isFixRequest": false,
   "gameProjectType": "2d",
   "projectName": "Story-based goal-setting game intro flow + vertical-scrolling 2D segment with jokes",
-  "clarification_mode": "pro",
-  "clarification_rounds": 0,
-  "requiresBackendChanges": false,
-  "requiresFrontendChanges": true
+  "clarification_mode": "instant",
+  "clarification_rounds": 0
 }
