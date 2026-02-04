@@ -2,10 +2,10 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-add-an-additional-25vh-top-offset-to-the-intro-narrative-layout-on-top-of-the-existing-fixed-top-padding-so-that-all-introflow-stages-opening-goals-slider-question-stat-donald-blocks-start-lower-on-the-screen-while-remaining-top-aligned-and-stable-no-layout-shifting-between-stages",
-      "featureTitle": "Add an additional 25vh top offset to the intro narrative layout (on top of the existing fixed top padding) so that all IntroFlow stages (opening, goals, slider question, stat, Donald blocks) start lower on the screen while remaining top-aligned and stable (no layout shifting between stages).",
+      "featureId": "feature-adjust-collectible-generation-so-that-the-first-collectible-star-the-player-encounters-is-placed-meaningfully-farther-from-the-player-spawn-position-so-it-is-not-reachable-immediately-after-starting-the-game",
+      "featureTitle": "Adjust collectible generation so that the first collectible star the player encounters is placed meaningfully farther from the player spawn position, so it is not reachable immediately after starting the game.",
       "files": [
-        "frontend/src/features/intro/IntroFlow.tsx"
+        "frontend/src/features/game/worldMap.ts"
       ],
       "components": [
         "core-infrastructure@1.0.2",
@@ -15,16 +15,15 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-1"
+        "REQ-11"
       ],
       "confidence": "high"
     },
     {
-      "featureId": "feature-update-styling-for-a-every-button-labeled-continue-across-the-intro-flow-and-b-the-submit-button-on-the-slider-question-screen-to-use-a-unified-pill-style-border-radius-100px-transparent-background-1px-solid-border-with-the-border-color-matching-the-current-text-color",
-      "featureTitle": "Update styling for (a) every button labeled \"Continue\" across the intro flow and (b) the \"Submit\" button on the slider question screen to use a unified pill style: border-radius 100px, transparent background, 1px solid border, with the border color matching the current text color.",
+      "featureId": "feature-update-the-gameplay-controls-legend-text-under-the-canvas-to-change-the-phrase-space-to-act-collect-stars-to-space-to-act",
+      "featureTitle": "Update the gameplay controls legend text under the canvas to change the phrase “Space to act & collect stars” to “Space to act”.",
       "files": [
-        "frontend/src/features/intro/GoalStickinessQuestion.tsx",
-        "frontend/src/features/intro/IntroFlow.tsx"
+        "frontend/src/features/game/GameView.tsx"
       ],
       "components": [
         "core-infrastructure@1.0.2",
@@ -34,26 +33,7 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-2"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-adjust-the-2d-canvas-game-movement-and-camera-feel-to-be-closer-to-classic-zelda-style-top-down-movement-while-keeping-the-map-progressing-top-to-bottom-scope-is-movement-camera-feel-only-do-not-add-enemies-combat-collisions-or-obstacle-handling-keep-a-zelda-inspired-brown-terrain-aesthetic",
-      "featureTitle": "Adjust the 2D canvas game movement and camera feel to be closer to classic Zelda-style top-down movement while keeping the map progressing top-to-bottom. Scope is movement + camera feel only: do not add enemies, combat, collisions, or obstacle handling. Keep a Zelda-inspired brown terrain aesthetic.",
-      "files": [
-        "frontend/src/features/game/GameView.tsx",
-        "frontend/src/features/game/useGameLoop.ts"
-      ],
-      "components": [
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-3"
+        "REQ-12"
       ],
       "confidence": "high"
     }

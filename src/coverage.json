@@ -1,49 +1,34 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-03T21:47:53.738Z",
+  "generatedAt": "2026-02-04T00:52:42.915Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
-    "total": 3,
-    "implemented": 3,
+    "total": 2,
+    "implemented": 2,
     "items": [
       {
-        "id": "REQ-1",
-        "summary": "Add an additional 25vh top offset to the intro narrative layout (on top of the existing fixed top padding) so that all IntroFlow stages (opening, goals, slider question, stat, Donald blocks) start lower on the screen while remaining top-aligned and stable (no layout shifting between stages).",
+        "id": "REQ-11",
+        "summary": "Adjust collectible generation so that the first collectible star the player encounters is placed meaningfully farther from the player spawn position, so it is not reachable immediately after starting the game.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/features/intro/IntroFlow.tsx"
+          "frontend/src/features/game/worldMap.ts"
         ],
         "matchedFiles": [
-          "frontend/src/features/intro/IntroFlow.tsx"
+          "frontend/src/features/game/worldMap.ts"
         ]
       },
       {
-        "id": "REQ-2",
-        "summary": "Update styling for (a) every button labeled \"Continue\" across the intro flow and (b) the \"Submit\" button on the slider question screen to use a unified pill style: border-radius 100px, transparent background, 1px solid border, with the border color matching the current text color.",
+        "id": "REQ-12",
+        "summary": "Update the gameplay controls legend text under the canvas to change the phrase “Space to act & collect stars” to “Space to act”.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/features/intro/IntroFlow.tsx",
-          "frontend/src/features/intro/GoalStickinessQuestion.tsx"
-        ],
-        "matchedFiles": [
-          "frontend/src/features/intro/IntroFlow.tsx",
-          "frontend/src/features/intro/GoalStickinessQuestion.tsx"
-        ]
-      },
-      {
-        "id": "REQ-3",
-        "summary": "Adjust the 2D canvas game movement and camera feel to be closer to classic Zelda-style top-down movement while keeping the map progressing top-to-bottom. Scope is movement + camera feel only: do not add enemies, combat, collisions, or obstacle handling. Keep a Zelda-inspired brown terrain aesthetic.",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/features/game/useGameLoop.ts",
           "frontend/src/features/game/GameView.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/features/game/useGameLoop.ts",
           "frontend/src/features/game/GameView.tsx"
         ]
       }
@@ -55,9 +40,7 @@
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
     "frontend/src/features/game/GameView.tsx",
-    "frontend/src/features/game/useGameLoop.ts",
-    "frontend/src/features/intro/GoalStickinessQuestion.tsx",
-    "frontend/src/features/intro/IntroFlow.tsx",
+    "frontend/src/features/game/worldMap.ts",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",

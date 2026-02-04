@@ -7,7 +7,11 @@ interface Movement {
   down: boolean;
 }
 
-export function useKeyboardControls(onSpacePress: () => void) {
+export function useKeyboardControls(
+  onSpacePress: () => void,
+  onJokePress: () => void,
+  canvasRef: React.RefObject<HTMLCanvasElement | null>
+) {
   const [movement, setMovement] = useState<Movement>({
     left: false,
     right: false,
@@ -38,27 +42,35 @@ export function useKeyboardControls(onSpacePress: () => void) {
           e.preventDefault();
           onSpacePress();
           break;
+        case 'j':
+        case 'J':
+          e.preventDefault();
+          onJokePress();
+          break;
       }
     },
-    [onSpacePress]
+    [onSpacePress, onJokePress]
   );
 
-  const handleKeyUp = useCallback((e: KeyboardEvent) => {
-    switch (e.key) {
-      case 'ArrowLeft':
-        setMovement((prev) => ({ ...prev, left: false }));
-        break;
-      case 'ArrowRight':
-        setMovement((prev) => ({ ...prev, right: false }));
-        break;
-      case 'ArrowUp':
-        setMovement((prev) => ({ ...prev, up: false }));
-        break;
-      case 'ArrowDown':
-        setMovement((prev) => ({ ...prev, down: false }));
-        break;
-    }
-  }, []);
+  const handleKeyUp = useCallback(
+    (e: KeyboardEvent) => {
+      switch (e.key) {
+        case 'ArrowLeft':
+          setMovement((prev) => ({ ...prev, left: false }));
+          break;
+        case 'ArrowRight':
+          setMovement((prev) => ({ ...prev, right: false }));
+          break;
+        case 'ArrowUp':
+          setMovement((prev) => ({ ...prev, up: false }));
+          break;
+        case 'ArrowDown':
+          setMovement((prev) => ({ ...prev, down: false }));
+          break;
+      }
+    },
+    []
+  );
 
   useEffect(() => {
     window.addEventListener('keydown', handleKeyDown);

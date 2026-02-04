@@ -1,76 +1,51 @@
 {
   "kind": "build_request",
-  "title": "Intro spacing + unified Continue/Submit button style + Zelda-like top-down movement/camera feel",
+  "title": "Move first star farther from spawn + update Space controls legend",
   "priority": "normal",
   "requirements": [
     {
-      "id": "REQ-1",
-      "text": "Add an additional 25vh top offset to the intro narrative layout (on top of the existing fixed top padding) so that all IntroFlow stages (opening, goals, slider question, stat, Donald blocks) start lower on the screen while remaining top-aligned and stable (no layout shifting between stages).",
+      "id": "REQ-11",
+      "text": "Adjust collectible generation so that the first collectible star the player encounters is placed meaningfully farther from the player spawn position, so it is not reachable immediately after starting the game.",
       "target": "frontend",
       "source": {
         "messageIds": [
           "msg-1"
         ],
         "quotes": [
-          "1. Cool, now just add a `25 vh` margin from top",
-          "1. add on top of that"
+          "Move the first star a bit further away from the starting point."
         ]
       },
       "acceptanceCriteria": [
-        "All intro stages rendered by `frontend/src/features/intro/IntroFlow.tsx` have an additional 25vh spacing from the top in addition to the existing top padding.",
-        "The top offset is applied consistently across stages including the slider question stage (`GoalStickinessQuestion`).",
-        "No stage introduces extra vertical jumping/shifting compared to the current stable layout behavior."
+        "On a fresh game load, the closest uncollected star is not within immediate reach of the spawn area (i.e., the player must travel noticeably downward before encountering the first star).",
+        "The game still generates 7 total collectible stars and they remain inside the corridor and not intersecting obstacles."
       ]
     },
     {
-      "id": "REQ-2",
-      "text": "Update styling for (a) every button labeled \"Continue\" across the intro flow and (b) the \"Submit\" button on the slider question screen to use a unified pill style: border-radius 100px, transparent background, 1px solid border, with the border color matching the current text color.",
+      "id": "REQ-12",
+      "text": "Update the gameplay controls legend text under the canvas to change the phrase “Space to act & collect stars” to “Space to act”.",
       "target": "frontend",
       "source": {
         "messageIds": [
           "msg-1"
         ],
         "quotes": [
-          "Change the style of the \"Continue\" buttons (unified style for all butons) - border-radius: 100px, background: transparent, border: 1px solid, border color: {same as font color}",
-          "2. only \"continue\" buttons and \"Submit\" button in the question screen"
+          "change \"Space to act & collect stars\" to \"Space to act\""
         ]
       },
       "acceptanceCriteria": [
-        "All \"Continue\" buttons in `frontend/src/features/intro/IntroFlow.tsx` use the unified pill style (rounded 100px, transparent background, 1px solid border using current text color).",
-        "\"Submit\" in `frontend/src/features/intro/GoalStickinessQuestion.tsx` uses the same unified pill style.",
-        "Other CTAs (e.g., the start CTA in the opening lines) are not changed by this requirement."
-      ]
-    },
-    {
-      "id": "REQ-3",
-      "text": "Adjust the 2D canvas game movement and camera feel to be closer to classic Zelda-style top-down movement while keeping the map progressing top-to-bottom. Scope is movement + camera feel only: do not add enemies, combat, collisions, or obstacle handling. Keep a Zelda-inspired brown terrain aesthetic.",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-1"
-        ],
-        "quotes": [
-          "The gameplay mechanics should be something similar to old Legend of Zelda gameplay. Just that the map progresses and makes the player move from top to bottom.",
-          "only movement + camera feel. Also terrain could be something similar to zelda's but in brown color scheme. No need for enemies, collision/obstacle handling."
-        ]
-      },
-      "acceptanceCriteria": [
-        "Character movement is continuous while an arrow key is held (not dependent on OS key-repeat), and movement updates smoothly during gameplay.",
-        "Map scrolling/progression remains top-to-bottom and feels camera-like (i.e., the scene progression feels like a moving world rather than a static screen with occasional jumps).",
-        "The terrain remains brown and Zelda-inspired; no enemy/combat systems are introduced.",
-        "No collision/obstacle physics or blocking behavior is introduced (visual terrain details are allowed but must not block movement)."
+        "The controls legend displays: “Arrow keys to move • Space to act • J to tell a joke”.",
+        "No other gameplay control text is changed."
       ]
     }
   ],
   "constraints": [
-    "Do not edit any files under `frontend/immutablePaths` as defined in SYSTEM_CONTEXT (compose existing UI components instead).",
-    "Backend must remain a single Motoko actor; do not introduce additional backend services.",
-    "Use English for any user-facing text."
+    "Do not edit files under frontend/immutablePaths (compose existing components/hooks instead).",
+    "Keep the backend as a single Motoko actor; no backend changes are required for this request."
   ],
   "nonGoals": [
-    "Adding enemies, combat, quests, inventory, or item pickups.",
-    "Implementing collision detection or obstacle blocking behavior.",
-    "Changing non-specified buttons (e.g., Start/Start now CTA styling) beyond what is required for Continue/Submit."
+    "Do not change star pickup mechanics (it should remain Space-gated with proximity requirement).",
+    "Do not change world generation shape/size beyond repositioning the first star.",
+    "Do not add new collectibles, HUD elements, or new sound/animation work."
   ],
   "imageRequirements": {
     "required": [],

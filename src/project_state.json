@@ -1,28 +1,29 @@
 {
   "schemaVersion": "1.0.0",
-  "projectStateVersion": 3,
-  "summary": "A React + TypeScript single-page app that presents a multi-stage, story-driven intro experience (timed line-by-line narrative reveals with bottom-up fade-in, gated Continue/Start interactions, a goal “stickiness” slider question with conditional feedback, an emphasized “8%” statistic, colder progressively darkening/cooling background gradients, and a fixed top-aligned layout with additional ~25vh top offset) and then transitions into a simple 2D canvas game. The game currently shows a vertically progressing, brown, Zelda-inspired top-down terrain with a camera-like feel; the player controls a redesigned humanoid pixel-art character with the arrow keys and can press Space to display a random joke in a speech balloon. The codebase also contains scaffolding for Dfinity Internet Identity authentication and React Query-based backend actor creation/caching, while the Motoko backend canister is currently empty.",
+  "projectStateVersion": 52,
+  "summary": "A React + TypeScript single-page app with a story-driven, multi-stage intro experience (timed narrative reveals, user-gated progression, and mood-darkening gradient transitions plus a slider-based question) that transitions into a small 2D top-down canvas game. In the game, the player moves a Donald pixel character through a narrow, strictly linear, downward-progressing corridor world with gentle curves, while a smooth camera follows; obstacles block movement via collisions with wall-sliding; pressing Space shows a random joke in a timed speech balloon overlay. The repo also includes scaffolding for Internet Identity authentication and identity-aware backend actor creation via React Query, plus a reusable build-template directory containing ICP canister configs, frontend tooling, shadcn/ui component set, and deploy/build scripts for packaging/export.",
   "existing_features": [
     {
       "id": "IF-1",
-      "title": "App flow: intro narrative transitions into gameplay",
+      "title": "Intro-to-game app flow switch",
       "synonyms": [
-        "intro-to-game transition",
-        "gameStarted toggle"
+        "gameStarted toggle",
+        "IntroFlow onComplete",
+        "App conditional rendering"
       ],
-      "description": "The root App component conditionally renders IntroFlow until completion, then switches to GameView via local state toggled by the IntroFlow onComplete callback.",
+      "description": "The top-level App component initially shows the IntroFlow narrative sequence and switches to the canvas GameView after IntroFlow calls onComplete.",
       "reqIds": [],
       "version": 1
     },
     {
       "id": "IF-2",
-      "title": "Centralized typed story content for intro stages",
+      "title": "Centralized typed story content model",
       "synonyms": [
-        "story configuration",
-        "StoryStep",
-        "content/story.ts"
+        "StoryStep model",
+        "content/story.ts",
+        "story configuration"
       ],
-      "description": "Exports typed story steps and text blocks for the opening sequence, goals blocks, slider question, emphasized statistic, and Donald narrative blocks.",
+      "description": "Intro narrative copy and step metadata (opening lines, goal blocks, slider prompt, statistic step, Donald narrative blocks) are centralized in typed exports for consistent sequencing and rendering.",
       "reqIds": [],
       "version": 1
     },
@@ -30,327 +31,564 @@
       "id": "IF-3",
       "title": "Stage-based intro state machine with gated progression",
       "synonyms": [
-        "FlowStage",
-        "Continue gating",
-        "Start CTA stage"
+        "FlowStage union",
+        "Continue gates",
+        "Start stage"
       ],
-      "description": "IntroFlow advances through explicit stages (opening, opening lines, goals blocks, slider, stat, Donald blocks, complete) and gates progress with Continue/Start buttons rather than auto-advancing between major stages.",
+      "description": "IntroFlow drives the intro via an explicit stage union, showing Continue/Start actions at specific points rather than auto-advancing the whole sequence.",
       "reqIds": [],
       "version": 1
     },
     {
       "id": "IF-4",
-      "title": "Timed line-by-line reveal for intro text blocks (1000ms)",
+      "title": "Timed line-by-line narrative reveal with entrance animations",
       "synonyms": [
         "sequential reveal",
-        "LINE_REVEAL_DELAY"
+        "LINE_REVEAL_DELAY",
+        "fade-in + slide-in"
       ],
-      "description": "Narrative lines are appended to displayedText with a shared 1000ms delay to create a paced reveal across opening lines, goals blocks, and Donald blocks.",
+      "description": "Intro text is revealed one line at a time using timers (1000ms cadence) and animated in using Tailwind animation classes to emphasize progression.",
       "reqIds": [],
       "version": 1
     },
     {
       "id": "IF-5",
-      "title": "Per-line entrance animation for revealed intro text",
+      "title": "Progressive intro background mood darkening via gradient crossfade",
       "synonyms": [
-        "fade-in + slide-in",
-        "tailwindcss-animate"
+        "OKLCH gradient progression",
+        "darkeningIndex",
+        "getBackgroundGradient"
       ],
-      "description": "Each rendered narrative line uses animate-in classes (fade-in, slide-in-from-bottom) to visually emphasize progression as lines appear.",
+      "description": "As story steps marked with darkening are revealed, the background transitions from a light/fun gradient to darker, colder hues using a computed OKLCH gradient and a crossfaded two-layer background.",
       "reqIds": [],
       "version": 1
     },
     {
       "id": "IF-6",
-      "title": "Opening sequence with initial single line then Continue",
+      "title": "Goal stickiness slider question with conditional feedback and delayed Continue",
       "synonyms": [
-        "opening line reveal",
-        "opening-continue"
+        "GoalStickinessQuestion",
+        "1–100 slider",
+        "feedback gating"
       ],
-      "description": "Shows an initial opening line after a short delay, then reveals a Continue button after LINE_REVEAL_DELAY to move into the multi-line opening sequence.",
+      "description": "A slider question accepts a 1–100% guess, shows conditional feedback (\"correct\" if 5–10%), then reveals a Continue button after a short delay; advancing requires explicit Continue.",
       "reqIds": [],
       "version": 1
     },
     {
       "id": "IF-7",
-      "title": "Opening lines culminate in an in-place “Start now!” CTA",
+      "title": "Emphasized statistic stage with timed Continue gate",
       "synonyms": [
-        "merged start CTA",
-        "opening-lines-start"
+        "8% statistic",
+        "stat emphasis"
       ],
-      "description": "After the final opening line reveals, the flow shows the Start now button on the same screen (after one extra delay), rather than using a separate start stage screen.",
+      "description": "Displays an emphasized statistic message and then reveals a Continue button after the standard delay.",
       "reqIds": [],
       "version": 1
     },
     {
       "id": "IF-8",
-      "title": "Goals narrative split into two blocks with progressive darkening index",
+      "title": "Stage-specific Donald sprite in intro",
       "synonyms": [
-        "goalsBlockA/goalsBlockB",
-        "darkeningIndex progression"
+        "donald-block-a image",
+        "pixelated sprite"
       ],
-      "description": "Presents two sequential goals text blocks (A then B). Lines marked darkening increment darkeningIndex to drive mood changes, and each block ends with a gated Continue stage.",
+      "description": "Shows the Donald pixel sprite only during the first Donald narrative block stages, using a pixelated rendering style for crisp pixel art.",
       "reqIds": [],
       "version": 1
     },
     {
       "id": "IF-9",
-      "title": "Goal stickiness slider question with conditional feedback and delayed Continue",
+      "title": "Consistent CTA button styling across intro stages",
       "synonyms": [
-        "1–100 slider",
-        "GoalStickinessQuestion"
+        "pill-outline Continue buttons",
+        "animated Start button"
       ],
-      "description": "Renders a slider question; on submit, displays feedback depending on whether the value is between 5–10%, then reveals a Continue button after 1000ms and advances only when pressed.",
+      "description": "Continue/Submit CTAs share a pill-outline style while the \"Start now!\" CTA is presented as a distinct animated gradient button.",
       "reqIds": [],
       "version": 1
     },
     {
       "id": "IF-10",
-      "title": "Emphasized “8%” statistic stage with Continue gate",
+      "title": "Centered canvas game view with instructions and footer",
       "synonyms": [
-        "stat stage",
-        "emphasized copy"
+        "GameView layout",
+        "game HUD text"
       ],
-      "description": "Displays the statistic (“Only about 8%…”) in emphasized styling and reveals a Continue button after LINE_REVEAL_DELAY.",
+      "description": "Renders a 500×600 canvas in a centered layout with instruction text that changes based on whether the canvas is engaged, plus descriptive text and a footer link.",
       "reqIds": [],
       "version": 1
     },
     {
       "id": "IF-11",
-      "title": "Donald narrative in two timed blocks with selective character image display",
+      "title": "Canvas-scoped keyboard controls with focus indicator",
       "synonyms": [
-        "donald-block-a/b",
-        "stage-specific image"
+        "useKeyboardControls",
+        "arrow keys movement",
+        "Space action",
+        "focus border"
       ],
-      "description": "Reveals Donald narrative in two line-by-line blocks, each ending with Continue gating; the Donald image is shown only during donald-block-a stages and hidden during donald-block-b stages.",
+      "description": "Arrow keys move the character and Space triggers an action only when the canvas is considered focused; the canvas shows a highlighted border when active and movement resets on blur.",
       "reqIds": [],
       "version": 1
     },
     {
       "id": "IF-12",
-      "title": "Stable intro layout with fixed top padding and top-aligned narrative content",
+      "title": "DeltaTime requestAnimationFrame game loop hook",
       "synonyms": [
-        "top-aligned reveal container",
-        "fixed top margin"
+        "useGameLoop",
+        "RAF loop",
+        "frame-independent update"
       ],
-      "description": "Intro content uses a consistent top padding (pt-24) and a top-aligned text container so previously revealed lines remain visually stationary as new lines appear (layout-only behavior).",
+      "description": "Runs a requestAnimationFrame loop, computes deltaTime in seconds, and calls an onUpdate callback for frame-rate-independent simulation and rendering.",
       "reqIds": [],
       "version": 1
     },
     {
       "id": "IF-13",
-      "title": "Progressive intro background gradients with smooth crossfade transitions",
+      "title": "World-space movement clamped to world bounds",
       "synonyms": [
-        "OKLCH gradient progression",
-        "introBackground crossfade"
+        "top-down movement",
+        "clampToWorldBounds"
       ],
-      "description": "Computes a background gradient from darkeningIndex/total steps and crossfades between previous and next gradients using layered divs and opacity transitions.",
+      "description": "Moves the character in world coordinates at a constant pixels-per-second speed and clamps position so the player cannot leave the defined world rectangle.",
       "reqIds": [],
       "version": 1
     },
     {
       "id": "IF-14",
-      "title": "Intro completion triggers delayed transition into the game",
+      "title": "Collision detection against map obstacles",
       "synonyms": [
-        "complete stage",
-        "delayed onComplete"
+        "checkCollision",
+        "OBSTACLES"
       ],
-      "description": "After the final Donald block Continue, the flow enters a complete stage and calls onComplete after ~2 seconds to switch into gameplay.",
+      "description": "Detects rectangle-vs-obstacle overlap against a set of world obstacles (walls, rocks, trees).",
       "reqIds": [],
       "version": 1
     },
     {
       "id": "IF-15",
-      "title": "Canvas-based 2D vertical-scrolling terrain renderer",
+      "title": "Collision resolution with wall-sliding",
       "synonyms": [
-        "2D canvas scene",
-        "striped scrolling background"
+        "axis-separated resolution",
+        "slide along walls",
+        "reduced hitbox margin"
       ],
-      "description": "GameView renders a 500×600 canvas and draws a vertically scrolling striped brown background plus looping rock obstacles based on scrollOffset.",
+      "description": "Prevents passing through obstacles and attempts to resolve collisions by trying X-only movement then Y-only movement to create a smooth sliding feel.",
       "reqIds": [],
       "version": 1
     },
     {
       "id": "IF-16",
-      "title": "requestAnimationFrame game loop producing scroll offset",
+      "title": "Smooth camera follow with bounds clamping",
       "synonyms": [
-        "useGameLoop",
-        "RAF loop"
+        "Zelda-like camera",
+        "camera smoothing",
+        "camera bounds"
       ],
-      "description": "useGameLoop runs a requestAnimationFrame loop that increments scrollOffset continuously to drive background/terrain scrolling.",
+      "description": "A camera position follows the character with smoothing and is clamped so the visible viewport stays within world bounds; rendering applies a camera transform so the character stays near screen center.",
       "reqIds": [],
       "version": 1
     },
     {
       "id": "IF-17",
-      "title": "Pixel-art sprite loading and rendering with smoothing disabled",
+      "title": "Structured world rendering (floor tiles, grid, obstacles)",
       "synonyms": [
-        "Donald sprite",
-        "pixelated rendering"
+        "TILE_REGIONS",
+        "corridor floor rendering",
+        "grid lines"
       ],
-      "description": "Loads /assets/generated/donald-pixel.dim_64x64.png and renders it at 64×64 with imageSmoothingEnabled disabled for crisp pixel art.",
+      "description": "Renders a corridor floor using predefined/generated tile regions, draws subtle horizontal grid lines for structure, and renders obstacles with distinct styles (walls as rectangles; rocks/trees as circles).",
       "reqIds": [],
       "version": 1
     },
     {
       "id": "IF-18",
-      "title": "Keyboard controls: arrow-key movement + Space action callback",
+      "title": "Donald sprite loading with fallback character rendering",
       "synonyms": [
-        "useKeyboardControls",
-        "movement flags"
+        "sprite asset loading",
+        "imageLoaded/imageError",
+        "pixel-art fallback silhouette"
       ],
-      "description": "Tracks arrow key pressed state via keydown/keyup events and triggers a provided callback on Space (with preventDefault). Event listeners are cleaned up on unmount.",
-      "reqIds": [],
-      "version": 1
-    },
-    {
-      "id": "IF-19",
-      "title": "Bounded character movement within the canvas",
-      "synonyms": [
-        "movement clamp",
-        "player bounds"
-      ],
-      "description": "Updates the character position based on movement flags while clamping to canvas boundaries so the sprite remains fully visible.",
+      "description": "Loads the Donald pixel sprite and renders it with image smoothing disabled; if the asset fails to load, draws a pixel-art-like fallback character so gameplay remains visible.",
       "reqIds": [],
       "version": 1
     },
     {
       "id": "IF-20",
-      "title": "Random joke speech balloon triggered by Space",
+      "title": "Speech balloon UI with within-canvas horizontal clamping",
       "synonyms": [
-        "spacebar jokes",
-        "jokes list"
+        "SpeechBalloon clamping",
+        "balloon tail"
       ],
-      "description": "Pressing Space selects a random joke from a fixed list and displays it in a speech balloon above the character for ~3 seconds.",
+      "description": "Renders an animated speech balloon positioned relative to the canvas and clamps its left offset to stay within the canvas width while keeping a tail aligned to the intended x coordinate.",
       "reqIds": [],
       "version": 1
     },
     {
       "id": "IF-21",
-      "title": "Speech balloon component with bounds-aware positioning and tail",
+      "title": "Strictly linear 3-unit-wide downward corridor world map",
       "synonyms": [
-        "speech bubble",
-        "balloon clamp"
+        "linear corridor redesign",
+        "3 map units wide (300px)",
+        "downward-only (+Y) progression"
       ],
-      "description": "SpeechBalloon absolutely positions itself over the canvas area, clamps horizontal placement to remain within canvas bounds, and draws a tail aligned to the character position.",
-      "reqIds": [],
+      "description": "The world map is redesigned into a narrow corridor of exactly 3 map units (300px) wide that progresses downward with gentle horizontal curves and no branches/side areas, guiding players along one route.",
+      "reqIds": [
+        "REQ-9"
+      ],
       "version": 1
     },
     {
       "id": "IF-22",
-      "title": "Tailwind theming with OKLCH tokens and pixelated utility",
+      "title": "Procedural corridor map generation (bounds, floor, walls, interior obstacles)",
       "synonyms": [
-        "design tokens",
-        "CSS variables theme"
+        "worldMap.ts generation",
+        "WORLD_BOUNDS calculation",
+        "wall segments",
+        "interior rocks/trees placements"
       ],
-      "description": "Tailwind is configured to use OKLCH CSS variables for theming; global CSS defines light/dark tokens, a custom bounce animation, and a pixelated image-rendering utility.",
-      "reqIds": [],
+      "description": "Computes world bounds from the corridor centerline path, generates floor tile regions along the corridor, builds wall obstacles along both edges, and places interior rocks/trees relative to the path for variety.",
+      "reqIds": [
+        "REQ-10"
+      ],
       "version": 1
     },
     {
       "id": "IF-23",
-      "title": "Internet Identity authentication provider and hook",
+      "title": "Internet Identity authentication provider and hook (ICP)",
       "synonyms": [
-        "II auth",
+        "InternetIdentityProvider",
         "AuthClient context",
-        "useInternetIdentity"
+        "login/logout"
       ],
-      "description": "InternetIdentityProvider initializes and restores AuthClient identity, supports login/logout, validates delegation, and exposes identity and status flags through context and the useInternetIdentity hook.",
+      "description": "Provides a context-based authentication layer using @dfinity/auth-client, supporting identity restoration on reload, login/logout, delegation validity checks, and status flags for UI control.",
       "reqIds": [],
       "version": 1
     },
     {
       "id": "IF-24",
-      "title": "Backend actor creation and caching via React Query",
+      "title": "Identity-aware backend actor creation and caching via React Query",
       "synonyms": [
         "useActor",
-        "actor factory/caching"
+        "actor factory",
+        "principal-keyed caching"
       ],
-      "description": "useActor creates an anonymous actor when unauthenticated or an identity-bound actor when authenticated; caches it indefinitely keyed by principal and invalidates/refetches other queries when the actor changes.",
+      "description": "Creates an anonymous actor when unauthenticated or an identity-bound actor when authenticated; caches by principal and invalidates/refetches non-actor queries when the actor changes.",
       "reqIds": [],
       "version": 1
     },
     {
       "id": "IF-25",
-      "title": "App bootstrap with React Query and Internet Identity providers",
+      "title": "App bootstrap with React Query + Internet Identity providers",
       "synonyms": [
-        "main.tsx providers",
-        "QueryClientProvider"
+        "main.tsx",
+        "QueryClientProvider",
+        "provider composition"
       ],
-      "description": "main.tsx mounts the app into #root, wrapping it with QueryClientProvider and InternetIdentityProvider and importing global styles.",
+      "description": "Initializes a QueryClient and wraps the app with QueryClientProvider and InternetIdentityProvider before rendering the root App component.",
       "reqIds": [],
       "version": 1
     },
     {
-      "id": "feature-add-an-additional-25vh-top-offset-to-the-intro-narrative-layout-on-top-of-the-existing-fixed-top-padding-so-that-all-introflow-stages-opening-goals-slider-question-stat-donald-blocks-start-lower-on-the-screen-while-remaining-top-aligned-and-stable-no-layout-shifting-between-stages",
-      "title": "Add an additional 25vh top offset to the intro narrative layout (on top of the existing fixed top padding) so that all IntroFlow stages (opening, goals, slider question, stat, Donald blocks) start lower on the screen while remaining top-aligned and stable (no layout shifting between stages).",
+      "id": "IF-26",
+      "title": "Tailwind theming with OKLCH tokens and pixel-art utilities",
+      "synonyms": [
+        "tailwind.config.js",
+        "OKLCH CSS variables",
+        "pixelated utility",
+        "custom bounce animation"
+      ],
+      "description": "Tailwind is configured with OKLCH CSS-variable tokens for consistent theming, typography/container/animation plugins, and global CSS utilities for pixelated rendering and a custom bounce animation.",
+      "reqIds": [],
+      "version": 1
+    },
+    {
+      "id": "IF-27",
+      "title": "Always-active keyboard controls in gameplay (no click-to-focus gating)",
+      "synonyms": [
+        "global controls",
+        "remove canvas focus requirement",
+        "always-on arrow keys"
+      ],
+      "description": "Gameplay keyboard input no longer requires clicking the canvas to activate; arrow keys and Space work without a separate focus/engagement gate.",
       "reqIds": [
-        "REQ-1"
+        "AR-4"
       ],
       "version": 1
     },
     {
-      "id": "feature-update-styling-for-a-every-button-labeled-continue-across-the-intro-flow-and-b-the-submit-button-on-the-slider-question-screen-to-use-a-unified-pill-style-border-radius-100px-transparent-background-1px-solid-border-with-the-border-color-matching-the-current-text-color",
-      "title": "Update styling for (a) every button labeled \"Continue\" across the intro flow and (b) the \"Submit\" button on the slider question screen to use a unified pill style: border-radius 100px, transparent background, 1px solid border, with the border color matching the current text color.",
+      "id": "IF-28",
+      "title": "Gameplay view uses intro-style mood gradient background",
+      "synonyms": [
+        "shared background",
+        "introBackground reuse",
+        "game background gradient"
+      ],
+      "description": "The game screen reuses the same gradient/mood background styling used during the intro, providing a consistent visual backdrop behind the canvas.",
       "reqIds": [
-        "REQ-2"
+        "AR-2"
       ],
       "version": 1
     },
     {
-      "id": "feature-adjust-the-2d-canvas-game-movement-and-camera-feel-to-be-closer-to-classic-zelda-style-top-down-movement-while-keeping-the-map-progressing-top-to-bottom-scope-is-movement-camera-feel-only-do-not-add-enemies-combat-collisions-or-obstacle-handling-keep-a-zelda-inspired-brown-terrain-aesthetic",
-      "title": "Adjust the 2D canvas game movement and camera feel to be closer to classic Zelda-style top-down movement while keeping the map progressing top-to-bottom. Scope is movement + camera feel only: do not add enemies, combat, collisions, or obstacle handling. Keep a Zelda-inspired brown terrain aesthetic.",
+      "id": "IF-29",
+      "title": "Minimal canvas presentation (border/frame removed)",
+      "synonyms": [
+        "remove canvas border",
+        "no frame"
+      ],
+      "description": "The game canvas/view no longer renders with a visible border/frame around it.",
       "reqIds": [
-        "REQ-3"
+        "AR-3"
+      ],
+      "version": 1
+    },
+    {
+      "id": "IF-30",
+      "title": "Gameplay HUD copy cleanup (removed “Follow Donald'y Journey”)",
+      "synonyms": [
+        "remove follow text",
+        "HUD text removal"
+      ],
+      "description": "The extra “Follow Donald'y Journey” text has been removed from the game layout.",
+      "reqIds": [
+        "AR-5"
+      ],
+      "version": 1
+    },
+    {
+      "id": "IF-31",
+      "title": "Controls legend displayed under the canvas",
+      "synonyms": [
+        "controls list",
+        "arrows + space instructions under canvas"
+      ],
+      "description": "The gameplay layout includes a small controls list (arrow keys movement, Space action) under the canvas.",
+      "reqIds": [
+        "AR-6"
+      ],
+      "version": 1
+    },
+    {
+      "id": "IF-32",
+      "title": "Gameplay collision/spawn fix to prevent immediate stuck state",
+      "synonyms": [
+        "fix stuck-on-spawn",
+        "collision resolution fix",
+        "spawn placement fix"
+      ],
+      "description": "Adjusted world/collision/spawn logic to prevent the player from starting overlapped with obstacles/walls and becoming unable to move.",
+      "reqIds": [
+        "AR-1"
+      ],
+      "version": 1
+    },
+    {
+      "id": "IF-34",
+      "title": "Removed gameplay descriptive narrative line under the game",
+      "synonyms": [
+        "remove \"Donald explores the landscape of his ambitions...\"",
+        "game layout text cleanup"
+      ],
+      "description": "The gameplay layout no longer displays the descriptive text line “Donald explores the landscape of his ambitions…”.",
+      "reqIds": [
+        "AR-8"
+      ],
+      "version": 1
+    },
+    {
+      "id": "IF-35",
+      "title": "Rounded corners applied to the full game container (canvas + HUD/controls)",
+      "synonyms": [
+        "rounded game container",
+        "rounded corners around canvas + UI"
+      ],
+      "description": "The game container now has clearly rounded corners applied to the entire module (canvas and accompanying HUD/controls), not just the canvas element.",
+      "reqIds": [
+        "AR-9"
+      ],
+      "version": 1
+    },
+    {
+      "id": "IF-36",
+      "title": "Path-first corridor generation with passability validation",
+      "synonyms": [
+        "passability.ts",
+        "carve/validate lane",
+        "guaranteed continuous path"
+      ],
+      "description": "Corridor generation was reworked to hard-guarantee a continuous passable top-to-bottom lane by generating/validating a walkable path first (passability checks), then decorating with walls/obstacles constrained to never block that guaranteed route.",
+      "reqIds": [
+        "AR-7"
+      ],
+      "version": 1
+    },
+    {
+      "id": "IF-37",
+      "title": "Gameplay controls remap: 'J' for jokes, Space for action animation",
+      "synonyms": [
+        "AR-10 controls update",
+        "joke key J",
+        "Space action/spin"
+      ],
+      "description": "Arrow keys remain movement controls; the random-joke speech balloon is triggered with the 'J' key, and Space is reserved for a character action animation (e.g., spin).",
+      "reqIds": [
+        "AR-10"
+      ],
+      "version": 1
+    },
+    {
+      "id": "IF-39",
+      "title": "Collectibles HUD with unique item tracking (0/7 + stars)",
+      "synonyms": [
+        "CollectiblesHud",
+        "star counter",
+        "unique collectibles"
+      ],
+      "description": "Adds a top-of-container HUD that tracks uniquely collected items (7 total), rendering gold/yellow star indicators and a counter (e.g., \"0 / 7\"). Each collectible can only be collected once.",
+      "reqIds": [
+        "AR-12"
+      ],
+      "version": 1
+    },
+    {
+      "id": "IF-40",
+      "title": "First-movement goals modal (0.2s delayed)",
+      "synonyms": [
+        "GoalsModal delay 0.2s",
+        "first movement trigger timing"
+      ],
+      "description": "In gameplay, after the first detected player movement input, a goals prompt/modal is shown after a 0.2s delay displaying the provided Donald goals title/body text.",
+      "reqIds": [
+        "AR-16"
+      ],
+      "version": 1
+    },
+    {
+      "id": "IF-41",
+      "title": "Collectibles HUD positioned top-right with no border",
+      "synonyms": [
+        "CollectiblesHud top-right",
+        "borderless HUD"
+      ],
+      "description": "The collectibles HUD is rendered in the top-right of the game container and uses a borderless visual style.",
+      "reqIds": [
+        "AR-13"
+      ],
+      "version": 1
+    },
+    {
+      "id": "IF-42",
+      "title": "Space-gated star pickup interaction with proximity requirement",
+      "synonyms": [
+        "press Space to pick up",
+        "near-star pickup",
+        "pickup priority over action"
+      ],
+      "description": "Collectibles/stars are only picked up when the player presses Space while within a close proximity radius of the star; Space still performs the action animation, with pickup handled when in range.",
+      "reqIds": [
+        "AR-15"
+      ],
+      "version": 1
+    },
+    {
+      "id": "IF-43",
+      "title": "World/map scaled to ~2.5× height while keeping corridor width unchanged",
+      "synonyms": [
+        "map scaling 2.5x",
+        "longer corridor"
+      ],
+      "description": "The corridor world height/length is expanded to approximately 2.5× the prior size while keeping the corridor width unchanged.",
+      "reqIds": [
+        "AR-14"
+      ],
+      "version": 1
+    },
+    {
+      "id": "IF-44",
+      "title": "Star pickup sound effect feedback",
+      "synonyms": [
+        "pickup SFX",
+        "useSfx hook"
+      ],
+      "description": "A sound effect is played when a star/collectible is successfully picked up.",
+      "reqIds": [
+        "AR-17"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-adjust-collectible-generation-so-that-the-first-collectible-star-the-player-encounters-is-placed-meaningfully-farther-from-the-player-spawn-position-so-it-is-not-reachable-immediately-after-starting-the-game",
+      "title": "Adjust collectible generation so that the first collectible star the player encounters is placed meaningfully farther from the player spawn position, so it is not reachable immediately after starting the game.",
+      "reqIds": [
+        "REQ-11"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-the-gameplay-controls-legend-text-under-the-canvas-to-change-the-phrase-space-to-act-collect-stars-to-space-to-act",
+      "title": "Update the gameplay controls legend text under the canvas to change the phrase “Space to act & collect stars” to “Space to act”.",
+      "reqIds": [
+        "REQ-12"
       ],
       "version": 1
     }
   ],
   "new_feature_requests": [
     {
-      "id": "AR-1",
-      "summary": "Intro: add additional 25vh top margin/offset on top of existing top-aligned padding for all narrative text screens",
+      "id": "AR-18",
+      "summary": "Move the first collectible star further away from the player starting point",
       "reqIds": [],
       "status": "pending"
     },
     {
-      "id": "AR-2",
-      "summary": "UI: unify styling for Continue buttons and the slider question Submit button (pill radius 100px, transparent bg, 1px solid border matching font color)",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-3",
-      "summary": "Game: adjust 2D gameplay feel toward classic Zelda-style top-down movement + camera feel while keeping vertical top-to-bottom progression and brown Zelda-inspired terrain; no enemies/combat/collisions/obstacles",
+      "id": "AR-19",
+      "summary": "Update controls legend text to change “Space to act & collect stars” to “Space to act”",
       "reqIds": [],
       "status": "pending"
     }
   ],
   "architectural_notes": [
-    "React + TypeScript SPA organized by feature folders (features/intro, features/game) with shared hooks (hooks/*) and centralized story content (content/story.ts).",
-    "IntroFlow is implemented as a stage-based UI state machine (FlowStage union) driven by multiple useEffect timers for sequential line reveals and gated progression.",
-    "Story copy and metadata are centralized in typed data (StoryStep and exported step arrays) and consumed by IntroFlow.",
-    "Intro background mood progression uses OKLCH linear-gradients computed by getBackgroundGradient() and crossfaded via layered absolutely-positioned divs with CSS opacity transitions.",
-    "Game rendering is imperative HTML canvas drawing in GameView, driven by a requestAnimationFrame loop exposed by useGameLoop().",
-    "Keyboard input is encapsulated in useKeyboardControls(), attaching window-level keydown/keyup listeners and exposing movement booleans plus a Space callback.",
-    "UI styling uses Tailwind CSS with CSS-variable OKLCH tokens, shadcn/ui components (Button, Slider), and tailwindcss-animate for reveal animations.",
-    "ICP scaffolding: InternetIdentityProvider manages AuthClient lifecycle, identity restore, login/logout, and status flags; useActor creates an anonymous vs authenticated actor and caches it with React Query, invalidating other queries when identity changes.",
-    "UI change request: apply a unified pill-outline button style specifically to all Continue CTAs and the slider question Submit button (not to other CTAs like Start now!).",
-    "Gameplay direction change: evolve the canvas game from simple vertical scroller toward a Zelda-like top-down movement + camera feel while retaining a vertically progressing world and brown terrain palette."
+    "React + TypeScript SPA with feature-based organization (src/features/intro, src/features/game) and centralized story content (src/content/story.ts).",
+    "IntroFlow is implemented as an explicit stage/state machine (FlowStage union) coordinated by multiple useEffect timers for line-by-line reveals and gated progression.",
+    "Intro mood progression uses OKLCH-based CSS gradients computed in a helper (getBackgroundGradient) and crossfaded via layered full-screen divs with opacity transitions.",
+    "Gameplay rendering is imperative Canvas2D drawing inside a React component; simulation runs in a requestAnimationFrame loop (useGameLoop) with deltaTime in seconds for frame-rate-independent movement.",
+    "Per-frame gameplay state (character position, camera position) is stored in refs to avoid React re-renders; React state is reserved for UI overlays (joke balloon) and asset-load status.",
+    "Keyboard input is encapsulated in a hook (useKeyboardControls) that gates controls behind a canvas focus concept and uses window-level key listeners.",
+    "World geometry (bounds, floor tile regions, obstacles) and physics helpers (clamping, collision) are separated into a dedicated module (worldMap.ts); corridor floor/walls are generated procedurally from a centerline path definition.",
+    "Styling uses Tailwind CSS with OKLCH token theming, tailwindcss-animate, and shadcn/ui primitives (Button, Slider).",
+    "ICP scaffolding: InternetIdentityProvider wraps @dfinity/auth-client; useActor creates/caches an anonymous or identity-bound backend actor using TanStack React Query and invalidates/refetches non-actor queries when the actor changes.",
+    "Repository now includes a build-template/ scaffold for ICP projects: canister YAMLs, deploy/build scripts, frontend tooling (Vite/Tailwind), shadcn/ui component library sources, and custom ESLint rules to enforce Internet Identity provider usage and safe React Query key patterns.",
+    "Gameplay input handling has been simplified so keyboard controls are always active, removing the prior canvas-focus gating concept in useKeyboardControls/GameView.",
+    "GameView now reuses the intro background/gradient system to provide consistent mood styling behind the canvas UI.",
+    "Corridor/obstacle generation must guarantee at least one continuous passable path forward (no full-width impassable walling).",
+    "Gameplay layout: the removable descriptive text (“Donald explores the landscape of his ambitions…”) is located below the game container; rounded corners should apply to the entire game container (canvas + HUD/controls), clearly rounded.",
+    "Corridor wall/obstacle placement is constrained to ensure forward progress by enforcing openings/gaps and preventing any full-width impassable segments in the 3-unit corridor.",
+    "Gameplay layout no longer includes the extra descriptive narrative line beneath the game view; the container styling was updated so rounded corners wrap the entire game module (canvas + HUD/controls).",
+    "Corridor generation should use a path-first approach (carve/validate a continuous passable lane from start to end) and only then decorate with obstacles constrained not to block that guaranteed path; acceptable to rework the generator rather than patching with ad-hoc checks.",
+    "Corridor generation now follows a path-first approach: carve/validate a continuous passable lane, then place walls/obstacles with constraints so they cannot block the validated path (supported by a dedicated passability module).",
+    "Gameplay input mapping updated: jokes are triggered by 'J'; Space is used for a character action animation; movement remains Arrow keys.",
+    "Introduce gameplay progression UI: trigger a modal 0.5s after the first detected player movement input; add a HUD that tracks a set of uniquely collected items (7 total) and renders a 0/7 counter plus star indicators.",
+    "Collectibles HUD implemented as a dedicated component that tracks unique collectible pickups (7 total) and renders star indicators plus a 0/7 counter.",
+    "Star/collectible pickup should be input-gated: pressing Space while within a proximity radius triggers pickup; consider prioritizing pickup over the Space action animation when in range.",
+    "Map scaling clarification: expand world height only by ~2.5× while keeping corridor width unchanged.",
+    "Star pickup interaction clarification: require Space press when almost touching a star; Space should both trigger pickup (when in range) and still perform the action animation.",
+    "First-movement GoalsModal timing updated: trigger after 0.2s (was 0.5s).",
+    "Add SFX hook/asset for star pickup feedback sound.",
+    "Collectibles HUD UI is positioned top-right and rendered borderless within the rounded game container.",
+    "Collectible pickup logic is input-gated: pressing Space while within a tight proximity triggers pickup; Space continues to also trigger the action animation when used.",
+    "World scaling updated to extend corridor/world height by ~2.5× while keeping corridor width unchanged.",
+    "Star pickup plays an SFX; audio/sfx behavior is encapsulated via a small hook/utility and triggered on successful pickup."
   ],
   "known_issues": [
-    "Game movement is updated only when movement state changes (keydown/keyup). Continuous movement speed can depend on OS key-repeat behavior; movement is not updated per animation frame while a key is held.",
-    "useGameLoop computes deltaTime but does not use it; scrolling speed is frame-rate dependent (pixels per frame) rather than time-based.",
-    "GameView joke display uses setTimeout without canceling prior timers; repeated Space presses can cause earlier timers to clear newer jokes unexpectedly.",
-    "Keyboard listeners are attached to window; input is not scoped to canvas focus despite the canvas having tabIndex, and preventDefault on arrow keys/space can interfere with page-level behavior.",
-    "IntroFlow opening stage nests a setTimeout and returns a cleanup function inside the timeout callback (ineffective); the inner continueTimer may not be cleared on stage change/unmount.",
-    "Duplicate global CSS files exist (frontend/index.css and frontend/src/index.css) with different token sets; only src/index.css is imported, but the extra file can cause confusion.",
-    "Backend canister (backend/main.mo) is an empty actor with no methods; frontend actor/auth scaffolding exists but has nothing to call.",
-    "Internet Identity configuration depends on process.env.II_URL; if unset/misconfigured, login may not work as expected."
+    "Camera clamping assumes world bounds are larger than the viewport; with a corridor world that can be narrower than the 500px canvas, horizontal camera clamping can collapse to a constant value (camera X becomes effectively fixed).",
+    "Backend canister (backend/main.mo) is an empty actor with no methods; the auth/actor scaffolding currently has no functional backend API to call.",
+    "Duplicate/global CSS entrypoints exist (frontend/index.css and frontend/src/index.css); only src/index.css is imported by the app, but the extra file can confuse maintenance."
   ],
   "isFixRequest": false,
   "gameProjectType": "2d",
   "projectName": "Story-based goal-setting game intro flow + vertical-scrolling 2D segment with jokes",
-  "clarification_mode": "instant",
+  "clarification_mode": "pro",
   "clarification_rounds": 0
 }

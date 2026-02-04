@@ -1,64 +1,35 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Intro layout spacing, unified Continue/Submit pill buttons, and Zelda-like top-down movement/camera feel",
+  "title": "Space game: push first star farther from spawn and update controls legend",
   "requirements": [
     {
-      "id": "REQ-1",
-      "summary": "Add a consistent additional 25vh top offset to the IntroFlow layout across all stages without introducing layout shifting.",
+      "id": "REQ-11",
+      "summary": "Ensure the first generated collectible star spawns meaningfully farther (downward) from the player spawn so it cannot be reached immediately on a fresh load, while keeping 7 total stars safely inside the corridor.",
       "acceptanceCriteria": [
-        "All intro stages rendered by `frontend/src/features/intro/IntroFlow.tsx` have an additional 25vh spacing from the top in addition to the existing top padding.",
-        "The top offset is applied consistently across stages including the slider question stage (`GoalStickinessQuestion`).",
-        "No stage introduces extra vertical jumping/shifting compared to the current stable layout behavior."
+        "On a fresh game load, the closest uncollected star is not within immediate reach of the spawn area (i.e., the player must travel noticeably downward before encountering the first star).",
+        "The game still generates 7 total collectible stars and they remain inside the corridor and not intersecting obstacles."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/features/intro/IntroFlow.tsx",
+          "path": "frontend/src/features/game/worldMap.ts",
           "operation": "modify",
-          "description": "Adjust the top spacing on the IntroFlow outer layout container so it includes the existing fixed top padding plus an additional 25vh (e.g., via a single combined padding-top calculation) to keep all stages top-aligned and stable across transitions."
+          "description": "Adjust collectible generation to deterministically place the first collectible (i=0) at a minimum downward distance from the spawn position (e.g., enforce a configurable minY offset from getSpawnPosition()), using a bounded search for a valid (inside-corridor, non-intersecting-obstacles) location before generating the remaining 6 stars as today to preserve total count and corridor safety."
         }
       ]
     },
     {
-      "id": "REQ-2",
-      "summary": "Unify styling for all IntroFlow \"Continue\" buttons and the slider question \"Submit\" button into a transparent pill with border matching the current text color.",
+      "id": "REQ-12",
+      "summary": "Update the controls legend under the canvas to say “Space to act” (and change nothing else).",
       "acceptanceCriteria": [
-        "All \"Continue\" buttons in `frontend/src/features/intro/IntroFlow.tsx` use the unified pill style (rounded 100px, transparent background, 1px solid border using current text color).",
-        "\"Submit\" in `frontend/src/features/intro/GoalStickinessQuestion.tsx` uses the same unified pill style.",
-        "Other CTAs (e.g., the start CTA in the opening lines) are not changed by this requirement."
+        "The controls legend displays: “Arrow keys to move • Space to act • J to tell a joke”.",
+        "No other gameplay control text is changed."
       ],
       "file_operations": [
-        {
-          "path": "frontend/src/features/intro/IntroFlow.tsx",
-          "operation": "modify",
-          "description": "Update every \"Continue\" Button instance to use a shared pill-style class set (rounded-[100px], bg-transparent, border, border-current) while preserving each stage’s intended text color; keep the Start/Start-now CTA unchanged. Use the shadcn-ui Button component to apply the unified style. Verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/features/intro/GoalStickinessQuestion.tsx",
-          "operation": "modify",
-          "description": "Update the \"Submit\" Button (pre-submit state) and the post-feedback \"Continue\" Button to use the same unified pill style (rounded-[100px], bg-transparent, border, border-current with border color matching current text color). Use the shadcn-ui Button component to apply the unified style. Verify the component's usage instructions before implementing."
-        }
-      ]
-    },
-    {
-      "id": "REQ-3",
-      "summary": "Refine the 2D game to feel like classic Zelda top-down movement with smooth continuous input and a camera-like top-to-bottom world progression, without adding collisions or combat.",
-      "acceptanceCriteria": [
-        "Character movement is continuous while an arrow key is held (not dependent on OS key-repeat), and movement updates smoothly during gameplay.",
-        "Map scrolling/progression remains top-to-bottom and feels camera-like (i.e., the scene progression feels like a moving world rather than a static screen with occasional jumps).",
-        "The terrain remains brown and Zelda-inspired; no enemy/combat systems are introduced.",
-        "No collision/obstacle physics or blocking behavior is introduced (visual terrain details are allowed but must not block movement)."
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/features/game/useGameLoop.ts",
-          "operation": "modify",
-          "description": "Refactor the game loop to be deltaTime-based (time-scaled) rather than 'pixels per frame', and support a per-frame callback so movement and camera/world progression can update smoothly on requestAnimationFrame."
-        },
         {
           "path": "frontend/src/features/game/GameView.tsx",
           "operation": "modify",
-          "description": "Move character movement updates into a per-frame loop (instead of only reacting to movement-state changes) and implement a Zelda-like top-down feel: smooth continuous movement while keys are held, plus a camera-like top-to-bottom progression using a world position + camera offset (optionally with smoothing/lerp) so the terrain scroll feels like a moving world. Keep the brown, Zelda-inspired terrain styling and ensure any terrain details remain purely visual (no blocking/collision logic)."
+          "description": "Update the controls legend string rendered under the canvas by changing only the phrase “Space to act & collect stars” to “Space to act”, leaving the rest of the legend text unchanged."
         }
       ]
     }
