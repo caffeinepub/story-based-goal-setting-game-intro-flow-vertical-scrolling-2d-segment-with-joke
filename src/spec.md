@@ -1,10 +1,11 @@
 # Specification
 
 ## Summary
-**Goal:** Make the first collectible star spawn meaningfully farther from the player start, and simplify the Space key text in the controls legend.
+**Goal:** Trigger the final “Congratulations!” completion message and transition to the outro when the player picks up their 7th unique star (in any order), with the specified modal formatting.
 
 **Planned changes:**
-- Adjust collectible generation so the closest (first encountered) star is placed noticeably farther downward from the spawn position while keeping 7 total stars inside the corridor and not intersecting obstacles.
-- Update the controls legend under the canvas to change “Space to act & collect stars” to “Space to act”, without modifying other control text.
+- Update star-collection completion logic to detect when `collectedCount` reaches 7 unique collectibles, regardless of collectible ID or pickup order.
+- Ensure the 7th unique pickup modal appends the completion message, and that clicking Continue transitions from gameplay to the outro exactly once.
+- Implement the completion message formatting in the pickup modal: a visually separated empty line with 12px top margin, then a bold “Congratulations!” with 🌟 on the same line, followed by a line break and the provided sentence.
 
-**User-visible outcome:** On a fresh load, the player must travel noticeably downward before reaching the first star, and the controls legend reads: “Arrow keys to move • Space to act • J to tell a joke”.
+**User-visible outcome:** After collecting any 7 unique stars, the 7th pickup modal shows the formatted completion message; pressing Continue then moves the player from gameplay into the outro. Collecting fewer than 7 stars does not trigger the outro.

@@ -1,51 +1,55 @@
 {
   "kind": "build_request",
-  "title": "Move first star farther from spawn + update Space controls legend",
+  "title": "Trigger final congratulations + outro transition on 7th unique star pickup (any order) with specified modal formatting",
   "priority": "normal",
   "requirements": [
     {
       "id": "REQ-11",
-      "text": "Adjust collectible generation so that the first collectible star the player encounters is placed meaningfully farther from the player spawn position, so it is not reachable immediately after starting the game.",
+      "text": "Update gameplay completion logic so the appended completion message and the game-to-outro transition happen when the player picks up the 7th unique collectible (collectedCount reaches 7), regardless of which collectible ID it is (pickup order must not matter).",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-1"
+          "msg-4"
         ],
         "quotes": [
-          "Move the first star a bit further away from the starting point."
+          "Add the \"Congratulations! 🌟\nYou have successfully taught Barnabus the key components to ensure his goal is safely distanced from his reach.\" text and close behaviour described in previous message to the 7th star picked up.",
+          "E.g. if user skips the first star, collects stars 2 - 7, then picks up 1st star, we show the extra text and move to next section of the game after they click \"continue\"."
         ]
       },
       "acceptanceCriteria": [
-        "On a fresh game load, the closest uncollected star is not within immediate reach of the spawn area (i.e., the player must travel noticeably downward before encountering the first star).",
-        "The game still generates 7 total collectible stars and they remain inside the corridor and not intersecting obstacles."
+        "If the player collects any 7 unique stars in any order, the 7th pickup modal (whatever star it is) includes the appended completion message section.",
+        "After clicking the modal's Continue button for that 7th unique pickup modal, the app transitions out of gameplay into the next section (outro) exactly once.",
+        "If the player has collected fewer than 7 unique stars, closing a pickup modal does not trigger the outro transition."
       ]
     },
     {
       "id": "REQ-12",
-      "text": "Update the gameplay controls legend text under the canvas to change the phrase “Space to act & collect stars” to “Space to act”.",
+      "text": "Apply the specified formatting to the appended completion message section inside the star pickup modal: after the existing star description text, render an empty line with 12px top margin, then render a new line with bold \"Congratulations!\" followed by the 🌟 emoji, then a line break and the sentence \"You have successfully taught Barnabus the key components to ensure his goal is safely distanced from his reach.\"",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-1"
+          "msg-4"
         ],
         "quotes": [
-          "change \"Space to act & collect stars\" to \"Space to act\""
+          "Also, pay attention to the formatting of the text:\n\n[existing star's text]\n<empty line, 12px margin from top>\n<bold>Congratulations! </bold> 🌟 <line break>\nYou have successfully taught Barnabus the key components to ensure his goal is safely distanced from his reach."
         ]
       },
       "acceptanceCriteria": [
-        "The controls legend displays: “Arrow keys to move • Space to act • J to tell a joke”.",
-        "No other gameplay control text is changed."
+        "The completion section appears visually separated from the existing star text by an empty line with 12px top margin (not just a newline in a single <p>).",
+        "\"Congratulations!\" is bold, the 🌟 emoji is on the same line as \"Congratulations!\", and the following sentence starts on the next line.",
+        "The existing per-star title and description content remains unchanged aside from the appended completion section being added only for the 7th unique pickup."
       ]
     }
   ],
   "constraints": [
-    "Do not edit files under frontend/immutablePaths (compose existing components/hooks instead).",
-    "Keep the backend as a single Motoko actor; no backend changes are required for this request."
+    "Do not edit any files under frontend/src/components/ui (read-only).",
+    "Do not edit frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useInternetIdentity.tsx, frontend/src/hooks/useActor.ts, or frontend/src/main.tsx (immutable paths).",
+    "Keep all backend logic in the single Motoko actor (backend/main.mo); do not introduce additional backend services."
   ],
   "nonGoals": [
-    "Do not change star pickup mechanics (it should remain Space-gated with proximity requirement).",
-    "Do not change world generation shape/size beyond repositioning the first star.",
-    "Do not add new collectibles, HUD elements, or new sound/animation work."
+    "Do not change collectible placement, map generation, movement/collision behavior, or controls.",
+    "Do not change the outro script content or outro pacing/timing beyond what is necessary to ensure the transition triggers at the correct time.",
+    "Do not introduce new authentication flows or backend APIs."
   ],
   "imageRequirements": {
     "required": [],

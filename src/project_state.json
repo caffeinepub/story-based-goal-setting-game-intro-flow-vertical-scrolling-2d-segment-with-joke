@@ -1,7 +1,7 @@
 {
   "schemaVersion": "1.0.0",
-  "projectStateVersion": 52,
-  "summary": "A React + TypeScript single-page app with a story-driven, multi-stage intro experience (timed narrative reveals, user-gated progression, and mood-darkening gradient transitions plus a slider-based question) that transitions into a small 2D top-down canvas game. In the game, the player moves a Donald pixel character through a narrow, strictly linear, downward-progressing corridor world with gentle curves, while a smooth camera follows; obstacles block movement via collisions with wall-sliding; pressing Space shows a random joke in a timed speech balloon overlay. The repo also includes scaffolding for Internet Identity authentication and identity-aware backend actor creation via React Query, plus a reusable build-template directory containing ICP canister configs, frontend tooling, shadcn/ui component set, and deploy/build scripts for packaging/export.",
+  "projectStateVersion": 74,
+  "summary": "A React + TypeScript single-page app with a story-driven, multi-stage intro experience (timed narrative reveals, user-gated progression, and mood-darkening gradient transitions plus a slider-based question) that transitions into a small 2D top-down canvas game. In the game, the player moves a Donald pixel character through a narrow, strictly linear, downward-progressing corridor world with gentle curves, while a smooth camera follows; obstacles block movement via collisions with wall-sliding; pressing J shows a random joke in a timed speech balloon overlay; pressing Space performs an action and can also pick up nearby collectibles. The game includes a goals modal on first movement and a 0/7 collectibles HUD with per-star pickup modals; after the 7th pickup modal is closed, gameplay ends and the app transitions into an outro narrative flow using the same line-by-line reveal + gated Continue pattern as the intro. The repo also includes scaffolding for Internet Identity authentication and identity-aware backend actor creation via React Query, plus a reusable build-template directory containing ICP canister configs, frontend tooling, shadcn/ui component set, and deploy/build scripts for packaging/export.",
   "existing_features": [
     {
       "id": "IF-1",
@@ -519,16 +519,112 @@
       "version": 1
     },
     {
-      "id": "feature-adjust-collectible-generation-so-that-the-first-collectible-star-the-player-encounters-is-placed-meaningfully-farther-from-the-player-spawn-position-so-it-is-not-reachable-immediately-after-starting-the-game",
-      "title": "Adjust collectible generation so that the first collectible star the player encounters is placed meaningfully farther from the player spawn position, so it is not reachable immediately after starting the game.",
+      "id": "IF-45",
+      "title": "First collectible star moved further from player start",
+      "synonyms": [
+        "AR-18 first star placement",
+        "starting area spacing",
+        "early pickup spacing"
+      ],
+      "description": "Adjusted the initial collectible/star placement so the first star is positioned further away from the player starting point to avoid immediate pickup at spawn.",
+      "reqIds": [
+        "AR-18"
+      ],
+      "version": 1
+    },
+    {
+      "id": "IF-46",
+      "title": "Controls legend text updated: Space no longer mentions collecting stars",
+      "synonyms": [
+        "AR-19 controls legend copy",
+        "Space to act label",
+        "legend wording update"
+      ],
+      "description": "Updated the on-screen controls legend to change the Space key description from “Space to act & collect stars” to “Space to act”.",
+      "reqIds": [
+        "AR-19"
+      ],
+      "version": 1
+    },
+    {
+      "id": "IF-49",
+      "title": "Collectible placement adjustment: last collectible moved closer to map end",
+      "synonyms": [
+        "move last collectible",
+        "end-of-map placement tweak"
+      ],
+      "description": "Adjusted collectible placement so the last collectible is positioned closer to the end of the corridor/map to better align progression pacing.",
+      "reqIds": [
+        "AR-20"
+      ],
+      "version": 1
+    },
+    {
+      "id": "IF-50",
+      "title": "Per-collectible pickup modals for all 7 stars (unique title/description copy)",
+      "synonyms": [
+        "StarPickupModal",
+        "per-star pickup popup",
+        "7 unique pickup prompts"
+      ],
+      "description": "Each of the 7 star collectibles triggers a pickup modal prompt with its own unique title/description copy; the first-star copy is updated to the new Barnabus-themed text, using the shared gameplay modal system.",
+      "reqIds": [
+        "AR-24"
+      ],
+      "version": 1
+    },
+    {
+      "id": "IF-51",
+      "title": "First collectible reverted from mobile phone back to star",
+      "synonyms": [
+        "revert first collectible type",
+        "remove phone-as-first-collectible"
+      ],
+      "description": "The first collectible item in the corridor is a star again (reverting the prior mobile phone first-collectible behavior).",
+      "reqIds": [
+        "AR-23"
+      ],
+      "version": 1
+    },
+    {
+      "id": "IF-52",
+      "title": "7th (last) star pickup modal includes appended completion message",
+      "synonyms": [
+        "AR-25 last star copy",
+        "completion/congratulations appended text",
+        "7th pickup description update"
+      ],
+      "description": "The 7th/last collectible star’s pickup modal description appends the provided completion/congratulations message to the existing unique copy.",
+      "reqIds": [
+        "AR-25"
+      ],
+      "version": 1
+    },
+    {
+      "id": "IF-53",
+      "title": "Game-to-outro transition after last collectible modal closes",
+      "synonyms": [
+        "AR-26 end gameplay on last modal close",
+        "OutroFlow transition",
+        "post-game narrative"
+      ],
+      "description": "After the player closes the last (7th) star pickup modal, the GameView terminates and the app transitions to an OutroFlow that uses the intro-style timed line-by-line reveal system with gated Continue between narrative blocks.",
+      "reqIds": [
+        "AR-26"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-gameplay-completion-logic-so-the-appended-completion-message-and-the-game-to-outro-transition-happen-when-the-player-picks-up-the-7th-unique-collectible-collectedcount-reaches-7-regardless-of-which-collectible-id-it-is-pickup-order-must-not-matter",
+      "title": "Update gameplay completion logic so the appended completion message and the game-to-outro transition happen when the player picks up the 7th unique collectible (collectedCount reaches 7), regardless of which collectible ID it is (pickup order must not matter).",
       "reqIds": [
         "REQ-11"
       ],
       "version": 1
     },
     {
-      "id": "feature-update-the-gameplay-controls-legend-text-under-the-canvas-to-change-the-phrase-space-to-act-collect-stars-to-space-to-act",
-      "title": "Update the gameplay controls legend text under the canvas to change the phrase “Space to act & collect stars” to “Space to act”.",
+      "id": "feature-apply-the-specified-formatting-to-the-appended-completion-message-section-inside-the-star-pickup-modal-after-the-existing-star-description-text-render-an-empty-line-with-12px-top-margin-then-render-a-new-line-with-bold-congratulations-followed-by-the-emoji-then-a-line-break-and-the-sentence-you-have-successfully-taught-barnabus-the-key-components-to-ensure-his-goal-is-safely-distanced-from-his-reach",
+      "title": "Apply the specified formatting to the appended completion message section inside the star pickup modal: after the existing star description text, render an empty line with 12px top margin, then render a new line with bold \"Congratulations!\" followed by the 🌟 emoji, then a line break and the sentence \"You have successfully taught Barnabus the key components to ensure his goal is safely distanced from his reach.\"",
       "reqIds": [
         "REQ-12"
       ],
@@ -537,14 +633,8 @@
   ],
   "new_feature_requests": [
     {
-      "id": "AR-18",
-      "summary": "Move the first collectible star further away from the player starting point",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-19",
-      "summary": "Update controls legend text to change “Space to act & collect stars” to “Space to act”",
+      "id": "AR-27",
+      "summary": "Completion behavior: show congratulations + transition when the 7th unique collectible is picked up (regardless of which star ID it is), with specified formatting/margins in the modal description.",
       "reqIds": [],
       "status": "pending"
     }
@@ -579,14 +669,33 @@
     "Collectibles HUD UI is positioned top-right and rendered borderless within the rounded game container.",
     "Collectible pickup logic is input-gated: pressing Space while within a tight proximity triggers pickup; Space continues to also trigger the action animation when used.",
     "World scaling updated to extend corridor/world height by ~2.5× while keeping corridor width unchanged.",
-    "Star pickup plays an SFX; audio/sfx behavior is encapsulated via a small hook/utility and triggered on successful pickup."
+    "Star pickup plays an SFX; audio/sfx behavior is encapsulated via a small hook/utility and triggered on successful pickup.",
+    "Collectibles can support multiple item types (e.g., mobile phone replacing a star) with per-item pickup messaging/modals.",
+    "On pickup of specific collectibles (e.g., the first/mobile), trigger a modal prompt using the same modal system as the first-movement goals prompt.",
+    "A dedicated MobilePhoneModal component is used to display the first-collectible pickup prompt (title/description) via the shared gameplay modal system.",
+    "A mobile phone pixel asset is added under frontend/public/assets/generated/ and used as the visual for the first collectible item type.",
+    "All 7 collectibles/stars should trigger a pickup modal prompt with unique title/description copy; the existing first-collectible modal should be updated to the new first-star text (Barnabus-themed).",
+    "All 7 star collectibles now trigger pickup modals with unique copy (via StarPickupModal/shared gameplay modal system); pickup modal text is updated in centralized story/content configuration.",
+    "Last star (7th collectible) pickup modal should include an appended completion/congratulations message in its description copy.",
+    "After the player closes the last collectible popup, gameplay should terminate/leave the GameView and transition to an outro narrative flow that uses the same line-by-line reveal system as the intro, including a gated Continue button between blocks.",
+    "A dedicated OutroFlow (src/features/outro/OutroFlow.tsx) provides an intro-like timed, line-by-line narrative reveal with gated Continue between blocks, entered after gameplay completion (closing the 7th pickup modal).",
+    "End-of-game logic should trigger when total unique collectibles collected reaches 7 (the final missing star), not based on a specific star index/ID; the completion modal text formatting requires an empty line with ~12px top margin and bolded 'Congratulations!' followed by 🌟 and a line break."
   ],
   "known_issues": [
     "Camera clamping assumes world bounds are larger than the viewport; with a corridor world that can be narrower than the 500px canvas, horizontal camera clamping can collapse to a constant value (camera X becomes effectively fixed).",
     "Backend canister (backend/main.mo) is an empty actor with no methods; the auth/actor scaffolding currently has no functional backend API to call.",
-    "Duplicate/global CSS entrypoints exist (frontend/index.css and frontend/src/index.css); only src/index.css is imported by the app, but the extra file can confuse maintenance."
+    "Duplicate/global CSS entrypoints exist (frontend/index.css and frontend/src/index.css); only src/index.css is imported by the app, but the extra file can confuse maintenance.",
+    "Current end-game completion message/transition is tied to the '7th star' by ID/order rather than the 7th unique collectible picked up; collecting stars out of order can skip the completion message/transition."
   ],
-  "isFixRequest": false,
+  "isFixRequest": true,
+  "generatedImages": [
+    {
+      "filename": "frontend/public/assets/generated/mobile-phone-pixel.dim_64x64.png",
+      "description": "Generated pixel-art mobile phone collectible sprite used for the first collectible item.",
+      "targetWidth": 64,
+      "targetHeight": 64
+    }
+  ],
   "gameProjectType": "2d",
   "projectName": "Story-based goal-setting game intro flow + vertical-scrolling 2D segment with jokes",
   "clarification_mode": "pro",

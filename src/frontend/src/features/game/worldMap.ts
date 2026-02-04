@@ -541,6 +541,7 @@ export function getObstacleColor(type: Obstacle['type']): string {
 
 // Generate collectible positions (7 total) spread throughout the corridor
 // First collectible is placed meaningfully farther from spawn
+// Last collectible is placed near the end of the corridor
 function generateCollectibles(): Collectible[] {
   const collectibles: Collectible[] = [];
   const COLLECTIBLE_SIZE = 20;
@@ -627,8 +628,8 @@ function generateCollectibles(): Collectible[] {
     }
   }
   
-  // Generate remaining 6 collectibles distributed across the corridor
-  for (let i = 1; i < 7; i++) {
+  // Generate collectibles 1-5 distributed across the corridor
+  for (let i = 1; i < 6; i++) {
     // Select a segment (spread them out)
     const segmentIndex = Math.floor((i / 7) * totalSegments);
     const segment = CORRIDOR_SEGMENTS[Math.min(segmentIndex, totalSegments - 1)];
@@ -656,6 +657,70 @@ function generateCollectibles(): Collectible[] {
         id: `collectible-${i}`,
         x,
         y,
+        collected: false,
+      });
+    }
+  }
+  
+  // Generate the final collectible (collectible-6) near the end of the corridor
+  let finalStarPlaced = false;
+  const finalAttempts = 50;
+  
+  for (let attempt = 0; attempt < finalAttempts && !finalStarPlaced; attempt++) {
+    // Try to place final star in the last few segments
+    for (let segIdx = totalSegments - 1; segIdx >= Math.max(0, totalSegments - 3) && !finalStarPlaced; segIdx--) {
+      const segment = CORRIDOR_SEGMENTS[segIdx];
+      
+      if (segment.direction === 'vertical') {
+        // Place near the end of the vertical segment
+        const y = segment.endY - (segment.endY - segment.startY) * 0.2;
+        const x = segment.startX + (Math.random() - 0.5) * halfChannelWidth;
+        
+        if (isInsideCorridor(x, y) && !checkCollision(x - COLLECTIBLE_SIZE / 2, y - COLLECTIBLE_SIZE / 2, COLLECTIBLE_SIZE, COLLECTIBLE_SIZE)) {
+          collectibles.push({
+            id: 'collectible-6',
+            x,
+            y,
+            collected: false,
+          });
+          finalStarPlaced = true;
+        }
+      } else {
+        // Place in horizontal segment near the end
+        const minX = Math.min(segment.startX, segment.endX);
+        const maxX = Math.max(segment.startX, segment.endX);
+        const x = minX + (maxX - minX) * 0.7;
+        const y = segment.startY + (Math.random() - 0.5) * halfChannelWidth;
+        
+        if (isInsideCorridor(x, y) && !checkCollision(x - COLLECTIBLE_SIZE / 2, y - COLLECTIBLE_SIZE / 2, COLLECTIBLE_SIZE, COLLECTIBLE_SIZE)) {
+          collectibles.push({
+            id: 'collectible-6',
+            x,
+            y,
+            collected: false,
+          });
+          finalStarPlaced = true;
+        }
+      }
+    }
+  }
+  
+  // If we still couldn't place the final star, use a fallback position near the end
+  if (!finalStarPlaced) {
+    const lastSegment = CORRIDOR_SEGMENTS[totalSegments - 1];
+    if (lastSegment.direction === 'vertical') {
+      collectibles.push({
+        id: 'collectible-6',
+        x: lastSegment.endX,
+        y: lastSegment.endY - 100,
+        collected: false,
+      });
+    } else {
+      const maxX = Math.max(lastSegment.startX, lastSegment.endX);
+      collectibles.push({
+        id: 'collectible-6',
+        x: maxX - 50,
+        y: lastSegment.startY,
         collected: false,
       });
     }

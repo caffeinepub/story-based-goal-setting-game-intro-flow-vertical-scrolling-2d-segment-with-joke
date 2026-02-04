@@ -1,35 +1,47 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Space game: push first star farther from spawn and update controls legend",
+  "title": "Trigger outro + final congratulations modal section on 7th unique star pickup",
   "requirements": [
     {
       "id": "REQ-11",
-      "summary": "Ensure the first generated collectible star spawns meaningfully farther (downward) from the player spawn so it cannot be reached immediately on a fresh load, while keeping 7 total stars safely inside the corridor.",
+      "summary": "Trigger the completion modal behavior and gameplay-to-outro transition on the 7th unique collectible pickup (any order), only after Continue is clicked, and only once.",
       "acceptanceCriteria": [
-        "On a fresh game load, the closest uncollected star is not within immediate reach of the spawn area (i.e., the player must travel noticeably downward before encountering the first star).",
-        "The game still generates 7 total collectible stars and they remain inside the corridor and not intersecting obstacles."
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/features/game/worldMap.ts",
-          "operation": "modify",
-          "description": "Adjust collectible generation to deterministically place the first collectible (i=0) at a minimum downward distance from the spawn position (e.g., enforce a configurable minY offset from getSpawnPosition()), using a bounded search for a valid (inside-corridor, non-intersecting-obstacles) location before generating the remaining 6 stars as today to preserve total count and corridor safety."
-        }
-      ]
-    },
-    {
-      "id": "REQ-12",
-      "summary": "Update the controls legend under the canvas to say “Space to act” (and change nothing else).",
-      "acceptanceCriteria": [
-        "The controls legend displays: “Arrow keys to move • Space to act • J to tell a joke”.",
-        "No other gameplay control text is changed."
+        "If the player collects any 7 unique stars in any order, the 7th pickup modal (whatever star it is) includes the appended completion message section.",
+        "After clicking the modal's Continue button for that 7th unique pickup modal, the app transitions out of gameplay into the next section (outro) exactly once.",
+        "If the player has collected fewer than 7 unique stars, closing a pickup modal does not trigger the outro transition."
       ],
       "file_operations": [
         {
           "path": "frontend/src/features/game/GameView.tsx",
           "operation": "modify",
-          "description": "Update the controls legend string rendered under the canvas by changing only the phrase “Space to act & collect stars” to “Space to act”, leaving the rest of the legend text unchanged."
+          "description": "Update pickup/completion logic to mark the pickup that causes collectedCount to reach 7 as the completion pickup (independent of collectibleId), remove the hard-coded final-star ID check, and invoke onFinalStarDismiss only when dismissing the completion pickup modal (guarded so it fires exactly once). Also ensure STAR_CONTENT contains only per-star text (no embedded completion message) and ensure only one collectible can be picked up per Space press so the 7th pickup is unambiguous."
+        },
+        {
+          "path": "frontend/src/features/game/StarPickupModal.tsx",
+          "operation": "modify",
+          "description": "Extend the modal props to accept a boolean indicating whether this modal is the completion (7th) pickup, and use that to conditionally render the appended completion section while keeping the existing per-star title/description rendering intact."
+        }
+      ]
+    },
+    {
+      "id": "REQ-12",
+      "summary": "Render the appended completion message section in the pickup modal with the specified spacing and line formatting, only for the 7th unique pickup.",
+      "acceptanceCriteria": [
+        "The completion section appears visually separated from the existing star text by an empty line with 12px top margin (not just a newline in a single <p>).",
+        "\"Congratulations!\" is bold, the 🌟 emoji is on the same line as \"Congratulations!\", and the following sentence starts on the next line.",
+        "The existing per-star title and description content remains unchanged aside from the appended completion section being added only for the 7th unique pickup."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/features/game/StarPickupModal.tsx",
+          "operation": "modify",
+          "description": "Implement the completion section formatting: after the existing description block, add a separate empty spacer element with 12px top margin (e.g., Tailwind mt-3), then render a new line with bold \"Congratulations!\" followed by the 🌟 emoji on the same line, then a line break and the exact sentence \"You have successfully taught Barnabus the key components to ensure his goal is safely distanced from his reach.\" Render this section only when the modal is flagged as the 7th unique pickup."
+        },
+        {
+          "path": "frontend/src/features/game/GameView.tsx",
+          "operation": "modify",
+          "description": "Pass the completion/7th-pickup flag into StarPickupModal only for the pickup that brings the unique collected count to 7, ensuring the appended completion section is not shown for any earlier pickups."
         }
       ]
     }

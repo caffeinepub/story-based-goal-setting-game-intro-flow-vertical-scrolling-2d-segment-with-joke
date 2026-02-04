@@ -1,7 +1,7 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-04T00:52:42.915Z",
+  "generatedAt": "2026-02-04T12:05:25.821Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
@@ -12,23 +12,27 @@
     "items": [
       {
         "id": "REQ-11",
-        "summary": "Adjust collectible generation so that the first collectible star the player encounters is placed meaningfully farther from the player spawn position, so it is not reachable immediately after starting the game.",
+        "summary": "Update gameplay completion logic so the appended completion message and the game-to-outro transition happen when the player picks up the 7th unique collectible (collectedCount reaches 7), regardless of which collectible ID it is (pickup order must not matter).",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/features/game/worldMap.ts"
+          "frontend/src/features/game/GameView.tsx",
+          "frontend/src/features/game/StarPickupModal.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/features/game/worldMap.ts"
+          "frontend/src/features/game/GameView.tsx",
+          "frontend/src/features/game/StarPickupModal.tsx"
         ]
       },
       {
         "id": "REQ-12",
-        "summary": "Update the gameplay controls legend text under the canvas to change the phrase “Space to act & collect stars” to “Space to act”.",
+        "summary": "Apply the specified formatting to the appended completion message section inside the star pickup modal: after the existing star description text, render an empty line with 12px top margin, then render a new line with bold \"Congratulations!\" followed by the 🌟 emoji, then a line break and the sentence \"You have successfully taught Barnabus the key components to ensure his goal is safely distanced from his reach.\"",
         "status": "implemented",
         "plannedFiles": [
+          "frontend/src/features/game/StarPickupModal.tsx",
           "frontend/src/features/game/GameView.tsx"
         ],
         "matchedFiles": [
+          "frontend/src/features/game/StarPickupModal.tsx",
           "frontend/src/features/game/GameView.tsx"
         ]
       }
@@ -40,7 +44,7 @@
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
     "frontend/src/features/game/GameView.tsx",
-    "frontend/src/features/game/worldMap.ts",
+    "frontend/src/features/game/StarPickupModal.tsx",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",

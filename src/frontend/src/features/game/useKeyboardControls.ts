@@ -10,7 +10,8 @@ interface Movement {
 export function useKeyboardControls(
   onSpacePress: () => void,
   onJokePress: () => void,
-  canvasRef: React.RefObject<HTMLCanvasElement | null>
+  canvasRef: React.RefObject<HTMLCanvasElement | null>,
+  isDisabled: boolean = false
 ) {
   const [movement, setMovement] = useState<Movement>({
     left: false,
@@ -21,6 +22,11 @@ export function useKeyboardControls(
 
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
+      // If disabled, don't process any input
+      if (isDisabled) {
+        return;
+      }
+
       switch (e.key) {
         case 'ArrowLeft':
           e.preventDefault();
@@ -49,11 +55,16 @@ export function useKeyboardControls(
           break;
       }
     },
-    [onSpacePress, onJokePress]
+    [onSpacePress, onJokePress, isDisabled]
   );
 
   const handleKeyUp = useCallback(
     (e: KeyboardEvent) => {
+      // If disabled, don't process any input
+      if (isDisabled) {
+        return;
+      }
+
       switch (e.key) {
         case 'ArrowLeft':
           setMovement((prev) => ({ ...prev, left: false }));
@@ -69,8 +80,20 @@ export function useKeyboardControls(
           break;
       }
     },
-    []
+    [isDisabled]
   );
+
+  // Clear movement state when disabled
+  useEffect(() => {
+    if (isDisabled) {
+      setMovement({
+        left: false,
+        right: false,
+        up: false,
+        down: false,
+      });
+    }
+  }, [isDisabled]);
 
   useEffect(() => {
     window.addEventListener('keydown', handleKeyDown);

@@ -4,6 +4,7 @@ import { useKeyboardControls } from './useKeyboardControls';
 import { jokes } from './jokes';
 import SpeechBalloon from './SpeechBalloon';
 import GoalsModal from './GoalsModal';
+import StarPickupModal from './StarPickupModal';
 import CollectiblesHud from './CollectiblesHud';
 import { getFinalIntroGradient } from '../intro/introBackground';
 import {
@@ -29,7 +30,43 @@ interface Camera {
   y: number;
 }
 
-export default function GameView() {
+interface GameViewProps {
+  onFinalStarDismiss: () => void;
+}
+
+// Star collectible content map (per-star text only, no embedded completion message)
+const STAR_CONTENT: Record<string, { title: string; description: string }> = {
+  'collectible-0': {
+    title: 'Vague, magical, blurry definitions',
+    description: 'Why ruin the mystery with clarity? Barnabus should say things like "I just want to be successful" or "I want my life to be better." Avoid numbers, timelines, or concrete actions at all costs. If Barnabus doesn\'t know where the finish line is, he can\'t possibly be disappointed when he never crosses it.',
+  },
+  'collectible-1': {
+    title: 'Strict all-or-nothing mindset',
+    description: 'Barnabus has to decide in advance that missing one workout, one habit, or one good day means the entire goal is officially dead. Perfection or total collapse—no middle ground. Did Barny eat one cookie? Well, the diet is ruined — he might as well eat the whole bakery.',
+  },
+  'collectible-2': {
+    title: 'The dopamine announcement',
+    description: 'Get wildly excited at the beginning. Announce it to everyone. Buy the gear. Make the playlist. Then assume that this initial surge of dopamine will somehow carry Barnabus through months of boredom, resistance, and fatigue.',
+  },
+  'collectible-3': {
+    title: 'Environment as an obstacle course',
+    description: 'Expect sheer willpower to overcome friction. Keep distractions everywhere. Leave junk food in plain sight. Work where you usually procrastinate. Barnabus must structure his life exactly the same and be surprised when his old habits keep winning. If it were important, he\'d just try harder, right?',
+  },
+  'collectible-4': {
+    title: 'Choose someone else\'s goals',
+    description: 'Barnabus\'s goals are based what looks impressive, trendy, or socially approved. He makes sure it aligns with someone else\'s values — his mom\'s, peers\', or Instagram\'s. When motivation disappears, he can comfortably blame the goal instead of noticing it never mattered to him in the first place.',
+  },
+  'collectible-5': {
+    title: 'Never change your true identity',
+    description: 'Above all things, Barnabus must not change his self-image. A goal is a goal, and his identity is his identity; by no means should one be allowed to contaminate the other. To ensure total failure, Barnabus must attempt to reach new heights while stubbornly preserving his old habits and mental furniture.',
+  },
+  'collectible-6': {
+    title: 'Life will pause',
+    description: 'Barnabus assumes he\'ll suddenly have unlimited energy, time, and emotional stability. Planning an unsustainable pace that ignores stress, work, illness, relationships, and bad days is crucial. When real life inevitably interferes, Barny conclude that the system is broken and quits entirely, and with a dramatic disappointment.',
+  },
+};
+
+export default function GameView({ onFinalStarDismiss }: GameViewProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const spawnPos = getSpawnPosition();
   const characterRef = useRef<Character>({ x: spawnPos.x, y: spawnPos.y });
@@ -50,11 +87,17 @@ export default function GameView() {
   const firstMovementTimerRef = useRef<number | null>(null);
   const previousPositionRef = useRef({ x: spawnPos.x, y: spawnPos.y });
 
+  // Star pickup modal state - now tracks which collectible and whether it's the completion pickup
+  const [starPickupContent, setStarPickupContent] = useState<{ title: string; description: string; collectibleId: string; isCompletionPickup: boolean } | null>(null);
+
   // Collectibles state
   const collectiblesRef = useRef<Collectible[]>(getCollectibles());
   const [collectedCount, setCollectedCount] = useState(0);
   const COLLECTIBLE_SIZE = 20;
   const COLLECTIBLE_PICKUP_RADIUS = 25; // Tight radius for "almost touching"
+
+  // Track whether outro has been triggered to prevent duplicate calls
+  const outroTriggeredRef = useRef(false);
 
   // Audio for star pickup
   const pickupAudioRef = useRef<HTMLAudioElement | null>(null);
@@ -89,6 +132,11 @@ export default function GameView() {
   }, []);
 
   const handleSpacePress = () => {
+    // Don't process input if modal is open
+    if (showGoalsModal || starPickupContent) {
+      return;
+    }
+
     // Clear any existing spin timeout
     if (spinTimeoutRef.current !== null) {
       clearTimeout(spinTimeoutRef.current);
@@ -105,12 +153,13 @@ export default function GameView() {
       spinTimeoutRef.current = null;
     }, SPIN_DURATION);
 
-    // Check for star pickup (only when Space is pressed and very close)
+    // Check for collectible pickup (only when Space is pressed and very close)
+    // Only allow one collectible to be picked up per Space press
     const character = characterRef.current;
     let collected = false;
 
-    collectiblesRef.current.forEach((collectible) => {
-      if (!collectible.collected) {
+    for (const collectible of collectiblesRef.current) {
+      if (!collectible.collected && !collected) {
         const dx = character.x - collectible.x;
         const dy = character.y - collectible.y;
         const distance = Math.sqrt(dx * dx + dy * dy);
@@ -118,12 +167,32 @@ export default function GameView() {
         if (distance < COLLECTIBLE_PICKUP_RADIUS) {
           collectible.collected = true;
           collected = true;
-          setCollectedCount((prev) => Math.min(prev + 1, 7));
+          
+          // Calculate new collected count
+          const newCount = collectedCount + 1;
+          setCollectedCount(Math.min(newCount, 7));
+
+          // Determine if this is the 7th unique pickup (completion pickup)
+          const isCompletionPickup = newCount === 7;
+
+          // Show star pickup modal with the appropriate content
+          const content = STAR_CONTENT[collectible.id];
+          if (content) {
+            setStarPickupContent({
+              title: content.title,
+              description: content.description,
+              collectibleId: collectible.id,
+              isCompletionPickup,
+            });
+          }
+
+          // Break after first pickup to ensure only one collectible per Space press
+          break;
         }
       }
-    });
+    }
 
-    // Play pickup sound only if a star was collected
+    // Play pickup sound only if a collectible was collected
     if (collected && pickupAudioRef.current) {
       pickupAudioRef.current.currentTime = 0;
       pickupAudioRef.current.play().catch(() => {
@@ -133,6 +202,11 @@ export default function GameView() {
   };
 
   const handleJokePress = () => {
+    // Don't process input if modal is open
+    if (showGoalsModal || starPickupContent) {
+      return;
+    }
+
     // Clear any existing timeout to prevent race conditions
     if (jokeTimeoutRef.current !== null) {
       clearTimeout(jokeTimeoutRef.current);
@@ -153,7 +227,20 @@ export default function GameView() {
     }, 3000);
   };
 
-  const { movement } = useKeyboardControls(handleSpacePress, handleJokePress, canvasRef);
+  const handleStarModalDismiss = () => {
+    const isCompletionPickup = starPickupContent?.isCompletionPickup ?? false;
+    setStarPickupContent(null);
+    
+    // If this was the completion pickup (7th unique star), notify parent to transition to outro
+    // Guard to ensure it only fires once
+    if (isCompletionPickup && !outroTriggeredRef.current) {
+      outroTriggeredRef.current = true;
+      onFinalStarDismiss();
+    }
+  };
+
+  const isModalOpen = showGoalsModal || starPickupContent !== null;
+  const { movement } = useKeyboardControls(handleSpacePress, handleJokePress, canvasRef, isModalOpen);
 
   // Render function with world-space camera transform
   const render = () => {
@@ -234,10 +321,10 @@ export default function GameView() {
       }
     });
 
-    // Draw collectibles (stars)
+    // Draw collectibles (all as gold stars)
     collectiblesRef.current.forEach((collectible) => {
       if (!collectible.collected) {
-        // Draw a gold star
+        // Draw a gold star for all collectibles
         ctx.fillStyle = 'oklch(0.85 0.15 85)'; // Bright gold/yellow
         ctx.strokeStyle = 'oklch(0.65 0.18 75)'; // Darker gold outline
         ctx.lineWidth = 2;
@@ -339,6 +426,12 @@ export default function GameView() {
   // Game loop with deltaTime-based updates
   useGameLoop({
     onUpdate: (deltaTime: number) => {
+      // Pause movement updates if modal is open
+      if (isModalOpen) {
+        render();
+        return;
+      }
+
       const character = characterRef.current;
       const camera = cameraRef.current;
 
@@ -483,6 +576,16 @@ export default function GameView() {
         {/* Goals Modal */}
         {showGoalsModal && (
           <GoalsModal onDismiss={() => setShowGoalsModal(false)} />
+        )}
+
+        {/* Star Pickup Modal */}
+        {starPickupContent && (
+          <StarPickupModal
+            title={starPickupContent.title}
+            description={starPickupContent.description}
+            isCompletionPickup={starPickupContent.isCompletionPickup}
+            onDismiss={handleStarModalDismiss}
+          />
         )}
 
         {currentJoke && (

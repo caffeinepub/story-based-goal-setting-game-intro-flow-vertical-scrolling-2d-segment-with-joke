@@ -2,10 +2,11 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-adjust-collectible-generation-so-that-the-first-collectible-star-the-player-encounters-is-placed-meaningfully-farther-from-the-player-spawn-position-so-it-is-not-reachable-immediately-after-starting-the-game",
-      "featureTitle": "Adjust collectible generation so that the first collectible star the player encounters is placed meaningfully farther from the player spawn position, so it is not reachable immediately after starting the game.",
+      "featureId": "feature-update-gameplay-completion-logic-so-the-appended-completion-message-and-the-game-to-outro-transition-happen-when-the-player-picks-up-the-7th-unique-collectible-collectedcount-reaches-7-regardless-of-which-collectible-id-it-is-pickup-order-must-not-matter",
+      "featureTitle": "Update gameplay completion logic so the appended completion message and the game-to-outro transition happen when the player picks up the 7th unique collectible (collectedCount reaches 7), regardless of which collectible ID it is (pickup order must not matter).",
       "files": [
-        "frontend/src/features/game/worldMap.ts"
+        "frontend/src/features/game/GameView.tsx",
+        "frontend/src/features/game/StarPickupModal.tsx"
       ],
       "components": [
         "core-infrastructure@1.0.2",
@@ -20,10 +21,11 @@
       "confidence": "high"
     },
     {
-      "featureId": "feature-update-the-gameplay-controls-legend-text-under-the-canvas-to-change-the-phrase-space-to-act-collect-stars-to-space-to-act",
-      "featureTitle": "Update the gameplay controls legend text under the canvas to change the phrase “Space to act & collect stars” to “Space to act”.",
+      "featureId": "feature-apply-the-specified-formatting-to-the-appended-completion-message-section-inside-the-star-pickup-modal-after-the-existing-star-description-text-render-an-empty-line-with-12px-top-margin-then-render-a-new-line-with-bold-congratulations-followed-by-the-emoji-then-a-line-break-and-the-sentence-you-have-successfully-taught-barnabus-the-key-components-to-ensure-his-goal-is-safely-distanced-from-his-reach",
+      "featureTitle": "Apply the specified formatting to the appended completion message section inside the star pickup modal: after the existing star description text, render an empty line with 12px top margin, then render a new line with bold \"Congratulations!\" followed by the 🌟 emoji, then a line break and the sentence \"You have successfully taught Barnabus the key components to ensure his goal is safely distanced from his reach.\"",
       "files": [
-        "frontend/src/features/game/GameView.tsx"
+        "frontend/src/features/game/GameView.tsx",
+        "frontend/src/features/game/StarPickupModal.tsx"
       ],
       "components": [
         "core-infrastructure@1.0.2",
