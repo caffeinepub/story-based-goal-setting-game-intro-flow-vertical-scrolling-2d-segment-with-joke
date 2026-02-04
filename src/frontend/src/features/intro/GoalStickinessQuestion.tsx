@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { Slider } from '@/components/ui/slider';
 import { Button } from '@/components/ui/button';
 
 interface GoalStickinessQuestionProps {
@@ -21,7 +20,7 @@ export default function GoalStickinessQuestion({ onSubmit }: GoalStickinessQuest
       setFeedback("That's correct, I see you have some experience with setting goals.");
     } else {
       setFeedback(
-        "That's a good guess, but not exactly right. Don't worry, it's a tricky question and we're all just learning. No mistake is irreversible."
+        "That's a good guess, but not exactly right. Don't worry, it's a tricky question and we're all just learning."
       );
     }
     setSubmitted(true);
@@ -36,24 +35,57 @@ export default function GoalStickinessQuestion({ onSubmit }: GoalStickinessQuest
     onSubmit();
   };
 
+  const handleSliderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setValue([parseInt(e.target.value, 10)]);
+  };
+
   return (
     <div className="space-y-6 pt-8">
       {!submitted ? (
         <>
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-foreground/70">1%</span>
-              <span className="text-2xl font-bold text-amber-200">{value[0]}%</span>
-              <span className="text-sm text-foreground/70">100%</span>
+          <div className="flex justify-center">
+            <div className="w-1/2 space-y-4">
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-foreground/70">1%</span>
+                <span className="text-2xl font-bold text-amber-200">{value[0]}%</span>
+                <span className="text-sm text-foreground/70">100%</span>
+              </div>
+              <div className="relative">
+                <input
+                  type="range"
+                  min="1"
+                  max="100"
+                  step="1"
+                  value={value[0]}
+                  onChange={handleSliderChange}
+                  className="w-full h-2 bg-foreground/20 rounded-lg appearance-none cursor-pointer slider-thumb"
+                  style={{
+                    background: `linear-gradient(to right, oklch(0.35 0.12 280) 0%, oklch(0.35 0.12 280) ${value[0]}%, oklch(0.35 0.12 280 / 0.3) ${value[0]}%, oklch(0.35 0.12 280 / 0.3) 100%)`
+                  }}
+                />
+                <style>{`
+                  .slider-thumb::-webkit-slider-thumb {
+                    appearance: none;
+                    width: 20px;
+                    height: 20px;
+                    border-radius: 50%;
+                    background: oklch(0.45 0.15 280);
+                    cursor: pointer;
+                    border: 2px solid oklch(0.55 0.18 280);
+                    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+                  }
+                  .slider-thumb::-moz-range-thumb {
+                    width: 20px;
+                    height: 20px;
+                    border-radius: 50%;
+                    background: oklch(0.45 0.15 280);
+                    cursor: pointer;
+                    border: 2px solid oklch(0.55 0.18 280);
+                    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+                  }
+                `}</style>
+              </div>
             </div>
-            <Slider
-              value={value}
-              onValueChange={setValue}
-              min={1}
-              max={100}
-              step={1}
-              className="w-full"
-            />
           </div>
           <div className="flex justify-center">
             <Button

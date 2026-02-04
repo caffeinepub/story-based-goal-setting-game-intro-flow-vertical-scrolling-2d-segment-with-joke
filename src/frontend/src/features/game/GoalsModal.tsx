@@ -17,17 +17,17 @@ export default function GoalsModal({ onDismiss }: GoalsModalProps) {
   }, [onDismiss]);
 
   return (
-    <div className="absolute inset-0 flex items-center justify-center z-50 bg-stone-900/80 backdrop-blur-sm">
+    <div className="absolute inset-0 flex items-center justify-center z-50 bg-stone-900/80 backdrop-blur-sm modal-fade-in">
       <div className="bg-stone-800 border-2 border-stone-600 rounded-2xl p-8 max-w-md mx-4 shadow-2xl">
         <h2 className="text-2xl font-bold text-amber-400 mb-4">
-          Donald has new goals!
+          Barnabus has new goals!
         </h2>
         <div className="text-stone-200 leading-relaxed space-y-3 mb-6">
           <p>
-            This year Donald has decided to take on 4 new goals. Last year it was 6, however he managed to fulfill… 0.
+            This year Barnabus has decided to take on 4 new goals. Last year it was 6, however he managed to fulfill… 0.
           </p>
           <p>
-            Your target is to help Donald to once again accomplish none of his goals. Navigate Donald through the tunnels of the 21st century, find devices and advices to make achieving the goals as hard as possible.
+            Your target is to help Barnabus to once again accomplish none of his goals. Navigate Barnabus through the tunnels of the 21st century, find advices to ensure achieving his goals is impossible.
           </p>
         </div>
         <button

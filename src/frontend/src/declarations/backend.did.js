@@ -8,10 +8,27 @@
 
 import { IDL } from '@icp-sdk/core/candid';
 
-export const idlService = IDL.Service({});
+export const WallOfFameEntry = IDL.Record({
+  'id' : IDL.Nat,
+  'name' : IDL.Text,
+});
+
+export const idlService = IDL.Service({
+  'addEntry' : IDL.Func([IDL.Nat, IDL.Text], [], []),
+  'generateId' : IDL.Func([], [IDL.Nat], []),
+  'getAllEntries' : IDL.Func([], [IDL.Vec(WallOfFameEntry)], ['query']),
+});
 
 export const idlInitArgs = [];
 
-export const idlFactory = ({ IDL }) => { return IDL.Service({}); };
+export const idlFactory = ({ IDL }) => {
+  const WallOfFameEntry = IDL.Record({ 'id' : IDL.Nat, 'name' : IDL.Text });
+  
+  return IDL.Service({
+    'addEntry' : IDL.Func([IDL.Nat, IDL.Text], [], []),
+    'generateId' : IDL.Func([], [IDL.Nat], []),
+    'getAllEntries' : IDL.Func([], [IDL.Vec(WallOfFameEntry)], ['query']),
+  });
+};
 
 export const init = ({ IDL }) => { return []; };

@@ -1,12 +1,11 @@
 # Specification
 
 ## Summary
-**Goal:** Expand the post-game OutroFlow with an additional narrative block, an updated first block, and an interactive 7-item takeaways list with popups—while preserving existing flow, styling, and reveal/gating behavior.
+**Goal:** Improve the game experience by fixing intermittent background-music resume issues, adding a pre-game sound reminder line, and ensuring the Wall of Fame reliably loads entries when opened from its link.
 
 **Planned changes:**
-- Update the first outro text block to reveal a new third line (“That can't be it...”) after the existing two lines, and show a Continue button only after the block finishes revealing.
-- Add a new second outro block that reveals the provided multi-line narrative text line-by-line, then gates progression with a Continue button.
-- Add a new third outro block showing a 7-item underlined takeaways list with pointer cursor; clicking an item opens a closable popup/modal containing placeholder lorem ipsum text and a link to https://lmt.lv.
-- Keep the outro integrated into the existing post-game transition and reuse existing OutroFlow stage system, animations, typography, gradient background, button style, and popup styling patterns (no new navigation paths).
+- Fix gameplay audio flow so background music reliably resumes after being paused for the star-collection sound, including when stars are collected rapidly in succession.
+- Update the specified pre-game narrative section by appending the exact final line: "Also, it's recommended for you to turn on sound."
+- Fix Wall of Fame data-loading so navigating via the "Wall of Fame" link fetches and renders persisted entries immediately (showing loading while fetching as needed), for both anonymous and authenticated users.
 
-**User-visible outcome:** After finishing the game, players see an extended outro sequence with two Continue-gated narrative blocks, followed by a clickable 7-item takeaways list where each item opens a popup with placeholder text and a link.
+**User-visible outcome:** Background music consistently comes back after collecting stars, the pre-game narrative includes a sound-on recommendation, and the Wall of Fame shows existing entries when opened directly from its link.

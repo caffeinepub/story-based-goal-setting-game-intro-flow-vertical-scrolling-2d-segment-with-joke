@@ -1,59 +1,51 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-04T12:24:43.967Z",
+  "generatedAt": "2026-02-04T20:50:50.084Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
-    "total": 4,
-    "implemented": 4,
+    "total": 3,
+    "implemented": 3,
     "items": [
       {
         "id": "REQ-11",
-        "summary": "Update the existing first outro text block to add a third revealed line after the current two lines: \"That can't be it...\" and require a visible Continue button to proceed to the next outro block (matching the existing line-by-line reveal + gated progression behavior used in OutroFlow).",
+        "summary": "Fix the gameplay background music resume behavior so that after the star-collection sound pauses the background music, the background music reliably resumes playback (instead of sometimes remaining paused).",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/features/outro/OutroFlow.tsx"
+          "frontend/src/features/game/useGameplayAudio.ts",
+          "frontend/src/features/game/GameView.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/features/outro/OutroFlow.tsx"
+          "frontend/src/features/game/useGameplayAudio.ts"
         ]
       },
       {
         "id": "REQ-12",
-        "summary": "Add a new second outro block (after the first block’s Continue) that reveals the provided multi-line text line-by-line, and then requires a Continue button to proceed to the next block.",
+        "summary": "Update the pre-game narrative section that begins with \"This particular Barnabus's journey is not that long.\" by appending an additional final line: \"Also, it's recommended for you to turn on sound.\"",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/features/outro/OutroFlow.tsx"
+          "frontend/src/content/story.ts",
+          "frontend/src/features/intro/IntroFlow.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/features/outro/OutroFlow.tsx"
+          "frontend/src/content/story.ts"
         ]
       },
       {
         "id": "REQ-13",
-        "summary": "Add a new third outro block (after the second block’s Continue) that displays a 7-item takeaways list where each item is underlined and uses a pointer cursor; clicking any item opens a popup/modal containing placeholder lorem ipsum text and a link to https://lmt.lv.",
+        "summary": "Fix the Wall of Fame (Hall of Fame) screen so that opening it via the \"Wall of Fame\" link shows the persisted entries immediately (without requiring the user to first finish the game and submit a name).",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/features/outro/TakeawayModal.tsx",
-          "frontend/src/features/outro/OutroFlow.tsx"
+          "frontend/src/hooks/useQueries.ts",
+          "frontend/src/features/hall-of-fame/HallOfFameView.tsx",
+          "frontend/src/components/WallOfFameLink.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/features/outro/TakeawayModal.tsx",
-          "frontend/src/features/outro/OutroFlow.tsx"
-        ]
-      },
-      {
-        "id": "REQ-14",
-        "summary": "Keep the expanded outro fully integrated into the existing post-game flow: the game-to-outro transition remains the same, and the outro continues to use the existing OutroFlow styling conventions (background gradient, typography, button style, and reveal animations) without introducing new navigation paths.",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/features/outro/OutroFlow.tsx"
-        ],
-        "matchedFiles": [
-          "frontend/src/features/outro/OutroFlow.tsx"
+          "frontend/src/hooks/useQueries.ts",
+          "frontend/src/features/hall-of-fame/HallOfFameView.tsx"
         ]
       }
     ]
@@ -63,8 +55,10 @@
     "feature_evidence.json",
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
-    "frontend/src/features/outro/OutroFlow.tsx",
-    "frontend/src/features/outro/TakeawayModal.tsx",
+    "frontend/src/content/story.ts",
+    "frontend/src/features/game/useGameplayAudio.ts",
+    "frontend/src/features/hall-of-fame/HallOfFameView.tsx",
+    "frontend/src/hooks/useQueries.ts",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",

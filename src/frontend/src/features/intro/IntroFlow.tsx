@@ -6,16 +6,20 @@ import {
   startButton,
   goalsBlockA,
   goalsBlockB,
+  negativityBlock,
   sliderQuestion,
   statStep,
   donaldBlockA,
   donaldBlockB,
+  preGameBlock,
 } from '@/content/story';
 import GoalStickinessQuestion from './GoalStickinessQuestion';
 import { getBackgroundGradient } from './introBackground';
+import WallOfFameLink from '@/components/WallOfFameLink';
 
 interface IntroFlowProps {
   onComplete: () => void;
+  onNavigateToHallOfFame: () => void;
 }
 
 type FlowStage =
@@ -27,6 +31,8 @@ type FlowStage =
   | 'goals-a-continue'
   | 'goals-b'
   | 'goals-b-continue'
+  | 'negativity-block'
+  | 'negativity-block-continue'
   | 'slider'
   | 'stat'
   | 'stat-continue'
@@ -34,12 +40,14 @@ type FlowStage =
   | 'donald-block-a-continue'
   | 'donald-block-b'
   | 'donald-block-b-continue'
+  | 'pre-game-block'
+  | 'pre-game-block-continue'
   | 'complete';
 
 // Shared timing constant - 50% of previous 2000ms
 const LINE_REVEAL_DELAY = 1000;
 
-export default function IntroFlow({ onComplete }: IntroFlowProps) {
+export default function IntroFlow({ onComplete, onNavigateToHallOfFame }: IntroFlowProps) {
   const [stage, setStage] = useState<FlowStage>('opening');
   const [displayedText, setDisplayedText] = useState<string[]>([]);
   const [currentLineIndex, setCurrentLineIndex] = useState(0);
@@ -48,6 +56,7 @@ export default function IntroFlow({ onComplete }: IntroFlowProps) {
   const [nextGradient, setNextGradient] = useState('');
   const [gradientOpacity, setGradientOpacity] = useState(1);
   const [showContinue, setShowContinue] = useState(false);
+  const [imageError, setImageError] = useState(false);
 
   const totalDarkeningSteps = [...goalsBlockA, ...goalsBlockB, sliderQuestion].filter(
     (s) => s.darkening
@@ -156,6 +165,24 @@ export default function IntroFlow({ onComplete }: IntroFlowProps) {
     }
   }, [stage, currentLineIndex]);
 
+  // Negativity block reveal (new)
+  useEffect(() => {
+    if (stage === 'negativity-block' && currentLineIndex < negativityBlock.length) {
+      const timer = setTimeout(() => {
+        setDisplayedText((prev) => [...prev, negativityBlock[currentLineIndex]]);
+        setCurrentLineIndex((prev) => prev + 1);
+      }, LINE_REVEAL_DELAY);
+      return () => clearTimeout(timer);
+    } else if (stage === 'negativity-block' && currentLineIndex >= negativityBlock.length) {
+      // Show continue button after last line + one delay
+      const timer = setTimeout(() => {
+        setShowContinue(true);
+        setStage('negativity-block-continue');
+      }, LINE_REVEAL_DELAY);
+      return () => clearTimeout(timer);
+    }
+  }, [stage, currentLineIndex]);
+
   // Stat stage - show text then continue button
   useEffect(() => {
     if (stage === 'stat') {
@@ -168,7 +195,7 @@ export default function IntroFlow({ onComplete }: IntroFlowProps) {
     }
   }, [stage]);
 
-  // Donald Block A reveal
+  // Barnabus Block A reveal
   useEffect(() => {
     if (stage === 'donald-block-a' && currentLineIndex < donaldBlockA.length) {
       const timer = setTimeout(() => {
@@ -186,7 +213,7 @@ export default function IntroFlow({ onComplete }: IntroFlowProps) {
     }
   }, [stage, currentLineIndex]);
 
-  // Donald Block B reveal
+  // Barnabus Block B reveal
   useEffect(() => {
     if (stage === 'donald-block-b' && currentLineIndex < donaldBlockB.length) {
       const timer = setTimeout(() => {
@@ -199,6 +226,24 @@ export default function IntroFlow({ onComplete }: IntroFlowProps) {
       const timer = setTimeout(() => {
         setShowContinue(true);
         setStage('donald-block-b-continue');
+      }, LINE_REVEAL_DELAY);
+      return () => clearTimeout(timer);
+    }
+  }, [stage, currentLineIndex]);
+
+  // Pre-game block reveal (new)
+  useEffect(() => {
+    if (stage === 'pre-game-block' && currentLineIndex < preGameBlock.length) {
+      const timer = setTimeout(() => {
+        setDisplayedText((prev) => [...prev, preGameBlock[currentLineIndex]]);
+        setCurrentLineIndex((prev) => prev + 1);
+      }, LINE_REVEAL_DELAY);
+      return () => clearTimeout(timer);
+    } else if (stage === 'pre-game-block' && currentLineIndex >= preGameBlock.length) {
+      // Show continue button after last line + one delay
+      const timer = setTimeout(() => {
+        setShowContinue(true);
+        setStage('pre-game-block-continue');
       }, LINE_REVEAL_DELAY);
       return () => clearTimeout(timer);
     }
@@ -236,6 +281,13 @@ export default function IntroFlow({ onComplete }: IntroFlowProps) {
   };
 
   const handleGoalsBContinue = () => {
+    setDisplayedText([]);
+    setCurrentLineIndex(0);
+    setShowContinue(false);
+    setStage('negativity-block');
+  };
+
+  const handleNegativityBlockContinue = () => {
     setDisplayedText([sliderQuestion.text]);
     setShowContinue(false);
     if (sliderQuestion.darkening) {
@@ -266,12 +318,22 @@ export default function IntroFlow({ onComplete }: IntroFlowProps) {
 
   const handleDonaldBlockBContinue = () => {
     setDisplayedText([]);
+    setCurrentLineIndex(0);
+    setShowContinue(false);
+    setStage('pre-game-block');
+  };
+
+  const handlePreGameBlockContinue = () => {
+    setDisplayedText([]);
     setShowContinue(false);
     setStage('complete');
   };
 
-  // Only show Donald image during donald-block-a stages
+  // Only show Barnabus image during donald-block-a stages
   const showDonaldImage = stage === 'donald-block-a' || stage === 'donald-block-a-continue';
+
+  // Show Wall of Fame link only on the very first intro screen (opening stage)
+  const showWallOfFameLink = stage === 'opening' || stage === 'opening-continue';
 
   return (
     <div className="min-h-screen flex flex-col items-center px-6 pb-12 relative overflow-hidden" style={{ paddingTop: 'calc(96px + 25vh)' }}>
@@ -293,17 +355,32 @@ export default function IntroFlow({ onComplete }: IntroFlowProps) {
         />
       )}
 
-      {/* Content container with stable top-aligned positioning */}
-      <div className="max-w-2xl w-full relative z-10 flex flex-col items-center">
-        {/* Donald image - only visible during donald-block-a stages */}
+      {/* Wall of Fame link - only visible on first intro screen */}
+      {showWallOfFameLink && (
+        <WallOfFameLink onClick={onNavigateToHallOfFame} />
+      )}
+
+      {/* Content container with stable top-aligned positioning - 15% wider */}
+      <div className="max-w-3xl w-full relative z-10 flex flex-col items-center">
+        {/* Barnabus image - only visible during donald-block-a stages */}
         {showDonaldImage && (
           <div className="mb-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
-            <img
-              src="/assets/generated/donald-pixel.dim_64x64.png"
-              alt="Donald"
-              className="w-32 h-32 pixelated"
-              style={{ imageRendering: 'pixelated' }}
-            />
+            {!imageError ? (
+              <img
+                src="/assets/barnabus.png"
+                alt="Barnabus"
+                className="w-32 h-32 pixelated"
+                style={{ imageRendering: 'pixelated' }}
+                onError={() => setImageError(true)}
+              />
+            ) : (
+              <div className="w-32 h-32 flex items-center justify-center bg-amber-600/20 rounded-lg border-2 border-amber-600/40">
+                <div className="text-center">
+                  <div className="w-16 h-16 mx-auto bg-amber-600/40 rounded-full mb-2" />
+                  <p className="text-xs text-amber-200">Barnabus</p>
+                </div>
+              </div>
+            )}
           </div>
         )}
 
@@ -376,6 +453,18 @@ export default function IntroFlow({ onComplete }: IntroFlowProps) {
             </div>
           )}
 
+          {stage === 'negativity-block-continue' && showContinue && (
+            <div className="flex justify-center pt-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+              <Button
+                onClick={handleNegativityBlockContinue}
+                size="lg"
+                className="rounded-[100px] bg-transparent border border-current text-foreground/90 hover:bg-foreground/5 px-8"
+              >
+                Continue
+              </Button>
+            </div>
+          )}
+
           {stage === 'slider' && <GoalStickinessQuestion onSubmit={handleSliderSubmit} />}
 
           {stage === 'stat-continue' && showContinue && (
@@ -406,6 +495,18 @@ export default function IntroFlow({ onComplete }: IntroFlowProps) {
             <div className="flex justify-center pt-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
               <Button
                 onClick={handleDonaldBlockBContinue}
+                size="lg"
+                className="rounded-[100px] bg-transparent border border-current text-foreground/90 hover:bg-foreground/5 px-8"
+              >
+                Continue
+              </Button>
+            </div>
+          )}
+
+          {stage === 'pre-game-block-continue' && showContinue && (
+            <div className="flex justify-center pt-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+              <Button
+                onClick={handlePreGameBlockContinue}
                 size="lg"
                 className="rounded-[100px] bg-transparent border border-current text-foreground/90 hover:bg-foreground/5 px-8"
               >

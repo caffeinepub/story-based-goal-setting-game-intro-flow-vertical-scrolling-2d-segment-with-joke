@@ -1,57 +1,66 @@
 {
   "kind": "spec_vs_diff_report",
   "version": "1.0",
-  "generatedAt": "2026-02-04T12:24:43.919Z",
-  "summary": "Diff adds a TakeawayModal overlay and extends OutroFlow with multiple staged text blocks and a takeaways list state. However, the requested placement of the new line in the *first* outro block is not implemented (it appears in block 2 instead), and an additional narrative text block (OUTRO_BLOCK_3) is introduced before the takeaways list, which was not requested.",
+  "generatedAt": "2026-02-04T20:50:50.040Z",
+  "summary": "REQ-11 appears implemented via a deterministic resume timeout with a last-request-wins token to handle rapid star pickups. REQ-12’s exact required appended line cannot be confirmed from the truncated diff, and story content shows additional unrequested copy changes. REQ-13 is partially addressed (query refetch behavior adjusted), but the Hall of Fame can still render an empty state before the actor initializes because the query is disabled until `actor` exists, making `isLoading` false initially.",
   "missing_requirements": [
     {
-      "id": "REQ-11",
-      "requirement": "Update the existing first outro text block to add a third revealed line \"That can't be it...\" after the current two lines, and require a visible Continue button to proceed only after the block fully reveals.",
-      "reason": "In the diff, OUTRO_BLOCK_1 still contains only two lines, and the new line \"That can't be it...\" is placed in OUTRO_BLOCK_2 instead of being the third revealed line of the first block.",
-      "evidence": [
-        "frontend/src/features/outro/OutroFlow.tsx"
-      ]
-    },
-    {
       "id": "REQ-12",
-      "requirement": "Add a new second outro block (after the first block’s Continue) that reveals the provided multi-line text line-by-line, then shows Continue; all text must match user-provided wording exactly.",
-      "reason": "The diff’s OUTRO_BLOCK_2 is a 3-line set ending with \"That can't be it...\" and appears to function as a narrative block, but the BuildRequest’s required 'provided multi-line text' is not present/verifiable in the diff summary, and \"That can't be it...\" is used here rather than in block 1 as required.",
+      "requirement": "Append the exact final line \"Also, it's recommended for you to turn on sound.\" to the pre-game narrative section that begins with \"This particular Barnabus's journey is not that long.\"",
+      "reason": "The relevant `preGameBlock` content is truncated in the diff, so the presence and exact wording/placement of the required final line cannot be verified from the provided evidence.",
       "evidence": [
-        "frontend/src/features/outro/OutroFlow.tsx"
+        "frontend/src/content/story.ts (truncated)",
+        "frontend-file-summaries.txt (mentions sound recommendation but not the exact required quoted line)"
       ]
     },
     {
       "id": "REQ-13",
-      "requirement": "Third outro block should be a 7-item takeaways list with underlined, pointer-cursor items; clicking opens a popup/modal with lorem ipsum and a link to exactly https://lmt.lv; modal can be closed returning to the same list state.",
-      "reason": "While TAKEAWAYS (7 items) and a TakeawayModal with lorem ipsum and a link to https://lmt.lv are present, the diff summary is truncated before showing how the takeaways list is rendered/styled (underline + pointer cursor) and how modal open/close returns to the same list state. This cannot be confirmed from the provided diff excerpt.",
+      "requirement": "When navigating to the Wall of Fame via the link, the screen should not render an empty list due to actor-initialization timing; it should show a loading indicator while fetching or show fetched entries.",
+      "reason": "`useWallOfFame` uses `enabled: !!actor`; while `actor` is not yet initialized the query does not run and `isLoading` will be false, but `HallOfFameView` defaults `entries = []` and will render the empty-state message instead of a loader. This can still produce an empty list/empty state during actor init timing.",
       "evidence": [
-        "frontend/src/features/outro/OutroFlow.tsx",
-        "frontend/src/features/outro/TakeawayModal.tsx"
-      ]
-    },
-    {
-      "id": "REQ-14",
-      "requirement": "Expanded outro order must be: (1) first block with added line + Continue, (2) new multi-line block + Continue, (3) clickable takeaways list with popups; keep existing post-game transition and styling conventions without new navigation paths.",
-      "reason": "The diff introduces an additional narrative 'block-3' stage (OUTRO_BLOCK_3 and 'block-3-continue') before reaching 'takeaways', which does not match the specified 3-part order where the third block is the takeaways list. Also, the first block is missing the added line per REQ-11, so the required order is not met.",
-      "evidence": [
-        "frontend/src/features/outro/OutroFlow.tsx"
+        "frontend/src/hooks/useQueries.ts (enabled: !!actor; queryFn returns [] if !actor)",
+        "frontend/src/features/hall-of-fame/HallOfFameView.tsx (uses entries default []; shows loader only when isLoading; shows empty-state text when entries.length===0)"
       ]
     }
   ],
   "hallucinated_features": [
     {
-      "description": "An extra narrative block (OUTRO_BLOCK_3) with its own reveal sequence and Continue gating, plus additional stages ('block-3', 'block-3-continue') before the takeaways list.",
-      "reason": "The BuildRequest specifies only two narrative text blocks followed by the takeaways list as the third block; it does not request an additional narrative block prior to the takeaways.",
+      "description": "Additional narrative/content changes beyond appending the single requested pre-game sound reminder line (e.g., new negativity block, revised opening/goals/slider question text, revised Barnabus/Donald copy).",
+      "reason": "REQ-12 only requests appending one exact line to a specific section; the diff indicates broader copy/content edits and new blocks.",
       "evidence": [
-        "frontend/src/features/outro/OutroFlow.tsx"
+        "frontend/src/content/story.ts (truncated)",
+        "frontend-file-summaries.txt (describes multiple copy updates and new negativityBlock)"
+      ]
+    },
+    {
+      "description": "Star-collected sound volume reduction and extra playback behavior changes (e.g., restarting background music from beginning, additional retry-on-failure logic).",
+      "reason": "REQ-11 asks only to fix resume reliability with no new user-facing text; changing audio mix/volume and adding other behavioral changes were not requested.",
+      "evidence": [
+        "frontend/src/features/game/useGameplayAudio.ts (starAudio.volume = 0.4; bgMusic.currentTime = 0 before play; retry logic mentioned/truncated)"
+      ]
+    },
+    {
+      "description": "Wall of Fame certificate download button/feature and added footer branding text.",
+      "reason": "REQ-13 is limited to fixing loading of persisted entries when opened via link; adding certificate download UI and extra footer text is not requested.",
+      "evidence": [
+        "frontend/src/features/hall-of-fame/HallOfFameView.tsx (Download Your Certificate button; footer with “© 2026. Built with love using caffeine.ai”)"
+      ]
+    },
+    {
+      "description": "Empty-state message copy (“No entries yet. Be the first to complete the journey!”) added/shown when entries are empty.",
+      "reason": "REQ-13 requires loading/fetch correctness; adding new empty-state messaging is not requested and may mask loading issues.",
+      "evidence": [
+        "frontend/src/features/hall-of-fame/HallOfFameView.tsx (renders empty-state paragraph when entries.length === 0)"
       ]
     }
   ],
-  "confidence": 0.7,
+  "confidence": 0.63,
   "changed_files": [
     "frontend-file-summaries.txt",
-    "frontend/src/features/outro/OutroFlow.tsx",
-    "frontend/src/features/outro/TakeawayModal.tsx",
+    "frontend/src/content/story.ts",
+    "frontend/src/features/game/useGameplayAudio.ts",
+    "frontend/src/features/hall-of-fame/HallOfFameView.tsx",
+    "frontend/src/hooks/useQueries.ts",
     "project_state.json"
   ]
 }

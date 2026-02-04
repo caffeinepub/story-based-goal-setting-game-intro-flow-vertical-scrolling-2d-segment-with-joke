@@ -1,76 +1,72 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Expand OutroFlow with additional narrative blocks and interactive takeaways popups",
+  "title": "Gameplay audio resume reliability, pre-game sound reminder line, and Wall of Fame initial load fix",
   "requirements": [
     {
       "id": "REQ-11",
-      "summary": "Add a third revealed line to the first outro block and gate progression behind a visible Continue button after reveal completes.",
+      "summary": "Make background music reliably resume after the star-collection sound pauses it, including during rapid consecutive star pickups.",
       "acceptanceCriteria": [
-        "After game completion, the outro first block displays the existing two lines, then reveals the new third line \"That can't be it...\" using the same timed line-by-line reveal behavior as other outro lines.",
-        "A Continue button is shown for the user to advance only after the first block content is revealed (consistent with existing OutroFlow gating).",
-        "Clicking Continue transitions to the next outro block with the same animation/styling conventions used elsewhere in OutroFlow."
+        "During gameplay, collecting a star pauses the background music and then the background music resumes reliably afterward (no intermittent failure to resume).",
+        "Rapidly collecting multiple stars does not permanently stop the background music (it still resumes after the most recent pause window completes).",
+        "No new user-facing text is added as part of this fix."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/features/outro/OutroFlow.tsx",
+          "path": "frontend/src/features/game/useGameplayAudio.ts",
           "operation": "modify",
-          "description": "Update OUTRO_BLOCK_1 to include the new third line \"That can't be it...\" and ensure Continue gating remains visible only after the final line is revealed. Continue to use the existing shadcn-ui Button (from '@/components/ui/button') for CTA styling consistency; verify the component's usage instructions before implementing."
+          "description": "Fix resume timing so background music resume is scheduled deterministically even when the star sound's play() does not return a Promise (or resolves unpredictably). Ensure rapid star pickups cancel/replace prior resume schedules (e.g., via a monotonic resume token or last-request-wins logic) and that resume attempts re-trigger playback safely without leaving the music paused."
+        },
+        {
+          "path": "frontend/src/features/game/GameView.tsx",
+          "operation": "modify",
+          "description": "Confirm the gameplay flow triggers the updated audio hook correctly for star collection events and that no additional UI text is introduced while validating the resumed playback behavior during gameplay."
         }
       ]
     },
     {
       "id": "REQ-12",
-      "summary": "Insert a new second outro block with the provided multi-line narrative revealed line-by-line and gated by Continue.",
+      "summary": "Append the exact sound reminder line to the specified pre-game narrative section.",
       "acceptanceCriteria": [
-        "The second block appears only after the user clicks Continue on the first block.",
-        "The second block reveals each of the provided lines in order using the same timed line-by-line reveal pattern as the current OutroFlow.",
-        "After the final line is revealed, a Continue button is available to advance to the next block.",
-        "All text matches the user-provided wording, punctuation, and capitalization exactly."
+        "The pre-game block displays the new line after the existing lines in that same section.",
+        "The new line matches exactly: \"Also, it's recommended for you to turn on sound.\""
       ],
       "file_operations": [
         {
-          "path": "frontend/src/features/outro/OutroFlow.tsx",
+          "path": "frontend/src/content/story.ts",
           "operation": "modify",
-          "description": "Add a new outro block array containing the exact provided lines (in order) and extend the OutroFlow stage system to run: block-1 → continue → new block-2 reveal → block-2 continue. Keep the same LINE_REVEAL_DELAY timing and the same reveal animation/styling conventions for each line. Use the existing shadcn-ui Button for the block-2 Continue CTA; verify the component's usage instructions before implementing."
+          "description": "Append the final line \"Also, it's recommended for you to turn on sound.\" to the existing preGameBlock that begins with \"This particular Barnabus's journey is not that long.\" ensuring ordering matches the requirement."
+        },
+        {
+          "path": "frontend/src/features/intro/IntroFlow.tsx",
+          "operation": "modify",
+          "description": "Verify the pre-game narrative rendering uses the updated preGameBlock and that the appended line appears as the final line of that section without altering unrelated copy."
         }
       ]
     },
     {
       "id": "REQ-13",
-      "summary": "Add a third outro block showing a 7-item clickable takeaways list; clicking an item opens a closable in-app modal with lorem ipsum and a link to https://lmt.lv.",
+      "summary": "Ensure Wall of Fame loads persisted entries immediately when opened via the Wall of Fame link, with proper loading state and working for anonymous users.",
       "acceptanceCriteria": [
-        "After the user clicks Continue on the second block, the 7-item list is shown with each item underlined and the cursor changes to pointer on hover.",
-        "Clicking any list item opens a popup/modal (in-app overlay) containing placeholder lorem ipsum text and a clickable link pointing to exactly https://lmt.lv.",
-        "The popup/modal can be closed and the user returns to the same list state (no navigation away from the outro).",
-        "All 7 list item labels match the user-provided text exactly."
+        "When navigating to the Wall of Fame via the link, the list fetches and renders the same persisted entries that are visible after completing the game and submitting a name.",
+        "The Wall of Fame screen does not render an empty list due to caching/disabled-query/actor-initialization timing issues; it either shows a loading indicator while fetching or shows the fetched entries.",
+        "This fix works for anonymous (not logged in) users as well as authenticated users."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/features/outro/TakeawayModal.tsx",
-          "operation": "create",
-          "description": "Create a focused, reusable outro modal component that renders an in-app overlay with placeholder lorem ipsum content, a clickable link to exactly https://lmt.lv, and a close control. Match existing in-app popup styling patterns already used in the app (overlay, centered card, close via button and Escape). Use existing shadcn-ui Button for the modal close CTA where appropriate; verify the component's usage instructions before implementing."
+          "path": "frontend/src/hooks/useQueries.ts",
+          "operation": "modify",
+          "description": "Adjust the Wall of Fame query to avoid actor-timing-related disabled-query states (e.g., remove dependency on an in-flight actor fetch flag for enabling; include an actor-specific stable key if needed). Ensure the query reliably fetches once an anonymous/authenticated actor is ready and does not get stuck returning an empty list due to initialization timing."
         },
         {
-          "path": "frontend/src/features/outro/OutroFlow.tsx",
+          "path": "frontend/src/features/hall-of-fame/HallOfFameView.tsx",
           "operation": "modify",
-          "description": "Extend OutroFlow with a final 'takeaways' stage that renders the 7-item list with underlined labels and pointer cursor. Wire each item click to open TakeawayModal without leaving the outro flow, and ensure closing the modal returns to the same list state."
-        }
-      ]
-    },
-    {
-      "id": "REQ-14",
-      "summary": "Keep the expanded outro integrated into the existing post-game flow and preserve existing OutroFlow styling and transitions without adding new navigation paths.",
-      "acceptanceCriteria": [
-        "Collecting the 7th unique collectible and closing the final pickup modal still transitions into the outro as it does today.",
-        "The expanded outro runs in the new order: (1) first block with added line + Continue, (2) new multi-line block + Continue, (3) clickable takeaways list with popups.",
-        "Visual presentation matches existing OutroFlow patterns (same background treatment and CTA button style) and does not regress intro/game visuals."
-      ],
-      "file_operations": [
+          "description": "Update the Wall of Fame view to treat the initial fetch as a loading state (not an empty list) when navigation happens before data is available. Ensure the view renders a loading indicator while fetching and then renders fetched persisted entries once available for both anonymous and authenticated users."
+        },
         {
-          "path": "frontend/src/features/outro/OutroFlow.tsx",
+          "path": "frontend/src/components/WallOfFameLink.tsx",
           "operation": "modify",
-          "description": "Ensure the updated stage sequence and rendering preserves existing OutroFlow layout (final intro gradient background, typography, line reveal animations, CTA styling) and does not introduce any new routes or navigation. Confirm the outro still mounts via the existing App phase switch (no changes to routing/navigation). Use the existing shadcn-ui Button for CTAs to maintain the established style; verify the component's usage instructions before implementing."
+          "description": "Verify link navigation wiring triggers the Hall of Fame screen in a way that mounts the data-fetching view and results in entries being fetched immediately upon navigation (no dependency on finishing the game first)."
         }
       ]
     }

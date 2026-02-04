@@ -27,6 +27,12 @@ export function useKeyboardControls(
         return;
       }
 
+      // Ignore repeat events for Space to prevent rapid firing
+      if (e.key === ' ' && e.repeat) {
+        e.preventDefault();
+        return;
+      }
+
       switch (e.key) {
         case 'ArrowLeft':
           e.preventDefault();

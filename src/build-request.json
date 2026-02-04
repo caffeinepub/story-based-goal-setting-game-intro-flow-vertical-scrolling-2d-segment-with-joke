@@ -1,92 +1,71 @@
 {
   "kind": "build_request",
-  "title": "Expand post-game OutroFlow with additional narrative blocks and interactive takeaways popups",
+  "title": "Fix gameplay audio resume, add pre-game sound reminder line, and ensure Wall of Fame loads from link",
   "priority": "normal",
   "requirements": [
     {
       "id": "REQ-11",
-      "text": "Update the existing first outro text block to add a third revealed line after the current two lines: \"That can't be it...\" and require a visible Continue button to proceed to the next outro block (matching the existing line-by-line reveal + gated progression behavior used in OutroFlow).",
+      "text": "Fix the gameplay background music resume behavior so that after the star-collection sound pauses the background music, the background music reliably resumes playback (instead of sometimes remaining paused).",
       "target": "frontend",
       "source": {
         "messageIds": [
           "msg-1"
         ],
         "quotes": [
-          "Add one more line to it:\nThat can't be it...\n// \"continue\" button"
+          "The background music sometimes doesn't restart after it's been paused for the star collection soundtrack."
         ]
       },
       "acceptanceCriteria": [
-        "After game completion, the outro first block displays the existing two lines, then reveals the new third line \"That can't be it...\" using the same timed line-by-line reveal behavior as other outro lines.",
-        "A Continue button is shown for the user to advance only after the first block content is revealed (consistent with existing OutroFlow gating).",
-        "Clicking Continue transitions to the next outro block with the same animation/styling conventions used elsewhere in OutroFlow."
+        "During gameplay, collecting a star pauses the background music and then the background music resumes reliably afterward (no intermittent failure to resume).",
+        "Rapidly collecting multiple stars does not permanently stop the background music (it still resumes after the most recent pause window completes).",
+        "No new user-facing text is added as part of this fix."
       ]
     },
     {
       "id": "REQ-12",
-      "text": "Add a new second outro block (after the first block’s Continue) that reveals the provided multi-line text line-by-line, and then requires a Continue button to proceed to the next block.",
+      "text": "Update the pre-game narrative section that begins with \"This particular Barnabus's journey is not that long.\" by appending an additional final line: \"Also, it's recommended for you to turn on sound.\"",
       "target": "frontend",
       "source": {
         "messageIds": [
           "msg-1"
         ],
         "quotes": [
-          "Next block of texts:\n\nSetting goals is good, it gives you a sense destination and direction.\nApplications and TODO lists won’t accomplish your goals for you, the drive must come from within.\nAnd not all goals can and will be reached, but that's fine.\nIf you fail - analyze, tweak, and most importantly, don’t shame yourself.\nHere are 7 takeaways from Barny's experience to help you and Barny craft goals that are more realistic and can truly change you for the better without doing harm\n\n// \"continue\" button"
+          "To the section that starts with \"This particular Barnabus's journey is not that long.\" add additional message at the end of current ones: \"Also, it's recommended for you to turn on sound.\"."
         ]
       },
       "acceptanceCriteria": [
-        "The second block appears only after the user clicks Continue on the first block.",
-        "The second block reveals each of the provided lines in order using the same timed line-by-line reveal pattern as the current OutroFlow.",
-        "After the final line is revealed, a Continue button is available to advance to the next block.",
-        "All text matches the user-provided wording, punctuation, and capitalization exactly."
+        "The pre-game block displays the new line after the existing lines in that same section.",
+        "The new line matches exactly: \"Also, it's recommended for you to turn on sound.\""
       ]
     },
     {
       "id": "REQ-13",
-      "text": "Add a new third outro block (after the second block’s Continue) that displays a 7-item takeaways list where each item is underlined and uses a pointer cursor; clicking any item opens a popup/modal containing placeholder lorem ipsum text and a link to https://lmt.lv.",
+      "text": "Fix the Wall of Fame (Hall of Fame) screen so that opening it via the \"Wall of Fame\" link shows the persisted entries immediately (without requiring the user to first finish the game and submit a name).",
       "target": "frontend",
       "source": {
         "messageIds": [
           "msg-1"
         ],
         "quotes": [
-          "Next block with texts (here all texts have underline and cursor: pointer. On click, a popup appears with lorem ipsum text and link to https://lmt.lv (we'll update the texts and links later)).\n\n- Vague goals, wishes\n- All-or-Nothing mentality\n- Kick-off excitement (especially if share with others)\n- Lack of Environmental Design\n- The conformity of the goal\n- Identity shift\n- Sustainable pace, realistic expectations"
+          "Also if I open wall of fame from the link, it doesn't show any entries. However, if I finished the game, input my name, then it shows other entries as well."
         ]
       },
       "acceptanceCriteria": [
-        "After the user clicks Continue on the second block, the 7-item list is shown with each item underlined and the cursor changes to pointer on hover.",
-        "Clicking any list item opens a popup/modal (in-app overlay) containing placeholder lorem ipsum text and a clickable link pointing to exactly https://lmt.lv.",
-        "The popup/modal can be closed and the user returns to the same list state (no navigation away from the outro).",
-        "All 7 list item labels match the user-provided text exactly."
-      ]
-    },
-    {
-      "id": "REQ-14",
-      "text": "Keep the expanded outro fully integrated into the existing post-game flow: the game-to-outro transition remains the same, and the outro continues to use the existing OutroFlow styling conventions (background gradient, typography, button style, and reveal animations) without introducing new navigation paths.",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-1"
-        ],
-        "quotes": [
-          "All of this should reuse the existing OutroFlow stage system, line-by-line reveals, Continue gating, and popup styling patterns already in the app."
-        ]
-      },
-      "acceptanceCriteria": [
-        "Collecting the 7th unique collectible and closing the final pickup modal still transitions into the outro as it does today.",
-        "The expanded outro runs in the new order: (1) first block with added line + Continue, (2) new multi-line block + Continue, (3) clickable takeaways list with popups.",
-        "Visual presentation matches existing OutroFlow patterns (same background treatment and CTA button style) and does not regress intro/game visuals."
+        "When navigating to the Wall of Fame via the link, the list fetches and renders the same persisted entries that are visible after completing the game and submitting a name.",
+        "The Wall of Fame screen does not render an empty list due to caching/disabled-query/actor-initialization timing issues; it either shows a loading indicator while fetching or shows the fetched entries.",
+        "This fix works for anonymous (not logged in) users as well as authenticated users."
       ]
     }
   ],
   "constraints": [
-    "Do not edit files under frontend/src/components/ui; compose and reuse existing UI components instead.",
-    "Do not modify frontend immutable paths listed in SYSTEM_CONTEXT (Internet Identity/actor hooks and frontend/src/main.tsx).",
-    "Backend must remain single-actor; no new backend work is required for this change."
+    "Do not edit files under frontend.immutablePaths (compose existing hooks/components instead).",
+    "Respect the single-actor backend architecture; do not introduce additional backend services.",
+    "Use English for any user-facing text."
   ],
   "nonGoals": [
-    "Do not change any gameplay mechanics, collectible logic, or the condition that triggers the outro after the 7th unique collectible.",
-    "Do not finalize or customize the popup content beyond placeholder lorem ipsum and the provided https://lmt.lv link.",
-    "Do not introduce new authentication flows or any backend API dependencies for the outro content."
+    "Do not change the Wall of Fame storage schema or introduce new backend persistence mechanisms beyond what is required for the loading bug.",
+    "Do not redesign the Wall of Fame UI beyond what is necessary to ensure entries load and display correctly.",
+    "Do not add new audio tracks or new sound effects; only fix the existing resume reliability issue."
   ],
   "imageRequirements": {
     "required": [],

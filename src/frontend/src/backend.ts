@@ -89,10 +89,59 @@ export class ExternalBlob {
         return this;
     }
 }
+export interface WallOfFameEntry {
+    id: bigint;
+    name: string;
+}
 export interface backendInterface {
+    addEntry(id: bigint, name: string): Promise<void>;
+    generateId(): Promise<bigint>;
+    getAllEntries(): Promise<Array<WallOfFameEntry>>;
 }
 export class Backend implements backendInterface {
     constructor(private actor: ActorSubclass<_SERVICE>, private _uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, private _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, private processError?: (error: unknown) => never){}
+    async addEntry(arg0: bigint, arg1: string): Promise<void> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.addEntry(arg0, arg1);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.addEntry(arg0, arg1);
+            return result;
+        }
+    }
+    async generateId(): Promise<bigint> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.generateId();
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.generateId();
+            return result;
+        }
+    }
+    async getAllEntries(): Promise<Array<WallOfFameEntry>> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getAllEntries();
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getAllEntries();
+            return result;
+        }
+    }
 }
 export interface CreateActorOptions {
     agent?: Agent;

@@ -20,7 +20,7 @@ export default function StarPickupModal({ title, description, isCompletionPickup
   }, [onDismiss]);
 
   return (
-    <div className="absolute inset-0 flex items-center justify-center z-50 bg-stone-900/80 backdrop-blur-sm">
+    <div className="absolute inset-0 flex items-center justify-center z-50 bg-stone-900/80 backdrop-blur-sm modal-fade-in">
       <div className="bg-stone-800 border-2 border-stone-600 rounded-2xl p-8 max-w-md mx-4 shadow-2xl">
         <h2 className="text-2xl font-bold text-amber-400 mb-4">
           {title}

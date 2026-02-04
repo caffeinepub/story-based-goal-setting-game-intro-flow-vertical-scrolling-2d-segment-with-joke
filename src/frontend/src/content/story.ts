@@ -39,7 +39,12 @@ export const openingLines: StoryStep[] = [
   {
     id: 'opening-4',
     type: 'text',
-    text: "You've seen the posts. 1% better every day. Simple math for a better life.",
+    text: "You've seen the posts. 1% better every day.",
+  },
+  {
+    id: 'opening-5',
+    type: 'text',
+    text: "Simple math for a better life.",
   },
 ];
 
@@ -102,13 +107,13 @@ export const goalsBlockB: StoryStep[] = [
   {
     id: 'goals-7',
     type: 'text',
-    text: 'What if something else comes up.',
+    text: "What if it's not ambitious enough.",
     darkening: true,
   },
   {
     id: 'goals-8',
     type: 'text',
-    text: 'What if you fail. Or stop.',
+    text: 'What if you fail. What if you slow down.',
     darkening: true,
   },
 ];
@@ -120,11 +125,16 @@ export const goalsBlockBContinue: StoryStep = {
   clearBefore: true,
 };
 
+// Negativity block (new - before slider question)
+export const negativityBlock: string[] = [
+  "There's no time for negativity, it doesn't help!",
+];
+
 // Question
 export const sliderQuestion: StoryStep = {
   id: 'question',
   type: 'slider',
-  text: 'Do you know how many people stick to their goals?',
+  text: "Do you know how many people manage to fulfill their New Year's resolutions?",
   darkening: true,
 };
 
@@ -149,17 +159,26 @@ export const donaldImage: StoryStep = {
   text: '',
 };
 
-// Donald narrative - Block 1
+// Barnabus narrative - Block 1
 export const donaldBlockA: string[] = [
-  'Well, meet Donald.',
-  'Donald is very ambitious and aims to reach new highs this year.',
-  'But most of the time Donald gets lost on his way.',
-  'He gets tangled in his ambitions. He stumbles and fails to reach his goals.',
+  'Meet Barnabus.',
+  'Barnabus is very ambitious and aims to reach new highs this year.',
+  'But most of the time Barnabus gets lost on his way.',
+  'He gets tangled in his ambitions. He stumbles, falls and fails to deliver.',
 ];
 
-// Donald narrative - Block 2
+// Barnabus narrative - Block 2
 export const donaldBlockB: string[] = [
-  "Today we'll follow Donald for a little while.",
-  "During this short journey we'll examine how Donald ends up like that.",
+  "Today we'll follow Barnabus for a little while.",
+  "During this journey we'll examine how Barnabus ends up like that.",
   "And we'll see what happens to the 92% people who also fail to accomplish what they have promised to themselves.",
+  "I'll tell you one thing - it's not laziness.",
+];
+
+// Pre-game block (new - before game starts)
+export const preGameBlock: string[] = [
+  "This particular Barnabus's journey is not that long.",
+  "However, it is full of important lessons.",
+  "So please don't skip through and pay deep attention.",
+  "Also, it's recommended for you to turn on sound.",
 ];

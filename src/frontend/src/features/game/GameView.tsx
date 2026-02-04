@@ -7,6 +7,7 @@ import GoalsModal from './GoalsModal';
 import StarPickupModal from './StarPickupModal';
 import CollectiblesHud from './CollectiblesHud';
 import { getFinalIntroGradient } from '../intro/introBackground';
+import { useGameplayAudio } from './useGameplayAudio';
 import {
   WORLD_BOUNDS,
   TILE_REGIONS,
@@ -32,41 +33,42 @@ interface Camera {
 
 interface GameViewProps {
   onFinalStarDismiss: () => void;
+  onNavigateToHallOfFame: () => void;
 }
 
 // Star collectible content map (per-star text only, no embedded completion message)
 const STAR_CONTENT: Record<string, { title: string; description: string }> = {
   'collectible-0': {
-    title: 'Vague, magical, blurry definitions',
+    title: 'Vague, magical, blurry definitions.',
     description: 'Why ruin the mystery with clarity? Barnabus should say things like "I just want to be successful" or "I want my life to be better." Avoid numbers, timelines, or concrete actions at all costs. If Barnabus doesn\'t know where the finish line is, he can\'t possibly be disappointed when he never crosses it.',
   },
   'collectible-1': {
-    title: 'Strict all-or-nothing mindset',
+    title: 'Strict all-or-nothing mindset.',
     description: 'Barnabus has to decide in advance that missing one workout, one habit, or one good day means the entire goal is officially dead. Perfection or total collapse—no middle ground. Did Barny eat one cookie? Well, the diet is ruined — he might as well eat the whole bakery.',
   },
   'collectible-2': {
-    title: 'The dopamine announcement',
-    description: 'Get wildly excited at the beginning. Announce it to everyone. Buy the gear. Make the playlist. Then assume that this initial surge of dopamine will somehow carry Barnabus through months of boredom, resistance, and fatigue.',
+    title: 'The dopamine announcement.',
+    description: 'Get Barnabus wildly excited at the beginning. Announce it to everyone. Buy the gear. Make the playlist. Then assume that this initial surge of dopamine will somehow carry Barnabus through months of boredom, resistance, and fatigue.',
   },
   'collectible-3': {
-    title: 'Environment as an obstacle course',
-    description: 'Expect sheer willpower to overcome friction. Keep distractions everywhere. Leave junk food in plain sight. Work where you usually procrastinate. Barnabus must structure his life exactly the same and be surprised when his old habits keep winning. If it were important, he\'d just try harder, right?',
+    title: 'Environment as an obstacle course.',
+    description: 'Barnabus has to expect sheer willpower to overcome friction. Keep distractions everywhere. Leave junk food in plain sight. He must work where he usually procrastinates. Barnabus must structure his life exactly the same and be surprised when his old habits keep winning. If it were important, he\'d just try harder, right?',
   },
   'collectible-4': {
-    title: 'Choose someone else\'s goals',
+    title: 'Choose someone else\'s goals.',
     description: 'Barnabus\'s goals are based what looks impressive, trendy, or socially approved. He makes sure it aligns with someone else\'s values — his mom\'s, peers\', or Instagram\'s. When motivation disappears, he can comfortably blame the goal instead of noticing it never mattered to him in the first place.',
   },
   'collectible-5': {
-    title: 'Never change your true identity',
+    title: 'Never change your true identity.',
     description: 'Above all things, Barnabus must not change his self-image. A goal is a goal, and his identity is his identity; by no means should one be allowed to contaminate the other. To ensure total failure, Barnabus must attempt to reach new heights while stubbornly preserving his old habits and mental furniture.',
   },
   'collectible-6': {
-    title: 'Life will pause',
-    description: 'Barnabus assumes he\'ll suddenly have unlimited energy, time, and emotional stability. Planning an unsustainable pace that ignores stress, work, illness, relationships, and bad days is crucial. When real life inevitably interferes, Barny conclude that the system is broken and quits entirely, and with a dramatic disappointment.',
+    title: 'Life will pause.',
+    description: 'Barnabus assumes he\'ll suddenly have unlimited energy, time, and emotional stability. Planning an unsustainable pace that ignores stress, work, illness, relationships, and bad days is crucial. When real life inevitably interferes, Barny concludes that the system is broken and quits entirely - with a dramatic disappointment.',
   },
 };
 
-export default function GameView({ onFinalStarDismiss }: GameViewProps) {
+export default function GameView({ onFinalStarDismiss, onNavigateToHallOfFame }: GameViewProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const spawnPos = getSpawnPosition();
   const characterRef = useRef<Character>({ x: spawnPos.x, y: spawnPos.y });
@@ -80,12 +82,10 @@ export default function GameView({ onFinalStarDismiss }: GameViewProps) {
   const [isSpinning, setIsSpinning] = useState(false);
   const spinTimeoutRef = useRef<number | null>(null);
   const spinRotationRef = useRef<number>(0);
+  const [fadeIn, setFadeIn] = useState(false);
 
-  // First movement detection and goals modal
-  const [showGoalsModal, setShowGoalsModal] = useState(false);
-  const hasMovedRef = useRef(false);
-  const firstMovementTimerRef = useRef<number | null>(null);
-  const previousPositionRef = useRef({ x: spawnPos.x, y: spawnPos.y });
+  // Goals modal - show immediately on mount
+  const [showGoalsModal, setShowGoalsModal] = useState(true);
 
   // Star pickup modal state - now tracks which collectible and whether it's the completion pickup
   const [starPickupContent, setStarPickupContent] = useState<{ title: string; description: string; collectibleId: string; isCompletionPickup: boolean } | null>(null);
@@ -99,17 +99,32 @@ export default function GameView({ onFinalStarDismiss }: GameViewProps) {
   // Track whether outro has been triggered to prevent duplicate calls
   const outroTriggeredRef = useRef(false);
 
-  // Audio for star pickup
-  const pickupAudioRef = useRef<HTMLAudioElement | null>(null);
+  // Audio management
+  const { playStarCollectedSound, startBackgroundMusic, stopBackgroundMusic } = useGameplayAudio();
 
-  const CANVAS_WIDTH = 500;
-  const CANVAS_HEIGHT = 600;
+  // Audio refs for other sounds
+  const spaceAudioRef = useRef<HTMLAudioElement | null>(null);
+
+  // Pending star modal timer ref
+  const pendingStarModalTimerRef = useRef<number | null>(null);
+
+  // Canvas dimensions increased by 10%
+  const CANVAS_WIDTH = 550; // 500 * 1.1
+  const CANVAS_HEIGHT = 660; // 600 * 1.1
   const CHARACTER_SIZE = 64;
   const MOVE_SPEED = 180; // pixels per second - Zelda-like movement speed
   const CAMERA_SMOOTHING = 0.1; // Camera follow smoothing factor
   const SPIN_DURATION = 600; // milliseconds for one full spin
 
-  // Load Donald pixel character image with error handling
+  // Trigger fade-in on mount
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setFadeIn(true);
+    }, 50);
+    return () => clearTimeout(timer);
+  }, []);
+
+  // Load Barnabus pixel character image with error handling
   useEffect(() => {
     const img = new Image();
     img.src = '/assets/generated/donald-pixel.dim_64x64.png';
@@ -124,17 +139,47 @@ export default function GameView({ onFinalStarDismiss }: GameViewProps) {
     };
   }, []);
 
-  // Load pickup sound effect
+  // Load space action audio
   useEffect(() => {
-    const audio = new Audio('/assets/sfx/star-pickup.mp3');
-    audio.preload = 'auto';
-    pickupAudioRef.current = audio;
+    const spaceAudio = new Audio('/assets/sfx/action-space.mp3');
+    spaceAudio.preload = 'auto';
+    spaceAudioRef.current = spaceAudio;
   }, []);
+
+  // Start background music on mount and stop on unmount
+  useEffect(() => {
+    // Attempt to start music immediately
+    startBackgroundMusic();
+
+    // Listener to retry music start on first user interaction if autoplay was blocked
+    const startMusicOnInteraction = () => {
+      startBackgroundMusic();
+    };
+
+    // Listen for keyboard and pointer interactions (once only)
+    window.addEventListener('keydown', startMusicOnInteraction, { once: true });
+    window.addEventListener('pointerdown', startMusicOnInteraction, { once: true });
+
+    // Cleanup: stop music on unmount
+    return () => {
+      stopBackgroundMusic();
+      window.removeEventListener('keydown', startMusicOnInteraction);
+      window.removeEventListener('pointerdown', startMusicOnInteraction);
+    };
+  }, [startBackgroundMusic, stopBackgroundMusic]);
 
   const handleSpacePress = () => {
     // Don't process input if modal is open
     if (showGoalsModal || starPickupContent) {
       return;
+    }
+
+    // Play space action SFX
+    if (spaceAudioRef.current) {
+      spaceAudioRef.current.currentTime = 0;
+      spaceAudioRef.current.play().catch(() => {
+        // Ignore audio play errors
+      });
     }
 
     // Clear any existing spin timeout
@@ -175,15 +220,23 @@ export default function GameView({ onFinalStarDismiss }: GameViewProps) {
           // Determine if this is the 7th unique pickup (completion pickup)
           const isCompletionPickup = newCount === 7;
 
-          // Show star pickup modal with the appropriate content
+          // Show star pickup modal after delay (spin duration + 50ms)
           const content = STAR_CONTENT[collectible.id];
           if (content) {
-            setStarPickupContent({
-              title: content.title,
-              description: content.description,
-              collectibleId: collectible.id,
-              isCompletionPickup,
-            });
+            // Clear any pending modal timer
+            if (pendingStarModalTimerRef.current !== null) {
+              clearTimeout(pendingStarModalTimerRef.current);
+            }
+
+            pendingStarModalTimerRef.current = window.setTimeout(() => {
+              setStarPickupContent({
+                title: content.title,
+                description: content.description,
+                collectibleId: collectible.id,
+                isCompletionPickup,
+              });
+              pendingStarModalTimerRef.current = null;
+            }, SPIN_DURATION + 50);
           }
 
           // Break after first pickup to ensure only one collectible per Space press
@@ -192,12 +245,9 @@ export default function GameView({ onFinalStarDismiss }: GameViewProps) {
       }
     }
 
-    // Play pickup sound only if a collectible was collected
-    if (collected && pickupAudioRef.current) {
-      pickupAudioRef.current.currentTime = 0;
-      pickupAudioRef.current.play().catch(() => {
-        // Ignore audio play errors (e.g., user hasn't interacted with page yet)
-      });
+    // Play star collected sound only if a collectible was collected
+    if (collected) {
+      playStarCollectedSound();
     }
   };
 
@@ -215,10 +265,20 @@ export default function GameView({ onFinalStarDismiss }: GameViewProps) {
     const randomJoke = jokes[Math.floor(Math.random() * jokes.length)];
     setCurrentJoke(randomJoke);
     
-    // Update joke position relative to canvas (screen space)
-    const screenX = CANVAS_WIDTH / 2;
-    const screenY = CANVAS_HEIGHT / 2 - 80;
-    setJokePosition({ x: screenX, y: screenY });
+    // Update joke position to be centered above character in world space - 70px higher
+    const character = characterRef.current;
+    const camera = cameraRef.current;
+    const canvas = canvasRef.current;
+    
+    if (canvas) {
+      // Convert character world position to screen position
+      const cameraOffsetX = CANVAS_WIDTH / 2 - camera.x;
+      const cameraOffsetY = CANVAS_HEIGHT / 2 - camera.y;
+      const screenX = character.x + cameraOffsetX;
+      const screenY = character.y + cameraOffsetY - 150; // 70px higher than before (was -80, now -150)
+      
+      setJokePosition({ x: screenX, y: screenY });
+    }
 
     // Set new timeout and store reference
     jokeTimeoutRef.current = window.setTimeout(() => {
@@ -358,7 +418,7 @@ export default function GameView({ onFinalStarDismiss }: GameViewProps) {
       }
     });
 
-    // Draw character (Donald) with fallback and optional spin
+    // Draw character (Barnabus) with fallback and optional spin
     const character = characterRef.current;
     
     // Apply spin rotation if active
@@ -504,20 +564,13 @@ export default function GameView({ onFinalStarDismiss }: GameViewProps) {
         character.y = newY;
       }
 
-      // Detect first actual movement (position change)
-      if (!hasMovedRef.current) {
-        const hasMoved = 
-          Math.abs(character.x - previousPositionRef.current.x) > 0.1 ||
-          Math.abs(character.y - previousPositionRef.current.y) > 0.1;
-        
-        if (hasMoved) {
-          hasMovedRef.current = true;
-          // Schedule modal to appear 0.2s after first movement
-          firstMovementTimerRef.current = window.setTimeout(() => {
-            setShowGoalsModal(true);
-            firstMovementTimerRef.current = null;
-          }, 200);
-        }
+      // Update joke position if joke is visible (track character in world space) - 70px higher
+      if (currentJoke) {
+        const cameraOffsetX = CANVAS_WIDTH / 2 - camera.x;
+        const cameraOffsetY = CANVAS_HEIGHT / 2 - camera.y;
+        const screenX = character.x + cameraOffsetX;
+        const screenY = character.y + cameraOffsetY - 150; // 70px higher than before
+        setJokePosition({ x: screenX, y: screenY });
       }
 
       // Smooth camera follow (Zelda-like)
@@ -550,23 +603,33 @@ export default function GameView({ onFinalStarDismiss }: GameViewProps) {
       if (spinTimeoutRef.current !== null) {
         clearTimeout(spinTimeoutRef.current);
       }
-      if (firstMovementTimerRef.current !== null) {
-        clearTimeout(firstMovementTimerRef.current);
+      if (pendingStarModalTimerRef.current !== null) {
+        clearTimeout(pendingStarModalTimerRef.current);
       }
     };
   }, []);
 
   return (
     <div 
-      className="min-h-screen flex flex-col items-center justify-center p-6"
-      style={{ background: getFinalIntroGradient() }}
+      className={`min-h-screen flex flex-col items-center justify-center p-6 transition-opacity duration-700 ${fadeIn ? 'opacity-100' : 'opacity-0'}`}
+      style={{ 
+        background: getFinalIntroGradient()
+      }}
     >
-      <div className="relative rounded-3xl overflow-hidden">
+      <div 
+        className="relative rounded-3xl overflow-hidden"
+        style={{
+          background: 'linear-gradient(135deg, oklch(0.15 0.08 240) 0%, oklch(0.12 0.10 250) 100%)'
+        }}
+      >
         <canvas
           ref={canvasRef}
           width={CANVAS_WIDTH}
           height={CANVAS_HEIGHT}
-          className="bg-stone-900 focus:outline-none"
+          className="focus:outline-none"
+          style={{
+            background: 'linear-gradient(135deg, oklch(0.18 0.08 240) 0%, oklch(0.15 0.10 250) 100%)'
+          }}
           tabIndex={0}
         />
 
@@ -594,25 +657,33 @@ export default function GameView({ onFinalStarDismiss }: GameViewProps) {
             x={jokePosition.x}
             y={jokePosition.y}
             canvasWidth={CANVAS_WIDTH}
+            canvasHeight={CANVAS_HEIGHT}
           />
         )}
 
-        <div className="absolute bottom-0 left-0 right-0 p-4 text-center text-stone-300 text-sm bg-gradient-to-t from-stone-900/80 to-transparent">
+        <div 
+          className="absolute bottom-0 left-0 right-0 p-4 text-center text-white/80 text-sm"
+          style={{
+            background: 'linear-gradient(to top, oklch(0.15 0.08 240 / 0.9), transparent)'
+          }}
+        >
           <p className="font-medium">Controls:</p>
-          <p className="mt-1">Arrow keys to move • Space to act • J to tell a joke</p>
+          <p className="mt-1">Arrow keys to move • Space to act • J to tell a joke.</p>
         </div>
       </div>
 
-      <footer className="mt-12 text-center text-stone-500 text-sm">
-        © 2026. Built with love using{' '}
-        <a
-          href="https://caffeine.ai"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-amber-600 hover:text-amber-500 underline"
-        >
-          caffeine.ai
-        </a>
+      <footer className="mt-12 text-center text-white/50 text-sm">
+        <p>
+          © 2026. Built with love using{' '}
+          <a
+            href="https://caffeine.ai"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-purple-300 hover:text-purple-200 underline"
+          >
+            caffeine.ai
+          </a>
+        </p>
       </footer>
     </div>
   );
