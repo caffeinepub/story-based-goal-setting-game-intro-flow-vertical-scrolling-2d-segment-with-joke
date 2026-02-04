@@ -1,39 +1,59 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-04T12:05:25.821Z",
+  "generatedAt": "2026-02-04T12:24:43.967Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
-    "total": 2,
-    "implemented": 2,
+    "total": 4,
+    "implemented": 4,
     "items": [
       {
         "id": "REQ-11",
-        "summary": "Update gameplay completion logic so the appended completion message and the game-to-outro transition happen when the player picks up the 7th unique collectible (collectedCount reaches 7), regardless of which collectible ID it is (pickup order must not matter).",
+        "summary": "Update the existing first outro text block to add a third revealed line after the current two lines: \"That can't be it...\" and require a visible Continue button to proceed to the next outro block (matching the existing line-by-line reveal + gated progression behavior used in OutroFlow).",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/features/game/GameView.tsx",
-          "frontend/src/features/game/StarPickupModal.tsx"
+          "frontend/src/features/outro/OutroFlow.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/features/game/GameView.tsx",
-          "frontend/src/features/game/StarPickupModal.tsx"
+          "frontend/src/features/outro/OutroFlow.tsx"
         ]
       },
       {
         "id": "REQ-12",
-        "summary": "Apply the specified formatting to the appended completion message section inside the star pickup modal: after the existing star description text, render an empty line with 12px top margin, then render a new line with bold \"Congratulations!\" followed by the 🌟 emoji, then a line break and the sentence \"You have successfully taught Barnabus the key components to ensure his goal is safely distanced from his reach.\"",
+        "summary": "Add a new second outro block (after the first block’s Continue) that reveals the provided multi-line text line-by-line, and then requires a Continue button to proceed to the next block.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/features/game/StarPickupModal.tsx",
-          "frontend/src/features/game/GameView.tsx"
+          "frontend/src/features/outro/OutroFlow.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/features/game/StarPickupModal.tsx",
-          "frontend/src/features/game/GameView.tsx"
+          "frontend/src/features/outro/OutroFlow.tsx"
+        ]
+      },
+      {
+        "id": "REQ-13",
+        "summary": "Add a new third outro block (after the second block’s Continue) that displays a 7-item takeaways list where each item is underlined and uses a pointer cursor; clicking any item opens a popup/modal containing placeholder lorem ipsum text and a link to https://lmt.lv.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/features/outro/TakeawayModal.tsx",
+          "frontend/src/features/outro/OutroFlow.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/features/outro/TakeawayModal.tsx",
+          "frontend/src/features/outro/OutroFlow.tsx"
+        ]
+      },
+      {
+        "id": "REQ-14",
+        "summary": "Keep the expanded outro fully integrated into the existing post-game flow: the game-to-outro transition remains the same, and the outro continues to use the existing OutroFlow styling conventions (background gradient, typography, button style, and reveal animations) without introducing new navigation paths.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/features/outro/OutroFlow.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/features/outro/OutroFlow.tsx"
         ]
       }
     ]
@@ -43,8 +63,8 @@
     "feature_evidence.json",
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
-    "frontend/src/features/game/GameView.tsx",
-    "frontend/src/features/game/StarPickupModal.tsx",
+    "frontend/src/features/outro/OutroFlow.tsx",
+    "frontend/src/features/outro/TakeawayModal.tsx",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",

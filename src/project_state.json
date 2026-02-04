@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "projectStateVersion": 74,
+  "projectStateVersion": 83,
   "summary": "A React + TypeScript single-page app with a story-driven, multi-stage intro experience (timed narrative reveals, user-gated progression, and mood-darkening gradient transitions plus a slider-based question) that transitions into a small 2D top-down canvas game. In the game, the player moves a Donald pixel character through a narrow, strictly linear, downward-progressing corridor world with gentle curves, while a smooth camera follows; obstacles block movement via collisions with wall-sliding; pressing J shows a random joke in a timed speech balloon overlay; pressing Space performs an action and can also pick up nearby collectibles. The game includes a goals modal on first movement and a 0/7 collectibles HUD with per-star pickup modals; after the 7th pickup modal is closed, gameplay ends and the app transitions into an outro narrative flow using the same line-by-line reveal + gated Continue pattern as the intro. The repo also includes scaffolding for Internet Identity authentication and identity-aware backend actor creation via React Query, plus a reusable build-template directory containing ICP canister configs, frontend tooling, shadcn/ui component set, and deploy/build scripts for packaging/export.",
   "existing_features": [
     {
@@ -615,28 +615,64 @@
       "version": 1
     },
     {
-      "id": "feature-update-gameplay-completion-logic-so-the-appended-completion-message-and-the-game-to-outro-transition-happen-when-the-player-picks-up-the-7th-unique-collectible-collectedcount-reaches-7-regardless-of-which-collectible-id-it-is-pickup-order-must-not-matter",
-      "title": "Update gameplay completion logic so the appended completion message and the game-to-outro transition happen when the player picks up the 7th unique collectible (collectedCount reaches 7), regardless of which collectible ID it is (pickup order must not matter).",
+      "id": "IF-54",
+      "title": "End-game completion triggers on 7th unique collectible (not specific star ID) with specified modal formatting",
+      "synonyms": [
+        "AR-27 completion behavior",
+        "unique-count-based completion",
+        "completion modal formatting"
+      ],
+      "description": "Game completion is determined by the total number of uniquely collected collectibles reaching 7 (regardless of pickup order/star ID). The final pickup modal includes the required formatted completion message (including an empty-line spacing and bolded 'Congratulations!' line) and the game-to-outro transition occurs on closing that modal.",
+      "reqIds": [
+        "AR-27"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-the-existing-first-outro-text-block-to-add-a-third-revealed-line-after-the-current-two-lines-that-can-t-be-it-and-require-a-visible-continue-button-to-proceed-to-the-next-outro-block-matching-the-existing-line-by-line-reveal-gated-progression-behavior-used-in-outroflow",
+      "title": "Update the existing first outro text block to add a third revealed line after the current two lines: \"That can't be it...\" and require a visible Continue button to proceed to the next outro block (matching the existing line-by-line reveal + gated progression behavior used in OutroFlow).",
       "reqIds": [
         "REQ-11"
       ],
       "version": 1
     },
     {
-      "id": "feature-apply-the-specified-formatting-to-the-appended-completion-message-section-inside-the-star-pickup-modal-after-the-existing-star-description-text-render-an-empty-line-with-12px-top-margin-then-render-a-new-line-with-bold-congratulations-followed-by-the-emoji-then-a-line-break-and-the-sentence-you-have-successfully-taught-barnabus-the-key-components-to-ensure-his-goal-is-safely-distanced-from-his-reach",
-      "title": "Apply the specified formatting to the appended completion message section inside the star pickup modal: after the existing star description text, render an empty line with 12px top margin, then render a new line with bold \"Congratulations!\" followed by the 🌟 emoji, then a line break and the sentence \"You have successfully taught Barnabus the key components to ensure his goal is safely distanced from his reach.\"",
+      "id": "feature-add-a-new-second-outro-block-after-the-first-block-s-continue-that-reveals-the-provided-multi-line-text-line-by-line-and-then-requires-a-continue-button-to-proceed-to-the-next-block",
+      "title": "Add a new second outro block (after the first block’s Continue) that reveals the provided multi-line text line-by-line, and then requires a Continue button to proceed to the next block.",
       "reqIds": [
         "REQ-12"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-a-new-third-outro-block-after-the-second-block-s-continue-that-displays-a-7-item-takeaways-list-where-each-item-is-underlined-and-uses-a-pointer-cursor-clicking-any-item-opens-a-popup-modal-containing-placeholder-lorem-ipsum-text-and-a-link-to-https-lmt-lv",
+      "title": "Add a new third outro block (after the second block’s Continue) that displays a 7-item takeaways list where each item is underlined and uses a pointer cursor; clicking any item opens a popup/modal containing placeholder lorem ipsum text and a link to https://lmt.lv.",
+      "reqIds": [
+        "REQ-13"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-keep-the-expanded-outro-fully-integrated-into-the-existing-post-game-flow-the-game-to-outro-transition-remains-the-same-and-the-outro-continues-to-use-the-existing-outroflow-styling-conventions-background-gradient-typography-button-style-and-reveal-animations-without-introducing-new-navigation-paths",
+      "title": "Keep the expanded outro fully integrated into the existing post-game flow: the game-to-outro transition remains the same, and the outro continues to use the existing OutroFlow styling conventions (background gradient, typography, button style, and reveal animations) without introducing new navigation paths.",
+      "reqIds": [
+        "REQ-14"
       ],
       "version": 1
     }
   ],
   "new_feature_requests": [
     {
-      "id": "AR-27",
-      "summary": "Completion behavior: show congratulations + transition when the 7th unique collectible is picked up (regardless of which star ID it is), with specified formatting/margins in the modal description.",
+      "id": "AR-29",
+      "summary": "Implement expanded OutroFlow after-game narrative: add line \"That can't be it...\" with Continue gate after the existing two lines; then show a new multi-line block about goals/applications/self-compassion ending with Continue; then show an underlined, clickable 7-item takeaways list where each item opens a popup (lorem ipsum for now) including a link to https://lmt.lv",
       "reqIds": [],
-      "status": "pending"
+      "status": "in_progress"
+    },
+    {
+      "id": "AR-30",
+      "summary": "Update/extend post-game OutroFlow narrative: append line \"That can't be it...\" after the existing two end questions, then Continue-gated multi-line block about goals/apps/self-compassion ending with Continue, then a final block showing an underlined clickable 7-item takeaways list (each item opens a popup with lorem ipsum placeholder and a link to https://lmt.lv) with the provided item labels",
+      "reqIds": [],
+      "status": "in_progress"
     }
   ],
   "architectural_notes": [
@@ -649,45 +685,14 @@
     "World geometry (bounds, floor tile regions, obstacles) and physics helpers (clamping, collision) are separated into a dedicated module (worldMap.ts); corridor floor/walls are generated procedurally from a centerline path definition.",
     "Styling uses Tailwind CSS with OKLCH token theming, tailwindcss-animate, and shadcn/ui primitives (Button, Slider).",
     "ICP scaffolding: InternetIdentityProvider wraps @dfinity/auth-client; useActor creates/caches an anonymous or identity-bound backend actor using TanStack React Query and invalidates/refetches non-actor queries when the actor changes.",
-    "Repository now includes a build-template/ scaffold for ICP projects: canister YAMLs, deploy/build scripts, frontend tooling (Vite/Tailwind), shadcn/ui component library sources, and custom ESLint rules to enforce Internet Identity provider usage and safe React Query key patterns.",
-    "Gameplay input handling has been simplified so keyboard controls are always active, removing the prior canvas-focus gating concept in useKeyboardControls/GameView.",
-    "GameView now reuses the intro background/gradient system to provide consistent mood styling behind the canvas UI.",
-    "Corridor/obstacle generation must guarantee at least one continuous passable path forward (no full-width impassable walling).",
-    "Gameplay layout: the removable descriptive text (“Donald explores the landscape of his ambitions…”) is located below the game container; rounded corners should apply to the entire game container (canvas + HUD/controls), clearly rounded.",
-    "Corridor wall/obstacle placement is constrained to ensure forward progress by enforcing openings/gaps and preventing any full-width impassable segments in the 3-unit corridor.",
-    "Gameplay layout no longer includes the extra descriptive narrative line beneath the game view; the container styling was updated so rounded corners wrap the entire game module (canvas + HUD/controls).",
-    "Corridor generation should use a path-first approach (carve/validate a continuous passable lane from start to end) and only then decorate with obstacles constrained not to block that guaranteed path; acceptable to rework the generator rather than patching with ad-hoc checks.",
-    "Corridor generation now follows a path-first approach: carve/validate a continuous passable lane, then place walls/obstacles with constraints so they cannot block the validated path (supported by a dedicated passability module).",
-    "Gameplay input mapping updated: jokes are triggered by 'J'; Space is used for a character action animation; movement remains Arrow keys.",
-    "Introduce gameplay progression UI: trigger a modal 0.5s after the first detected player movement input; add a HUD that tracks a set of uniquely collected items (7 total) and renders a 0/7 counter plus star indicators.",
-    "Collectibles HUD implemented as a dedicated component that tracks unique collectible pickups (7 total) and renders star indicators plus a 0/7 counter.",
-    "Star/collectible pickup should be input-gated: pressing Space while within a proximity radius triggers pickup; consider prioritizing pickup over the Space action animation when in range.",
-    "Map scaling clarification: expand world height only by ~2.5× while keeping corridor width unchanged.",
-    "Star pickup interaction clarification: require Space press when almost touching a star; Space should both trigger pickup (when in range) and still perform the action animation.",
-    "First-movement GoalsModal timing updated: trigger after 0.2s (was 0.5s).",
-    "Add SFX hook/asset for star pickup feedback sound.",
-    "Collectibles HUD UI is positioned top-right and rendered borderless within the rounded game container.",
-    "Collectible pickup logic is input-gated: pressing Space while within a tight proximity triggers pickup; Space continues to also trigger the action animation when used.",
-    "World scaling updated to extend corridor/world height by ~2.5× while keeping corridor width unchanged.",
-    "Star pickup plays an SFX; audio/sfx behavior is encapsulated via a small hook/utility and triggered on successful pickup.",
-    "Collectibles can support multiple item types (e.g., mobile phone replacing a star) with per-item pickup messaging/modals.",
-    "On pickup of specific collectibles (e.g., the first/mobile), trigger a modal prompt using the same modal system as the first-movement goals prompt.",
-    "A dedicated MobilePhoneModal component is used to display the first-collectible pickup prompt (title/description) via the shared gameplay modal system.",
-    "A mobile phone pixel asset is added under frontend/public/assets/generated/ and used as the visual for the first collectible item type.",
-    "All 7 collectibles/stars should trigger a pickup modal prompt with unique title/description copy; the existing first-collectible modal should be updated to the new first-star text (Barnabus-themed).",
-    "All 7 star collectibles now trigger pickup modals with unique copy (via StarPickupModal/shared gameplay modal system); pickup modal text is updated in centralized story/content configuration.",
-    "Last star (7th collectible) pickup modal should include an appended completion/congratulations message in its description copy.",
-    "After the player closes the last collectible popup, gameplay should terminate/leave the GameView and transition to an outro narrative flow that uses the same line-by-line reveal system as the intro, including a gated Continue button between blocks.",
-    "A dedicated OutroFlow (src/features/outro/OutroFlow.tsx) provides an intro-like timed, line-by-line narrative reveal with gated Continue between blocks, entered after gameplay completion (closing the 7th pickup modal).",
-    "End-of-game logic should trigger when total unique collectibles collected reaches 7 (the final missing star), not based on a specific star index/ID; the completion modal text formatting requires an empty line with ~12px top margin and bolded 'Congratulations!' followed by 🌟 and a line break."
+    "Repository now includes a build-template/ scaffold for ICP projects: canister YAMLs, deploy/build scripts, frontend tooling (Vite/Tailwind), shadcn/ui component library sources, and custom ESLint rules to enforce Internet Identity provider usage and safe React Query key patterns."
   ],
   "known_issues": [
     "Camera clamping assumes world bounds are larger than the viewport; with a corridor world that can be narrower than the 500px canvas, horizontal camera clamping can collapse to a constant value (camera X becomes effectively fixed).",
     "Backend canister (backend/main.mo) is an empty actor with no methods; the auth/actor scaffolding currently has no functional backend API to call.",
-    "Duplicate/global CSS entrypoints exist (frontend/index.css and frontend/src/index.css); only src/index.css is imported by the app, but the extra file can confuse maintenance.",
-    "Current end-game completion message/transition is tied to the '7th star' by ID/order rather than the 7th unique collectible picked up; collecting stars out of order can skip the completion message/transition."
+    "Duplicate/global CSS entrypoints exist (frontend/index.css and frontend/src/index.css); only src/index.css is imported by the app, but the extra file can confuse maintenance."
   ],
-  "isFixRequest": true,
+  "isFixRequest": false,
   "generatedImages": [
     {
       "filename": "frontend/public/assets/generated/mobile-phone-pixel.dim_64x64.png",

@@ -1,15 +1,57 @@
 {
   "kind": "spec_vs_diff_report",
   "version": "1.0",
-  "generatedAt": "2026-02-04T12:05:25.774Z",
-  "summary": "The diff implements the completion-message rendering in the star pickup modal and introduces props/structure in GameView consistent with triggering an outro transition on dismissal of the 7th unique pickup modal. No unrequested features are clearly evidenced beyond the BuildRequest scope.",
-  "missing_requirements": [],
-  "hallucinated_features": [],
-  "confidence": 0.74,
+  "generatedAt": "2026-02-04T12:24:43.919Z",
+  "summary": "Diff adds a TakeawayModal overlay and extends OutroFlow with multiple staged text blocks and a takeaways list state. However, the requested placement of the new line in the *first* outro block is not implemented (it appears in block 2 instead), and an additional narrative text block (OUTRO_BLOCK_3) is introduced before the takeaways list, which was not requested.",
+  "missing_requirements": [
+    {
+      "id": "REQ-11",
+      "requirement": "Update the existing first outro text block to add a third revealed line \"That can't be it...\" after the current two lines, and require a visible Continue button to proceed only after the block fully reveals.",
+      "reason": "In the diff, OUTRO_BLOCK_1 still contains only two lines, and the new line \"That can't be it...\" is placed in OUTRO_BLOCK_2 instead of being the third revealed line of the first block.",
+      "evidence": [
+        "frontend/src/features/outro/OutroFlow.tsx"
+      ]
+    },
+    {
+      "id": "REQ-12",
+      "requirement": "Add a new second outro block (after the first block’s Continue) that reveals the provided multi-line text line-by-line, then shows Continue; all text must match user-provided wording exactly.",
+      "reason": "The diff’s OUTRO_BLOCK_2 is a 3-line set ending with \"That can't be it...\" and appears to function as a narrative block, but the BuildRequest’s required 'provided multi-line text' is not present/verifiable in the diff summary, and \"That can't be it...\" is used here rather than in block 1 as required.",
+      "evidence": [
+        "frontend/src/features/outro/OutroFlow.tsx"
+      ]
+    },
+    {
+      "id": "REQ-13",
+      "requirement": "Third outro block should be a 7-item takeaways list with underlined, pointer-cursor items; clicking opens a popup/modal with lorem ipsum and a link to exactly https://lmt.lv; modal can be closed returning to the same list state.",
+      "reason": "While TAKEAWAYS (7 items) and a TakeawayModal with lorem ipsum and a link to https://lmt.lv are present, the diff summary is truncated before showing how the takeaways list is rendered/styled (underline + pointer cursor) and how modal open/close returns to the same list state. This cannot be confirmed from the provided diff excerpt.",
+      "evidence": [
+        "frontend/src/features/outro/OutroFlow.tsx",
+        "frontend/src/features/outro/TakeawayModal.tsx"
+      ]
+    },
+    {
+      "id": "REQ-14",
+      "requirement": "Expanded outro order must be: (1) first block with added line + Continue, (2) new multi-line block + Continue, (3) clickable takeaways list with popups; keep existing post-game transition and styling conventions without new navigation paths.",
+      "reason": "The diff introduces an additional narrative 'block-3' stage (OUTRO_BLOCK_3 and 'block-3-continue') before reaching 'takeaways', which does not match the specified 3-part order where the third block is the takeaways list. Also, the first block is missing the added line per REQ-11, so the required order is not met.",
+      "evidence": [
+        "frontend/src/features/outro/OutroFlow.tsx"
+      ]
+    }
+  ],
+  "hallucinated_features": [
+    {
+      "description": "An extra narrative block (OUTRO_BLOCK_3) with its own reveal sequence and Continue gating, plus additional stages ('block-3', 'block-3-continue') before the takeaways list.",
+      "reason": "The BuildRequest specifies only two narrative text blocks followed by the takeaways list as the third block; it does not request an additional narrative block prior to the takeaways.",
+      "evidence": [
+        "frontend/src/features/outro/OutroFlow.tsx"
+      ]
+    }
+  ],
+  "confidence": 0.7,
   "changed_files": [
     "frontend-file-summaries.txt",
-    "frontend/src/features/game/GameView.tsx",
-    "frontend/src/features/game/StarPickupModal.tsx",
+    "frontend/src/features/outro/OutroFlow.tsx",
+    "frontend/src/features/outro/TakeawayModal.tsx",
     "project_state.json"
   ]
 }

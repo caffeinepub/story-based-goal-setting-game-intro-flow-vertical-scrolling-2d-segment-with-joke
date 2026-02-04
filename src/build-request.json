@@ -1,55 +1,92 @@
 {
   "kind": "build_request",
-  "title": "Trigger final congratulations + outro transition on 7th unique star pickup (any order) with specified modal formatting",
+  "title": "Expand post-game OutroFlow with additional narrative blocks and interactive takeaways popups",
   "priority": "normal",
   "requirements": [
     {
       "id": "REQ-11",
-      "text": "Update gameplay completion logic so the appended completion message and the game-to-outro transition happen when the player picks up the 7th unique collectible (collectedCount reaches 7), regardless of which collectible ID it is (pickup order must not matter).",
+      "text": "Update the existing first outro text block to add a third revealed line after the current two lines: \"That can't be it...\" and require a visible Continue button to proceed to the next outro block (matching the existing line-by-line reveal + gated progression behavior used in OutroFlow).",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-4"
+          "msg-1"
         ],
         "quotes": [
-          "Add the \"Congratulations! 🌟\nYou have successfully taught Barnabus the key components to ensure his goal is safely distanced from his reach.\" text and close behaviour described in previous message to the 7th star picked up.",
-          "E.g. if user skips the first star, collects stars 2 - 7, then picks up 1st star, we show the extra text and move to next section of the game after they click \"continue\"."
+          "Add one more line to it:\nThat can't be it...\n// \"continue\" button"
         ]
       },
       "acceptanceCriteria": [
-        "If the player collects any 7 unique stars in any order, the 7th pickup modal (whatever star it is) includes the appended completion message section.",
-        "After clicking the modal's Continue button for that 7th unique pickup modal, the app transitions out of gameplay into the next section (outro) exactly once.",
-        "If the player has collected fewer than 7 unique stars, closing a pickup modal does not trigger the outro transition."
+        "After game completion, the outro first block displays the existing two lines, then reveals the new third line \"That can't be it...\" using the same timed line-by-line reveal behavior as other outro lines.",
+        "A Continue button is shown for the user to advance only after the first block content is revealed (consistent with existing OutroFlow gating).",
+        "Clicking Continue transitions to the next outro block with the same animation/styling conventions used elsewhere in OutroFlow."
       ]
     },
     {
       "id": "REQ-12",
-      "text": "Apply the specified formatting to the appended completion message section inside the star pickup modal: after the existing star description text, render an empty line with 12px top margin, then render a new line with bold \"Congratulations!\" followed by the 🌟 emoji, then a line break and the sentence \"You have successfully taught Barnabus the key components to ensure his goal is safely distanced from his reach.\"",
+      "text": "Add a new second outro block (after the first block’s Continue) that reveals the provided multi-line text line-by-line, and then requires a Continue button to proceed to the next block.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-4"
+          "msg-1"
         ],
         "quotes": [
-          "Also, pay attention to the formatting of the text:\n\n[existing star's text]\n<empty line, 12px margin from top>\n<bold>Congratulations! </bold> 🌟 <line break>\nYou have successfully taught Barnabus the key components to ensure his goal is safely distanced from his reach."
+          "Next block of texts:\n\nSetting goals is good, it gives you a sense destination and direction.\nApplications and TODO lists won’t accomplish your goals for you, the drive must come from within.\nAnd not all goals can and will be reached, but that's fine.\nIf you fail - analyze, tweak, and most importantly, don’t shame yourself.\nHere are 7 takeaways from Barny's experience to help you and Barny craft goals that are more realistic and can truly change you for the better without doing harm\n\n// \"continue\" button"
         ]
       },
       "acceptanceCriteria": [
-        "The completion section appears visually separated from the existing star text by an empty line with 12px top margin (not just a newline in a single <p>).",
-        "\"Congratulations!\" is bold, the 🌟 emoji is on the same line as \"Congratulations!\", and the following sentence starts on the next line.",
-        "The existing per-star title and description content remains unchanged aside from the appended completion section being added only for the 7th unique pickup."
+        "The second block appears only after the user clicks Continue on the first block.",
+        "The second block reveals each of the provided lines in order using the same timed line-by-line reveal pattern as the current OutroFlow.",
+        "After the final line is revealed, a Continue button is available to advance to the next block.",
+        "All text matches the user-provided wording, punctuation, and capitalization exactly."
+      ]
+    },
+    {
+      "id": "REQ-13",
+      "text": "Add a new third outro block (after the second block’s Continue) that displays a 7-item takeaways list where each item is underlined and uses a pointer cursor; clicking any item opens a popup/modal containing placeholder lorem ipsum text and a link to https://lmt.lv.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-1"
+        ],
+        "quotes": [
+          "Next block with texts (here all texts have underline and cursor: pointer. On click, a popup appears with lorem ipsum text and link to https://lmt.lv (we'll update the texts and links later)).\n\n- Vague goals, wishes\n- All-or-Nothing mentality\n- Kick-off excitement (especially if share with others)\n- Lack of Environmental Design\n- The conformity of the goal\n- Identity shift\n- Sustainable pace, realistic expectations"
+        ]
+      },
+      "acceptanceCriteria": [
+        "After the user clicks Continue on the second block, the 7-item list is shown with each item underlined and the cursor changes to pointer on hover.",
+        "Clicking any list item opens a popup/modal (in-app overlay) containing placeholder lorem ipsum text and a clickable link pointing to exactly https://lmt.lv.",
+        "The popup/modal can be closed and the user returns to the same list state (no navigation away from the outro).",
+        "All 7 list item labels match the user-provided text exactly."
+      ]
+    },
+    {
+      "id": "REQ-14",
+      "text": "Keep the expanded outro fully integrated into the existing post-game flow: the game-to-outro transition remains the same, and the outro continues to use the existing OutroFlow styling conventions (background gradient, typography, button style, and reveal animations) without introducing new navigation paths.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-1"
+        ],
+        "quotes": [
+          "All of this should reuse the existing OutroFlow stage system, line-by-line reveals, Continue gating, and popup styling patterns already in the app."
+        ]
+      },
+      "acceptanceCriteria": [
+        "Collecting the 7th unique collectible and closing the final pickup modal still transitions into the outro as it does today.",
+        "The expanded outro runs in the new order: (1) first block with added line + Continue, (2) new multi-line block + Continue, (3) clickable takeaways list with popups.",
+        "Visual presentation matches existing OutroFlow patterns (same background treatment and CTA button style) and does not regress intro/game visuals."
       ]
     }
   ],
   "constraints": [
-    "Do not edit any files under frontend/src/components/ui (read-only).",
-    "Do not edit frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useInternetIdentity.tsx, frontend/src/hooks/useActor.ts, or frontend/src/main.tsx (immutable paths).",
-    "Keep all backend logic in the single Motoko actor (backend/main.mo); do not introduce additional backend services."
+    "Do not edit files under frontend/src/components/ui; compose and reuse existing UI components instead.",
+    "Do not modify frontend immutable paths listed in SYSTEM_CONTEXT (Internet Identity/actor hooks and frontend/src/main.tsx).",
+    "Backend must remain single-actor; no new backend work is required for this change."
   ],
   "nonGoals": [
-    "Do not change collectible placement, map generation, movement/collision behavior, or controls.",
-    "Do not change the outro script content or outro pacing/timing beyond what is necessary to ensure the transition triggers at the correct time.",
-    "Do not introduce new authentication flows or backend APIs."
+    "Do not change any gameplay mechanics, collectible logic, or the condition that triggers the outro after the 7th unique collectible.",
+    "Do not finalize or customize the popup content beyond placeholder lorem ipsum and the provided https://lmt.lv link.",
+    "Do not introduce new authentication flows or any backend API dependencies for the outro content."
   ],
   "imageRequirements": {
     "required": [],

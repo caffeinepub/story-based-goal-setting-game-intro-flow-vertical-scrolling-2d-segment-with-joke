@@ -1,11 +1,12 @@
 # Specification
 
 ## Summary
-**Goal:** Trigger the final “Congratulations!” completion message and transition to the outro when the player picks up their 7th unique star (in any order), with the specified modal formatting.
+**Goal:** Expand the post-game OutroFlow with an additional narrative block, an updated first block, and an interactive 7-item takeaways list with popups—while preserving existing flow, styling, and reveal/gating behavior.
 
 **Planned changes:**
-- Update star-collection completion logic to detect when `collectedCount` reaches 7 unique collectibles, regardless of collectible ID or pickup order.
-- Ensure the 7th unique pickup modal appends the completion message, and that clicking Continue transitions from gameplay to the outro exactly once.
-- Implement the completion message formatting in the pickup modal: a visually separated empty line with 12px top margin, then a bold “Congratulations!” with 🌟 on the same line, followed by a line break and the provided sentence.
+- Update the first outro text block to reveal a new third line (“That can't be it...”) after the existing two lines, and show a Continue button only after the block finishes revealing.
+- Add a new second outro block that reveals the provided multi-line narrative text line-by-line, then gates progression with a Continue button.
+- Add a new third outro block showing a 7-item underlined takeaways list with pointer cursor; clicking an item opens a closable popup/modal containing placeholder lorem ipsum text and a link to https://lmt.lv.
+- Keep the outro integrated into the existing post-game transition and reuse existing OutroFlow stage system, animations, typography, gradient background, button style, and popup styling patterns (no new navigation paths).
 
-**User-visible outcome:** After collecting any 7 unique stars, the 7th pickup modal shows the formatted completion message; pressing Continue then moves the player from gameplay into the outro. Collecting fewer than 7 stars does not trigger the outro.
+**User-visible outcome:** After finishing the game, players see an extended outro sequence with two Continue-gated narrative blocks, followed by a clickable 7-item takeaways list where each item opens a popup with placeholder text and a link.
