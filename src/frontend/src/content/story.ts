@@ -78,7 +78,7 @@ export const goalsBlockA: StoryStep[] = [
   {
     id: 'goals-4',
     type: 'text',
-    text: 'So much that you get lost thinking where to start.',
+    text: 'So much that you get lost wondering where to start.',
     darkening: true,
   },
 ];
@@ -170,7 +170,7 @@ export const donaldBlockA: string[] = [
 // Barnabus narrative - Block 2
 export const donaldBlockB: string[] = [
   "Today we'll follow Barnabus for a little while.",
-  "During this journey we'll examine how Barnabus ends up like that.",
+  "During this journey we'll examine how Barnabus ends up this way.",
   "And we'll see what happens to the 92% people who also fail to accomplish what they have promised to themselves.",
   "I'll tell you one thing - it's not laziness.",
 ];
@@ -179,6 +179,6 @@ export const donaldBlockB: string[] = [
 export const preGameBlock: string[] = [
   "This particular Barnabus's journey is not that long.",
   "However, it is full of important lessons.",
-  "So please don't skip through and pay deep attention.",
+  "So please don't skip through and pay close attention.",
   "Also, it's recommended for you to turn on sound.",
 ];

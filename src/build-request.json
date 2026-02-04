@@ -1,71 +1,77 @@
 {
   "kind": "build_request",
-  "title": "Fix gameplay audio resume, add pre-game sound reminder line, and ensure Wall of Fame loads from link",
+  "title": "Use provided PDF template for certificate (overlay name on underscores) + center Wall of Fame names in 3 columns",
   "priority": "normal",
   "requirements": [
     {
       "id": "REQ-11",
-      "text": "Fix the gameplay background music resume behavior so that after the star-collection sound pauses the background music, the background music reliably resumes playback (instead of sometimes remaining paused).",
+      "text": "Update certificate generation so the downloaded certificate uses the user-provided PDF template as the base certificate page, and dynamically overlays the player’s name centered horizontally over the underscore area at the top of that PDF.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-1"
+          "msg-8",
+          "msg-10"
         ],
         "quotes": [
-          "The background music sometimes doesn't restart after it's been paused for the star collection soundtrack."
+          "At the top of the PDF there are multiple _ (underscore) symbols. When preparing the certificate, place player's name right on top of those underscores.",
+          "center horizontally"
         ]
       },
       "acceptanceCriteria": [
-        "During gameplay, collecting a star pauses the background music and then the background music resumes reliably afterward (no intermittent failure to resume).",
-        "Rapidly collecting multiple stars does not permanently stop the background music (it still resumes after the most recent pause window completes).",
-        "No new user-facing text is added as part of this fix."
+        "Clicking the existing “Download Your Certificate” button downloads a valid PDF file (application/pdf).",
+        "The downloaded PDF visually matches the provided template for the certificate page (no re-rendered custom background/borders replacing it).",
+        "The player name is rendered on top of (overlapping) the underscore line region and is centered horizontally relative to that underscore region.",
+        "The name overlay is computed at download-time from the entry being downloaded (i.e., it works for different names without rebuilding the app)."
       ]
     },
     {
       "id": "REQ-12",
-      "text": "Update the pre-game narrative section that begins with \"This particular Barnabus's journey is not that long.\" by appending an additional final line: \"Also, it's recommended for you to turn on sound.\"",
+      "text": "Preserve the existing Key Takeaways certificate behavior by keeping the Key Takeaways content included as an additional page after the template-based certificate page (unless the provided template PDF already includes its own additional pages, in which case append the Key Takeaways page after the template’s pages).",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-1"
+          "msg-8",
+          "msg-10"
         ],
         "quotes": [
-          "To the section that starts with \"This particular Barnabus's journey is not that long.\" add additional message at the end of current ones: \"Also, it's recommended for you to turn on sound.\"."
+          "here's pdf with for the certificate",
+          "dynamically"
         ]
       },
       "acceptanceCriteria": [
-        "The pre-game block displays the new line after the existing lines in that same section.",
-        "The new line matches exactly: \"Also, it's recommended for you to turn on sound.\""
+        "The downloaded PDF contains the template-based certificate page with the name overlay plus the existing Key Takeaways page content.",
+        "Key Takeaways page continues to list all takeaways with their body content and link text/URL when present."
       ]
     },
     {
       "id": "REQ-13",
-      "text": "Fix the Wall of Fame (Hall of Fame) screen so that opening it via the \"Wall of Fame\" link shows the persisted entries immediately (without requiring the user to first finish the game and submit a name).",
+      "text": "In the Wall of Fame list, center player names horizontally within each of the three columns while keeping the existing 3-column layout unchanged.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-1"
+          "msg-8",
+          "msg-10"
         ],
         "quotes": [
-          "Also if I open wall of fame from the link, it doesn't show any entries. However, if I finished the game, input my name, then it shows other entries as well."
+          "in the Wall of Fame, center the text (player names) horizontally in columns",
+          "yes"
         ]
       },
       "acceptanceCriteria": [
-        "When navigating to the Wall of Fame via the link, the list fetches and renders the same persisted entries that are visible after completing the game and submitting a name.",
-        "The Wall of Fame screen does not render an empty list due to caching/disabled-query/actor-initialization timing issues; it either shows a loading indicator while fetching or shows the fetched entries.",
-        "This fix works for anonymous (not logged in) users as well as authenticated users."
+        "Wall of Fame entries remain displayed in three columns at desktop widths as they are currently.",
+        "Within each column cell, the rendered entry text (including the number and the name) is horizontally centered."
       ]
     }
   ],
   "constraints": [
-    "Do not edit files under frontend.immutablePaths (compose existing hooks/components instead).",
-    "Respect the single-actor backend architecture; do not introduce additional backend services.",
-    "Use English for any user-facing text."
+    "Do not edit files under frontend/immutablePaths (compose existing UI components instead).",
+    "Respect the existing single-actor backend architecture; no additional backend canisters/services.",
+    "Keep all user-facing text in English."
   ],
   "nonGoals": [
-    "Do not change the Wall of Fame storage schema or introduce new backend persistence mechanisms beyond what is required for the loading bug.",
-    "Do not redesign the Wall of Fame UI beyond what is necessary to ensure entries load and display correctly.",
-    "Do not add new audio tracks or new sound effects; only fix the existing resume reliability issue."
+    "Do not introduce third-party auth providers (only Internet Identity is supported).",
+    "Do not change Wall of Fame persistence behavior or backend schema as part of this request.",
+    "Do not redesign the Wall of Fame layout beyond centering text within the existing three-column grid."
   ],
   "imageRequirements": {
     "required": [],

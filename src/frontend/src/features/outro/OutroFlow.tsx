@@ -9,19 +9,19 @@ import { usePersistentPlayerId } from '@/hooks/usePersistentPlayerId';
 // Outro text blocks
 const OUTRO_BLOCK_1 = [
   'Well, that wasn\'t that hard.',
-  'Who would\'ve thought that there are so many ways to sabotage your goals.',
+  'Who would\'ve thought there were so many ways to sabotage your goals.',
 ];
 
 const OUTRO_BLOCK_2 = [
   'What can we learn from Barnabus\'s experience?',
   'Setting goals is just not worth it?',
-  'That can\'t be it...',
+  'That can\'t be right…',
 ];
 
 const OUTRO_BLOCK_3 = [
   'Setting goals is good, it gives you a sense of destination and direction.',
   'Applications and TODO lists won\'t accomplish your goals for you, the drive must come from within.',
-  'And not all goals can and will be reached, but that\'s fine.',
+  'And not every goal can or will be achieved, and that\'s fine.',
   'If you fail - analyze, tweak, and most importantly, don\'t shame yourself.',
   'Here are 7 takeaways from Barny\'s experience that offer a more realistic way to think about goals and personal change.',
 ];
@@ -80,7 +80,7 @@ export default function OutroFlow({ onComplete }: OutroFlowProps) {
   const [nextGradient, setNextGradient] = useState('');
   const [gradientOpacity, setGradientOpacity] = useState(1);
   
-  const { setPlayerId } = usePersistentPlayerId();
+  const { setPlayerId, markAsCompleted } = usePersistentPlayerId();
   const addEntryMutation = useAddWallOfFameEntry();
 
   // Calculate current gradient based on lightening index
@@ -255,6 +255,9 @@ export default function OutroFlow({ onComplete }: OutroFlowProps) {
       
       // Store player ID locally after successful submission
       setPlayerId(result.id);
+      
+      // Mark as completed
+      markAsCompleted();
       
       // Close modal and navigate to Hall of Fame
       setShowNameModal(false);

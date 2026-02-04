@@ -1,72 +1,67 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Gameplay audio resume reliability, pre-game sound reminder line, and Wall of Fame initial load fix",
+  "title": "Template-based certificate PDF with name overlay + centered Wall of Fame columns",
   "requirements": [
     {
       "id": "REQ-11",
-      "summary": "Make background music reliably resume after the star-collection sound pauses it, including during rapid consecutive star pickups.",
+      "summary": "Use the provided PDF template as the certificate base and overlay the player name centered over the underscore region at download-time.",
       "acceptanceCriteria": [
-        "During gameplay, collecting a star pauses the background music and then the background music resumes reliably afterward (no intermittent failure to resume).",
-        "Rapidly collecting multiple stars does not permanently stop the background music (it still resumes after the most recent pause window completes).",
-        "No new user-facing text is added as part of this fix."
+        "Clicking the existing “Download Your Certificate” button downloads a valid PDF file (application/pdf).",
+        "The downloaded PDF visually matches the provided template for the certificate page (no re-rendered custom background/borders replacing it).",
+        "The player name is rendered on top of (overlapping) the underscore line region and is centered horizontally relative to that underscore region.",
+        "The name overlay is computed at download-time from the entry being downloaded (i.e., it works for different names without rebuilding the app)."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/features/game/useGameplayAudio.ts",
-          "operation": "modify",
-          "description": "Fix resume timing so background music resume is scheduled deterministically even when the star sound's play() does not return a Promise (or resolves unpredictably). Ensure rapid star pickups cancel/replace prior resume schedules (e.g., via a monotonic resume token or last-request-wins logic) and that resume attempts re-trigger playback safely without leaving the music paused."
+          "path": "frontend/public/assets/certificate-of-achievament.pdf",
+          "operation": "create",
+          "description": "Add the provided certificate PDF template to the public assets so it can be fetched at runtime for template-based certificate generation."
         },
         {
-          "path": "frontend/src/features/game/GameView.tsx",
+          "path": "frontend/src/features/hall-of-fame/certificatePdf.ts",
           "operation": "modify",
-          "description": "Confirm the gameplay flow triggers the updated audio hook correctly for star collection events and that no additional UI text is introduced while validating the resumed playback behavior during gameplay."
+          "description": "Replace the current manual-PDF-string generation with logic that loads the template PDF from frontend/public/assets/certificate-of-achievament.pdf at download-time, then overlays the provided player name as text on the first template page positioned to overlap the underscore region and centered horizontally within that region."
+        },
+        {
+          "path": "frontend/package.json",
+          "operation": "modify",
+          "description": "Add/update any required frontend PDF manipulation dependency used to load the template PDF, draw the name overlay, and output a valid application/pdf Blob for download."
         }
       ]
     },
     {
       "id": "REQ-12",
-      "summary": "Append the exact sound reminder line to the specified pre-game narrative section.",
+      "summary": "Keep Key Takeaways as an additional page appended after the template PDF pages.",
       "acceptanceCriteria": [
-        "The pre-game block displays the new line after the existing lines in that same section.",
-        "The new line matches exactly: \"Also, it's recommended for you to turn on sound.\""
+        "The downloaded PDF contains the template-based certificate page with the name overlay plus the existing Key Takeaways page content.",
+        "Key Takeaways page continues to list all takeaways with their body content and link text/URL when present."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/content/story.ts",
+          "path": "frontend/src/features/hall-of-fame/certificatePdf.ts",
           "operation": "modify",
-          "description": "Append the final line \"Also, it's recommended for you to turn on sound.\" to the existing preGameBlock that begins with \"This particular Barnabus's journey is not that long.\" ensuring ordering matches the requirement."
+          "description": "Update PDF assembly so that after loading the template PDF (which may contain multiple pages), the existing Key Takeaways content is rendered into a new page and appended after all template pages, preserving titles, body text, and link text/URL when present."
         },
         {
-          "path": "frontend/src/features/intro/IntroFlow.tsx",
+          "path": "frontend/src/features/outro/takeawaysContent.ts",
           "operation": "modify",
-          "description": "Verify the pre-game narrative rendering uses the updated preGameBlock and that the appended line appears as the final line of that section without altering unrelated copy."
+          "description": "Ensure the Key Takeaways data structure remains compatible with certificate PDF rendering (titles, body, optional link text/URL) and adjust only if needed to support consistent PDF output without changing user-facing English text."
         }
       ]
     },
     {
       "id": "REQ-13",
-      "summary": "Ensure Wall of Fame loads persisted entries immediately when opened via the Wall of Fame link, with proper loading state and working for anonymous users.",
+      "summary": "Center Wall of Fame entry text horizontally within each of the three existing columns.",
       "acceptanceCriteria": [
-        "When navigating to the Wall of Fame via the link, the list fetches and renders the same persisted entries that are visible after completing the game and submitting a name.",
-        "The Wall of Fame screen does not render an empty list due to caching/disabled-query/actor-initialization timing issues; it either shows a loading indicator while fetching or shows the fetched entries.",
-        "This fix works for anonymous (not logged in) users as well as authenticated users."
+        "Wall of Fame entries remain displayed in three columns at desktop widths as they are currently.",
+        "Within each column cell, the rendered entry text (including the number and the name) is horizontally centered."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/hooks/useQueries.ts",
-          "operation": "modify",
-          "description": "Adjust the Wall of Fame query to avoid actor-timing-related disabled-query states (e.g., remove dependency on an in-flight actor fetch flag for enabling; include an actor-specific stable key if needed). Ensure the query reliably fetches once an anonymous/authenticated actor is ready and does not get stuck returning an empty list due to initialization timing."
-        },
-        {
           "path": "frontend/src/features/hall-of-fame/HallOfFameView.tsx",
           "operation": "modify",
-          "description": "Update the Wall of Fame view to treat the initial fetch as a loading state (not an empty list) when navigation happens before data is available. Ensure the view renders a loading indicator while fetching and then renders fetched persisted entries once available for both anonymous and authenticated users."
-        },
-        {
-          "path": "frontend/src/components/WallOfFameLink.tsx",
-          "operation": "modify",
-          "description": "Verify link navigation wiring triggers the Hall of Fame screen in a way that mounts the data-fetching view and results in entries being fetched immediately upon navigation (no dependency on finishing the game first)."
+          "description": "Adjust the Wall of Fame entry cell styling so each item’s number+name text is horizontally centered within its column while preserving the existing responsive 3-column grid layout at desktop widths."
         }
       ]
     }

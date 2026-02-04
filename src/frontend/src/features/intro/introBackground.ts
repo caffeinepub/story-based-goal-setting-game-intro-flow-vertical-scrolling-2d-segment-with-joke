@@ -25,6 +25,11 @@ export function getBackgroundGradient(currentDarkeningIndex: number, totalDarken
   return `linear-gradient(135deg, oklch(${lightness1} ${chroma1} ${hue1}) 0%, oklch(${lightness2} ${chroma2} ${hue2}) 50%, oklch(${lightness3} ${chroma3} ${hue3}) 100%)`;
 }
 
+// Export the initial landing page gradient for reuse
+export function getInitialIntroGradient(): string {
+  return 'linear-gradient(135deg, oklch(0.50 0.12 280) 0%, oklch(0.45 0.14 290) 50%, oklch(0.48 0.12 270) 100%)';
+}
+
 // Export the final darkened gradient for use in game view
 export function getFinalIntroGradient(): string {
   // This represents the fully darkened terminal gradient (progress = 1) with brown tones

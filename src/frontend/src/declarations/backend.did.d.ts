@@ -15,6 +15,8 @@ export interface _SERVICE {
   'addEntry' : ActorMethod<[bigint, string], undefined>,
   'generateId' : ActorMethod<[], bigint>,
   'getAllEntries' : ActorMethod<[], Array<WallOfFameEntry>>,
+  'getEntries' : ActorMethod<[], Array<WallOfFameEntry>>,
+  'getEntriesCount' : ActorMethod<[], bigint>,
 }
 export declare const idlService: IDL.ServiceClass;
 export declare const idlInitArgs: IDL.Type[];

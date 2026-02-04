@@ -17,6 +17,8 @@ export const idlService = IDL.Service({
   'addEntry' : IDL.Func([IDL.Nat, IDL.Text], [], []),
   'generateId' : IDL.Func([], [IDL.Nat], []),
   'getAllEntries' : IDL.Func([], [IDL.Vec(WallOfFameEntry)], ['query']),
+  'getEntries' : IDL.Func([], [IDL.Vec(WallOfFameEntry)], ['query']),
+  'getEntriesCount' : IDL.Func([], [IDL.Nat], ['query']),
 });
 
 export const idlInitArgs = [];
@@ -28,6 +30,8 @@ export const idlFactory = ({ IDL }) => {
     'addEntry' : IDL.Func([IDL.Nat, IDL.Text], [], []),
     'generateId' : IDL.Func([], [IDL.Nat], []),
     'getAllEntries' : IDL.Func([], [IDL.Vec(WallOfFameEntry)], ['query']),
+    'getEntries' : IDL.Func([], [IDL.Vec(WallOfFameEntry)], ['query']),
+    'getEntriesCount' : IDL.Func([], [IDL.Nat], ['query']),
   });
 };
 

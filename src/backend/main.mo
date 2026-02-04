@@ -1,5 +1,7 @@
-import Nat "mo:core/Nat";
 import Array "mo:core/Array";
+import Nat "mo:core/Nat";
+
+
 
 actor {
   type WallOfFameEntry = {
@@ -16,6 +18,14 @@ actor {
   public shared ({ caller }) func addEntry(id : Nat, name : Text) : async () {
     let entry = fromActor(id, name);
     wallOfFameEntries := wallOfFameEntries.concat([entry]);
+  };
+
+  public query func getEntriesCount() : async Nat {
+    wallOfFameEntries.size();
+  };
+
+  public query ({ caller }) func getEntries() : async [WallOfFameEntry] {
+    wallOfFameEntries;
   };
 
   public query ({ caller }) func getAllEntries() : async [WallOfFameEntry] {

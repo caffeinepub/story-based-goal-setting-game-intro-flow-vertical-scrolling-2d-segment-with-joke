@@ -15,4 +15,6 @@ export interface backendInterface {
     addEntry(id: bigint, name: string): Promise<void>;
     generateId(): Promise<bigint>;
     getAllEntries(): Promise<Array<WallOfFameEntry>>;
+    getEntries(): Promise<Array<WallOfFameEntry>>;
+    getEntriesCount(): Promise<bigint>;
 }

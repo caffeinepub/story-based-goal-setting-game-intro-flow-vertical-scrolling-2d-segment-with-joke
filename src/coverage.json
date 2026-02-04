@@ -1,7 +1,7 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-04T20:50:50.084Z",
+  "generatedAt": "2026-02-04T22:54:15.174Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
@@ -12,39 +12,37 @@
     "items": [
       {
         "id": "REQ-11",
-        "summary": "Fix the gameplay background music resume behavior so that after the star-collection sound pauses the background music, the background music reliably resumes playback (instead of sometimes remaining paused).",
+        "summary": "Update certificate generation so the downloaded certificate uses the user-provided PDF template as the base certificate page, and dynamically overlays the player’s name centered horizontally over the underscore area at the top of that PDF.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/features/game/useGameplayAudio.ts",
-          "frontend/src/features/game/GameView.tsx"
+          "frontend/public/assets/certificate-of-achievament.pdf",
+          "frontend/src/features/hall-of-fame/certificatePdf.ts",
+          "frontend/package.json"
         ],
         "matchedFiles": [
-          "frontend/src/features/game/useGameplayAudio.ts"
+          "frontend/src/features/hall-of-fame/certificatePdf.ts"
         ]
       },
       {
         "id": "REQ-12",
-        "summary": "Update the pre-game narrative section that begins with \"This particular Barnabus's journey is not that long.\" by appending an additional final line: \"Also, it's recommended for you to turn on sound.\"",
+        "summary": "Preserve the existing Key Takeaways certificate behavior by keeping the Key Takeaways content included as an additional page after the template-based certificate page (unless the provided template PDF already includes its own additional pages, in which case append the Key Takeaways page after the template’s pages).",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/content/story.ts",
-          "frontend/src/features/intro/IntroFlow.tsx"
+          "frontend/src/features/hall-of-fame/certificatePdf.ts",
+          "frontend/src/features/outro/takeawaysContent.ts"
         ],
         "matchedFiles": [
-          "frontend/src/content/story.ts"
+          "frontend/src/features/hall-of-fame/certificatePdf.ts"
         ]
       },
       {
         "id": "REQ-13",
-        "summary": "Fix the Wall of Fame (Hall of Fame) screen so that opening it via the \"Wall of Fame\" link shows the persisted entries immediately (without requiring the user to first finish the game and submit a name).",
+        "summary": "In the Wall of Fame list, center player names horizontally within each of the three columns while keeping the existing 3-column layout unchanged.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/hooks/useQueries.ts",
-          "frontend/src/features/hall-of-fame/HallOfFameView.tsx",
-          "frontend/src/components/WallOfFameLink.tsx"
+          "frontend/src/features/hall-of-fame/HallOfFameView.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/hooks/useQueries.ts",
           "frontend/src/features/hall-of-fame/HallOfFameView.tsx"
         ]
       }
@@ -55,10 +53,9 @@
     "feature_evidence.json",
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
-    "frontend/src/content/story.ts",
-    "frontend/src/features/game/useGameplayAudio.ts",
+    "frontend/public/assets/certificate-of-achievament-1.pdf",
     "frontend/src/features/hall-of-fame/HallOfFameView.tsx",
-    "frontend/src/hooks/useQueries.ts",
+    "frontend/src/features/hall-of-fame/certificatePdf.ts",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",

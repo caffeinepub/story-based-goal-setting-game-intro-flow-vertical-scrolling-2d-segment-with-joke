@@ -87,9 +87,11 @@ export function useGameplayAudio(): UseGameplayAudioReturn {
     resumeTokenRef.current += 1;
     const currentToken = resumeTokenRef.current;
 
-    // Pause background music immediately
-    const wasMusicPlaying = bgMusic && !bgMusic.paused;
-    if (wasMusicPlaying && bgMusic) {
+    // Track whether music was intended to be playing (based on musicStartedRef, not current paused state)
+    const shouldResumeMusic = musicStartedRef.current;
+
+    // Pause background music immediately if it's playing
+    if (bgMusic && !bgMusic.paused) {
       bgMusic.pause();
     }
 
@@ -100,29 +102,29 @@ export function useGameplayAudio(): UseGameplayAudioReturn {
     });
 
     // Schedule background music resume deterministically after exactly 4.5 seconds
-    // This happens regardless of whether the star sound plays successfully
-    resumeTimeoutRef.current = window.setTimeout(() => {
-      // Only resume if this is still the most recent pickup request
-      if (currentToken === resumeTokenRef.current && wasMusicPlaying && bgMusic) {
-        // Restart from beginning
-        bgMusic.currentTime = 0;
-        const playPromise = bgMusic.play();
-        if (playPromise !== undefined) {
-          playPromise.catch(() => {
-            // If play fails, try again after a short delay
-            setTimeout(() => {
-              if (bgMusic && currentToken === resumeTokenRef.current) {
-                bgMusic.currentTime = 0;
-                bgMusic.play().catch(() => {
-                  // Final attempt failed, ignore
-                });
-              }
-            }, 100);
-          });
+    // Resume only if music was intended to be playing (not just if it was playing at this instant)
+    if (shouldResumeMusic) {
+      resumeTimeoutRef.current = window.setTimeout(() => {
+        // Only resume if this is still the most recent pickup request
+        if (currentToken === resumeTokenRef.current && bgMusic && musicStartedRef.current) {
+          // Resume from current position (don't reset to 0)
+          const playPromise = bgMusic.play();
+          if (playPromise !== undefined) {
+            playPromise.catch(() => {
+              // If play fails, try again after a short delay
+              setTimeout(() => {
+                if (bgMusic && currentToken === resumeTokenRef.current && musicStartedRef.current) {
+                  bgMusic.play().catch(() => {
+                    // Final attempt failed, ignore
+                  });
+                }
+              }, 100);
+            });
+          }
         }
-      }
-      resumeTimeoutRef.current = null;
-    }, 4500); // 4.5 seconds
+        resumeTimeoutRef.current = null;
+      }, 4500); // 4.5 seconds
+    }
   }, []);
 
   return {

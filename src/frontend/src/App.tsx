@@ -27,7 +27,7 @@ export default function App() {
         <OutroFlow onComplete={() => setPhase('hall-of-fame')} />
       )}
       {phase === 'hall-of-fame' && (
-        <HallOfFameView />
+        <HallOfFameView onBackToStart={() => setPhase('intro')} />
       )}
     </div>
   );

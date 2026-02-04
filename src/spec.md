@@ -1,11 +1,11 @@
 # Specification
 
 ## Summary
-**Goal:** Improve the game experience by fixing intermittent background-music resume issues, adding a pre-game sound reminder line, and ensuring the Wall of Fame reliably loads entries when opened from its link.
+**Goal:** Update certificate download to use the provided PDF template with a dynamic name overlay, and visually center Wall of Fame entries within their existing 3-column layout.
 
 **Planned changes:**
-- Fix gameplay audio flow so background music reliably resumes after being paused for the star-collection sound, including when stars are collected rapidly in succession.
-- Update the specified pre-game narrative section by appending the exact final line: "Also, it's recommended for you to turn on sound."
-- Fix Wall of Fame data-loading so navigating via the "Wall of Fame" link fetches and renders persisted entries immediately (showing loading while fetching as needed), for both anonymous and authenticated users.
+- Update the “Download Your Certificate” flow to generate a PDF using the provided certificate template PDF as the base page, then overlay the player’s name on top of the underscore region at the top, centered horizontally relative to that underscore area.
+- Preserve the existing Key Takeaways behavior by appending the Key Takeaways content as an additional page after the template’s page(s).
+- Adjust Wall of Fame rendering so each entry’s text (number + name) is horizontally centered within each of the three existing columns.
 
-**User-visible outcome:** Background music consistently comes back after collecting stars, the pre-game narrative includes a sound-on recommendation, and the Wall of Fame shows existing entries when opened directly from its link.
+**User-visible outcome:** Downloading a certificate produces a valid PDF that matches the provided template with the player’s name centered over the underscore line, followed by the Key Takeaways page; Wall of Fame names appear centered within each column without changing the 3-column layout.

@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "projectStateVersion": 178,
+  "projectStateVersion": 227,
   "summary": "Completed the final post-takeaways completion flow: after the 7 takeaways list, a Continue reveals a final timed message sequence, then a name-entry modal submits a finisher to a persisted shared \"Wall of Fame\" (Hall of Fame view), stores the player’s generated ID for ownership, enables proper PDF certificate generation/download for the owning player, and updates narrative copy across intro/game/outro with new gated blocks and revised prompts.",
   "existing_features": [
     {
@@ -948,24 +948,38 @@
       "version": 1
     },
     {
-      "id": "feature-fix-the-gameplay-background-music-resume-behavior-so-that-after-the-star-collection-sound-pauses-the-background-music-the-background-music-reliably-resumes-playback-instead-of-sometimes-remaining-paused",
-      "title": "Fix the gameplay background music resume behavior so that after the star-collection sound pauses the background music, the background music reliably resumes playback (instead of sometimes remaining paused).",
+      "id": "IF-77",
+      "title": "Certificate PDF includes Barnabus signature image asset",
+      "synonyms": [
+        "barnabus-signature-white-transparent PNG",
+        "certificate signature block image",
+        "PDF signature placement"
+      ],
+      "description": "Adds and uses a generated transparent white-ink Barnabus signature PNG in the certificate PDF signature block (for placement on a dark/purplish background).",
+      "reqIds": [
+        "AR-88"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-certificate-generation-so-the-downloaded-certificate-uses-the-user-provided-pdf-template-as-the-base-certificate-page-and-dynamically-overlays-the-player-s-name-centered-horizontally-over-the-underscore-area-at-the-top-of-that-pdf",
+      "title": "Update certificate generation so the downloaded certificate uses the user-provided PDF template as the base certificate page, and dynamically overlays the player’s name centered horizontally over the underscore area at the top of that PDF.",
       "reqIds": [
         "REQ-11"
       ],
       "version": 1
     },
     {
-      "id": "feature-update-the-pre-game-narrative-section-that-begins-with-this-particular-barnabus-s-journey-is-not-that-long-by-appending-an-additional-final-line-also-it-s-recommended-for-you-to-turn-on-sound",
-      "title": "Update the pre-game narrative section that begins with \"This particular Barnabus's journey is not that long.\" by appending an additional final line: \"Also, it's recommended for you to turn on sound.\"",
+      "id": "feature-preserve-the-existing-key-takeaways-certificate-behavior-by-keeping-the-key-takeaways-content-included-as-an-additional-page-after-the-template-based-certificate-page-unless-the-provided-template-pdf-already-includes-its-own-additional-pages-in-which-case-append-the-key-takeaways-page-after-the-template-s-pages",
+      "title": "Preserve the existing Key Takeaways certificate behavior by keeping the Key Takeaways content included as an additional page after the template-based certificate page (unless the provided template PDF already includes its own additional pages, in which case append the Key Takeaways page after the template’s pages).",
       "reqIds": [
         "REQ-12"
       ],
       "version": 1
     },
     {
-      "id": "feature-fix-the-wall-of-fame-hall-of-fame-screen-so-that-opening-it-via-the-wall-of-fame-link-shows-the-persisted-entries-immediately-without-requiring-the-user-to-first-finish-the-game-and-submit-a-name",
-      "title": "Fix the Wall of Fame (Hall of Fame) screen so that opening it via the \"Wall of Fame\" link shows the persisted entries immediately (without requiring the user to first finish the game and submit a name).",
+      "id": "feature-in-the-wall-of-fame-list-center-player-names-horizontally-within-each-of-the-three-columns-while-keeping-the-existing-3-column-layout-unchanged",
+      "title": "In the Wall of Fame list, center player names horizontally within each of the three columns while keeping the existing 3-column layout unchanged.",
       "reqIds": [
         "REQ-13"
       ],
@@ -1034,32 +1048,8 @@
       "status": "pending"
     },
     {
-      "id": "AR-62",
-      "summary": "Slider question UI: remove 50% mark and make slider narrower (50% of its container width)",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-65",
-      "summary": "Slider question UI: remove the persistent 50% mark/tick from the slider",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-66",
-      "summary": "Slider question UI: remove 50% label so only 1% and 100% labels show; set slider active color to dark purple and inactive/track color to transparent purple",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
       "id": "AR-67",
       "summary": "Fix gameplay background music: should not restart on every keyboard/mouse interaction; pause BGM on star-collection SFX and resume after 4.5s; reduce star-collection SFX volume",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-68",
-      "summary": "Fix Wall of Fame link showing an empty list (finishers not loading/displaying)",
       "reqIds": [],
       "status": "pending"
     },
@@ -1072,6 +1062,114 @@
     {
       "id": "AR-70",
       "summary": "Add extra narrative line \"Also, it's recommended for you to turn on sound.\" at the end of the section starting with \"This particular Barnabus's journey is not that long.\"",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-72",
+      "summary": "Wall of Fame UI: use same background styling as initial landing page",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-75",
+      "summary": "Wall of Fame UI: move \"Back to start\" button/link to the top-left corner (mirroring the Wall of Fame link placement style on landing page)",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-77",
+      "summary": "Copy updates: apply the four requested text changes (lost thinking→lost wondering; mission paragraph rewrite; ends up like that→ends up this way; deep attention→close attention)",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-78",
+      "summary": "Slider UI: add back the 50% label using white font and place it UNDER the slider",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-79",
+      "summary": "Slider UI: make the displayed percentage label reflect the current slider value (not a static \"50%\") while keeping the current visual styling/placement",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-80",
+      "summary": "UI/UX: unify popup/prompt styling between the 7 takeaways modals and the name input modal; keep the stronger background blur from the name modal and make the popup itself use lighter colors",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-82",
+      "summary": "Copy update: change \"Who would've thought there were so many ways to sabotage your goals.\" (use 'were' instead of 'are')",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-83",
+      "summary": "Copy update: change \"That can't be it...\" to \"That can't be right…\"",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-84",
+      "summary": "Wall of Fame UI: remove background/boxes around names and display names in 3 horizontal columns (left-to-right progression)",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-85",
+      "summary": "Style the PDF certificate to match the attached reference design",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-86",
+      "summary": "PDF certificate: circular seal text should read \"ICP ╳ Caffeine\" (using the ╳ symbol), matching the attached reference design otherwise",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-87",
+      "summary": "Wall of Fame: left-align text within columns and change numbering format from \"1 - Name\" to \"1. Name\"",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-88",
+      "summary": "Certificate PDF tweaks: remove top white box; center all text; add \"Presented To\" above player name; replace the completion paragraph copy; increase that paragraph font size by 30%; add bottom-left signature block \"Signed by\\n<Barnabus signature> Barnabus, The Undeterred\"",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-89",
+      "summary": "Certificate PDF: add a new page containing the Key Takeaways content (list of takeaway titles, and for each item include its popup content and article link if present)",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-90",
+      "summary": "Testing-only: always show \"Download your certificate\" and have it download the certificate for the most recent finisher (last player who completed the game)",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-91",
+      "summary": "Support using a user-provided PDF template with form fields and programmatically fill the player's name into the specified field when generating/downloading the certificate",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-92",
+      "summary": "Certificate PDF template (no form field): place the player’s name overlayed on top of the underscore line(s) at the top of the provided PDF",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-93",
+      "summary": "Wall of Fame UI: center player names horizontally within each of the 3 columns",
       "reqIds": [],
       "status": "pending"
     }
@@ -1091,19 +1189,17 @@
   "known_issues": [
     "Camera clamping assumes world bounds are larger than the viewport; with a corridor world that can be narrower than the 500px canvas, horizontal camera clamping can collapse to a constant value (camera X becomes effectively fixed).",
     "Duplicate/global CSS entrypoints exist (frontend/index.css and frontend/src/index.css); only src/index.css is imported by the app, but the extra file can confuse maintenance.",
-    "Slider question currently shows a 50% label (1% / 50% / 100%); should only show 1% and 100% and update slider active/inactive colors to purple scheme.",
     "Gameplay background music restarts after each keyboard/mouse interaction; it should persist and only pause during star-collection SFX (then resume after 4.5s).",
-    "Wall of Fame link currently opens an empty list (finishers not loading/displaying).",
     "Gameplay BGM sometimes fails to resume after being paused for the star-collection soundtrack/SFX.",
-    "Wall of Fame entries may not load when opened via the global link unless the user has just finished the game and submitted a name (entries appear after submission)."
+    "Gameplay audio: if BGM is paused for a star pickup and another star is collected before BGM resumes, BGM may never restart/resume."
   ],
-  "isFixRequest": true,
+  "isFixRequest": false,
   "generatedImages": [
     {
-      "filename": "frontend/public/assets/generated/mobile-phone-pixel.dim_64x64.png",
-      "description": "Generated pixel-art mobile phone collectible sprite used for the first collectible item.",
-      "targetWidth": 64,
-      "targetHeight": 64
+      "filename": "frontend/public/assets/generated/barnabus-signature-white-transparent.dim_800x240.png",
+      "description": "Generated stylized handwritten Barnabus signature (white ink, transparent PNG) for certificate PDF signature block.",
+      "targetWidth": 800,
+      "targetHeight": 240
     }
   ],
   "gameProjectType": "2d",

@@ -47,7 +47,6 @@ export default function GoalStickinessQuestion({ onSubmit }: GoalStickinessQuest
             <div className="w-1/2 space-y-4">
               <div className="flex items-center justify-between">
                 <span className="text-sm text-foreground/70">1%</span>
-                <span className="text-2xl font-bold text-amber-200">{value[0]}%</span>
                 <span className="text-sm text-foreground/70">100%</span>
               </div>
               <div className="relative">
@@ -84,6 +83,9 @@ export default function GoalStickinessQuestion({ onSubmit }: GoalStickinessQuest
                     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
                   }
                 `}</style>
+              </div>
+              <div className="flex justify-center">
+                <span className="text-sm text-white font-medium">{value[0]}%</span>
               </div>
             </div>
           </div>

@@ -97,6 +97,8 @@ export interface backendInterface {
     addEntry(id: bigint, name: string): Promise<void>;
     generateId(): Promise<bigint>;
     getAllEntries(): Promise<Array<WallOfFameEntry>>;
+    getEntries(): Promise<Array<WallOfFameEntry>>;
+    getEntriesCount(): Promise<bigint>;
 }
 export class Backend implements backendInterface {
     constructor(private actor: ActorSubclass<_SERVICE>, private _uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, private _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, private processError?: (error: unknown) => never){}
@@ -139,6 +141,34 @@ export class Backend implements backendInterface {
             }
         } else {
             const result = await this.actor.getAllEntries();
+            return result;
+        }
+    }
+    async getEntries(): Promise<Array<WallOfFameEntry>> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getEntries();
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getEntries();
+            return result;
+        }
+    }
+    async getEntriesCount(): Promise<bigint> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getEntriesCount();
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getEntriesCount();
             return result;
         }
     }

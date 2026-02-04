@@ -27,7 +27,7 @@ export default function GoalsModal({ onDismiss }: GoalsModalProps) {
             This year Barnabus has decided to take on 4 new goals. Last year it was 6, however he managed to fulfill… 0.
           </p>
           <p>
-            Your target is to help Barnabus to once again accomplish none of his goals. Navigate Barnabus through the tunnels of the 21st century, find advices to ensure achieving his goals is impossible.
+            Your mission is to derail Barnabus's grand resolution and make sure he once again accomplishes absolutely none of his goals. Guide Barnabus through the tunnels of the 21st century, uncovering constraints and obstacles that keeps success out of his reach.
           </p>
         </div>
         <button
