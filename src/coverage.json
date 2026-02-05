@@ -1,7 +1,7 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-04T22:54:15.174Z",
+  "generatedAt": "2026-02-05T01:49:25.355Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
@@ -11,33 +11,30 @@
     "implemented": 3,
     "items": [
       {
-        "id": "REQ-11",
-        "summary": "Update certificate generation so the downloaded certificate uses the user-provided PDF template as the base certificate page, and dynamically overlays the player’s name centered horizontally over the underscore area at the top of that PDF.",
+        "id": "REQ-20",
+        "summary": "Update the HTML document title in frontend/index.html so the <title> content is exactly \"Barnabus, The Undeterred\".",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/public/assets/certificate-of-achievament.pdf",
-          "frontend/src/features/hall-of-fame/certificatePdf.ts",
-          "frontend/package.json"
+          "frontend/index.html"
         ],
         "matchedFiles": [
-          "frontend/src/features/hall-of-fame/certificatePdf.ts"
+          "frontend/index.html"
         ]
       },
       {
-        "id": "REQ-12",
-        "summary": "Preserve the existing Key Takeaways certificate behavior by keeping the Key Takeaways content included as an additional page after the template-based certificate page (unless the provided template PDF already includes its own additional pages, in which case append the Key Takeaways page after the template’s pages).",
+        "id": "REQ-21",
+        "summary": "Remove the Wall of Fame testing behavior that allows downloading a certificate without completing the game: only render the \"Download Your Certificate\" button when the local completion flag indicates the player has completed the game (hasCompleted === true).",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/features/hall-of-fame/certificatePdf.ts",
-          "frontend/src/features/outro/takeawaysContent.ts"
+          "frontend/src/features/hall-of-fame/HallOfFameView.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/features/hall-of-fame/certificatePdf.ts"
+          "frontend/src/features/hall-of-fame/HallOfFameView.tsx"
         ]
       },
       {
-        "id": "REQ-13",
-        "summary": "In the Wall of Fame list, center player names horizontally within each of the three columns while keeping the existing 3-column layout unchanged.",
+        "id": "REQ-22",
+        "summary": "When the certificate download button is shown (player has completed), generate the certificate using the completed player's Wall of Fame entry (playerEntry) rather than the last entry in the list; if no matching player entry is found, keep the button disabled.",
         "status": "implemented",
         "plannedFiles": [
           "frontend/src/features/hall-of-fame/HallOfFameView.tsx"
@@ -53,9 +50,8 @@
     "feature_evidence.json",
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
-    "frontend/public/assets/certificate-of-achievament-1.pdf",
+    "frontend/index.html",
     "frontend/src/features/hall-of-fame/HallOfFameView.tsx",
-    "frontend/src/features/hall-of-fame/certificatePdf.ts",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",

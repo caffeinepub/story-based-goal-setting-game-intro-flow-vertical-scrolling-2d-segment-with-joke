@@ -1,62 +1,31 @@
 {
   "kind": "spec_vs_diff_report",
   "version": "1.0",
-  "generatedAt": "2026-02-04T22:54:15.125Z",
-  "summary": "REQ-12 appears implemented by loading a PDF template, overlaying a name on page 1, and appending a Key Takeaways page at the end. However, REQ-11’s specific centering requirement (relative to the underscore region) is only approximated (centered across full page with a hardcoded y), and the diff excerpt does not show the actual download/Blob/content-type handling. REQ-13 (centering Wall of Fame entries within each 3-column cell) is not evidenced in the truncated diff. Additional unrequested UI/behavior was added (Refresh button, developer verification note, and using the last entry for downloads).",
-  "missing_requirements": [
-    {
-      "id": "REQ-11",
-      "requirement": "The player name is rendered on top of (overlapping) the underscore line region and is centered horizontally relative to that underscore region.",
-      "reason": "The overlay x-position is computed by centering across the full page width (`(width - textWidth) / 2`) and the y-position is a hardcoded guess (`y = 540`) with a comment noting it is approximate; there is no evidence of measuring/anchoring to the underscore region bounds.",
-      "evidence": [
-        "frontend/src/features/hall-of-fame/certificatePdf.ts"
-      ]
-    },
-    {
-      "id": "REQ-11",
-      "requirement": "Clicking the existing “Download Your Certificate” button downloads a valid PDF file (application/pdf).",
-      "reason": "The provided diff excerpt shows PDF generation steps but is truncated before any code that serializes the PDF, creates a Blob with `application/pdf`, and triggers a browser download (e.g., via `URL.createObjectURL`/`a.download`).",
-      "evidence": [
-        "frontend/src/features/hall-of-fame/certificatePdf.ts (truncated)"
-      ]
-    },
-    {
-      "id": "REQ-13",
-      "requirement": "In the Wall of Fame list, center player names horizontally within each of the three columns while keeping the existing 3-column layout unchanged.",
-      "reason": "The diff shows the 3-column grid container, but the truncated excerpt does not show any change that centers the entry text within each grid cell (e.g., `text-center` or flex centering on the entry items).",
-      "evidence": [
-        "frontend/src/features/hall-of-fame/HallOfFameView.tsx (truncated)"
-      ]
-    }
-  ],
+  "generatedAt": "2026-02-05T01:49:25.335Z",
+  "summary": "REQ-20/21/22 appear implemented: index.html title updated; HallOfFameView now gates certificate button rendering on hasCompleted, uses playerEntry for certificate generation, and disables the button when no matching entry exists. However, additional unrelated modifications are present in project documentation/summary files.",
+  "missing_requirements": [],
   "hallucinated_features": [
     {
-      "description": "Added a “Refresh” button and associated refetch logic plus a developer verification note about persistence upgrades.",
-      "reason": "REQs only asked for certificate template overlay behavior and centering text in the Wall of Fame grid; adding a Refresh control and persistence verification instructions is not requested.",
+      "description": "Unrelated narrative/content and multiple feature updates described (story copy edits, IntroFlow behavior changes, game loop/keyboard/audio changes, styling and Tailwind token changes, etc.)",
+      "reason": "BuildRequest only asked to update the HTML <title> and adjust certificate download gating/behavior in HallOfFameView; the diff summary shows modifications to project-wide summaries describing many other changes not requested.",
       "evidence": [
-        "frontend/src/features/hall-of-fame/HallOfFameView.tsx"
+        "frontend-file-summaries.txt",
+        "project_state.json"
       ]
     },
     {
-      "description": "Certificate download uses the last Wall of Fame entry (“For testing: always show download button and use last entry”) instead of using the player’s own entry.",
-      "reason": "BuildRequest implies downloading the certificate for the relevant entry/player; selecting the last entry for testing is an unrequested behavior change and may conflict with intended ownership behavior.",
+      "description": "Added/updated developer note about “Wall of Fame Persistence Verification” in HallOfFameView",
+      "reason": "Not requested by any requirement; appears to be extra documentation added to the component.",
       "evidence": [
         "frontend/src/features/hall-of-fame/HallOfFameView.tsx"
-      ]
-    },
-    {
-      "description": "Loads pdf-lib dynamically from a third-party CDN at runtime.",
-      "reason": "The BuildRequest did not request adding external runtime dependencies; this introduces an unrequested dependency and network requirement.",
-      "evidence": [
-        "frontend/src/features/hall-of-fame/certificatePdf.ts"
       ]
     }
   ],
-  "confidence": 0.68,
+  "confidence": 0.74,
   "changed_files": [
     "frontend-file-summaries.txt",
+    "frontend/index.html",
     "frontend/src/features/hall-of-fame/HallOfFameView.tsx",
-    "frontend/src/features/hall-of-fame/certificatePdf.ts",
     "project_state.json"
   ]
 }

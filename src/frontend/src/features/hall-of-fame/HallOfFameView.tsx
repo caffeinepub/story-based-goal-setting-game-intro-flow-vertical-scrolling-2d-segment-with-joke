@@ -3,7 +3,7 @@ import { getInitialIntroGradient } from '../intro/introBackground';
 import { useWallOfFame } from '@/hooks/useQueries';
 import { usePersistentPlayerId } from '@/hooks/usePersistentPlayerId';
 import { generateCertificatePdf } from './certificatePdf';
-import { Download, Loader2, ArrowLeft, RefreshCw } from 'lucide-react';
+import { Download, Loader2, ArrowLeft, RefreshCw, AlertCircle } from 'lucide-react';
 
 /**
  * DEVELOPER NOTE: Wall of Fame Persistence Verification
@@ -11,36 +11,58 @@ import { Download, Loader2, ArrowLeft, RefreshCw } from 'lucide-react';
  * To verify entries persist across backend upgrades/redeploys:
  * 1. Submit a name → confirm it appears in the Wall of Fame
  * 2. Run: `dfx deploy backend --mode upgrade`
- * 3. Click the "Refresh" button below or reload the page
+ * 3. Reload the page to re-query the backend
  * 4. Confirm the same entry still appears
  * 
- * The Refresh button manually triggers refetch() to re-query the backend
- * without requiring a full page reload, making verification quick and easy.
+ * The error state includes a Retry button that manually triggers refetch()
+ * to re-query the backend without requiring a full page reload.
  */
 
 interface HallOfFameViewProps {
   onBackToStart?: () => void;
 }
 
+/**
+ * Checks if an error message indicates the backend canister is stopped.
+ */
+function isCanisterStoppedError(error: unknown): boolean {
+  if (!error) return false;
+  const errorMessage = error instanceof Error ? error.message : String(error);
+  return (
+    errorMessage.includes('IC0508') ||
+    errorMessage.includes('Reject code: 5') ||
+    errorMessage.includes('canister is stopped') ||
+    errorMessage.includes('Canister') && errorMessage.includes('is stopped')
+  );
+}
+
 export default function HallOfFameView({ onBackToStart }: HallOfFameViewProps) {
-  const { data: entries = [], isLoading, refetch, isFetching } = useWallOfFame();
+  const { data: entries = [], isLoading, refetch, isFetching, isError, error, isActorInitializing } = useWallOfFame();
   const { playerId, hasCompleted } = usePersistentPlayerId();
 
   // Find the player's entry only if they have completed
   const playerEntry = hasCompleted && playerId ? entries.find((entry) => entry.id === playerId) : null;
 
-  // For testing: always show download button and use last entry
-  const lastEntry = entries.length > 0 ? entries[entries.length - 1] : null;
-
   const handleDownloadCertificate = async () => {
-    if (lastEntry) {
-      await generateCertificatePdf(lastEntry.name);
+    if (playerEntry) {
+      await generateCertificatePdf(playerEntry.name);
     }
   };
 
   const handleRefresh = () => {
     refetch();
   };
+
+  // Show loading state while actor is initializing or data is being fetched for the first time
+  const showLoading = isActorInitializing || (isLoading && !isError);
+
+  // Determine friendly error message
+  const canisterStopped = isError && isCanisterStoppedError(error);
+  const errorMessage = canisterStopped
+    ? 'The backend service is currently stopped or unavailable. Please try again later.'
+    : error instanceof Error
+    ? error.message
+    : 'An error occurred while fetching entries. Please try again.';
 
   return (
     <div
@@ -72,35 +94,63 @@ export default function HallOfFameView({ onBackToStart }: HallOfFameViewProps) {
           Eternal respect to the heroes who have helped Barnabus, The Undeterred.
         </p>
 
-        {/* Action buttons row */}
-        <div className="mb-8 flex flex-wrap items-center justify-center gap-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
-          <Button
-            onClick={handleDownloadCertificate}
-            size="lg"
-            disabled={!lastEntry}
-            className="rounded-[100px] bg-purple-600 hover:bg-purple-700 text-white px-8 gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            <Download className="w-5 h-5" />
-            Download Your Certificate
-          </Button>
-          
-          <Button
-            onClick={handleRefresh}
-            size="lg"
-            disabled={isFetching}
-            variant="outline"
-            className="rounded-[100px] bg-white/10 hover:bg-white/20 text-white border-white/30 px-8 gap-2 disabled:opacity-50"
-          >
-            <RefreshCw className={`w-5 h-5 ${isFetching ? 'animate-spin' : ''}`} />
-            Refresh
-          </Button>
-        </div>
+        {/* Action buttons row - only show certificate button if player has completed */}
+        {hasCompleted && (
+          <div className="mb-8 flex flex-wrap items-center justify-center gap-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <Button
+              onClick={handleDownloadCertificate}
+              size="lg"
+              disabled={!playerEntry}
+              className="rounded-[100px] bg-purple-600 hover:bg-purple-700 text-white px-8 gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <Download className="w-5 h-5" />
+              Download Your Certificate
+            </Button>
+          </div>
+        )}
 
-        {isLoading ? (
+        {/* Loading state */}
+        {showLoading && (
           <div className="flex items-center justify-center py-12">
             <Loader2 className="w-8 h-8 animate-spin text-white/60" />
           </div>
-        ) : (
+        )}
+
+        {/* Error state */}
+        {isError && !showLoading && (
+          <div className="w-full max-w-md mx-auto">
+            <div className="bg-red-900/20 border border-red-500/30 rounded-lg p-6 text-center">
+              <AlertCircle className="w-12 h-12 text-red-400 mx-auto mb-4" />
+              <h3 className="text-xl font-semibold text-white mb-2">
+                {canisterStopped ? 'Service Unavailable' : 'Failed to Load Wall of Fame'}
+              </h3>
+              <p className="text-white/70 mb-6">
+                {errorMessage}
+              </p>
+              <Button
+                onClick={handleRefresh}
+                size="lg"
+                disabled={isFetching}
+                className="rounded-[100px] bg-purple-600 hover:bg-purple-700 text-white px-8 gap-2"
+              >
+                {isFetching ? (
+                  <>
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                    Retrying...
+                  </>
+                ) : (
+                  <>
+                    <RefreshCw className="w-5 h-5" />
+                    Retry
+                  </>
+                )}
+              </Button>
+            </div>
+          </div>
+        )}
+
+        {/* Success state - show entries or empty message */}
+        {!showLoading && !isError && (
           <div className="w-full">
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-x-8 gap-y-4">
               {entries.map((entry, index) => (

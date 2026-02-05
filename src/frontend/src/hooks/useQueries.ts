@@ -20,18 +20,27 @@ import type { WallOfFameEntry } from '../backend';
  * - No entries are lost during the upgrade process
  */
 export function useWallOfFame() {
-  const { actor, isFetching } = useActor();
+  const { actor, isFetching: isActorFetching } = useActor();
 
-  return useQuery<WallOfFameEntry[]>({
+  const query = useQuery<WallOfFameEntry[]>({
     queryKey: ['wall-of-fame'],
     queryFn: async () => {
-      if (!actor) return [];
+      if (!actor) {
+        throw new Error('Actor not initialized');
+      }
       return actor.getAllEntries();
     },
-    enabled: !!actor && !isFetching,
+    enabled: !!actor,
     staleTime: 0, // Always refetch to ensure fresh data
     refetchOnMount: 'always', // Refetch when component mounts
   });
+
+  return {
+    ...query,
+    // Expose actor initialization state so UI can distinguish between
+    // "waiting for actor" vs "fetching data" vs "no entries"
+    isActorInitializing: isActorFetching,
+  };
 }
 
 export function useAddWallOfFameEntry() {

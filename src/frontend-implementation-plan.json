@@ -1,67 +1,50 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Template-based certificate PDF with name overlay + centered Wall of Fame columns",
+  "title": "Title update + certificate download gating by completion",
   "requirements": [
     {
-      "id": "REQ-11",
-      "summary": "Use the provided PDF template as the certificate base and overlay the player name centered over the underscore region at download-time.",
+      "id": "REQ-20",
+      "summary": "Set the HTML document title to the requested game name.",
       "acceptanceCriteria": [
-        "Clicking the existing “Download Your Certificate” button downloads a valid PDF file (application/pdf).",
-        "The downloaded PDF visually matches the provided template for the certificate page (no re-rendered custom background/borders replacing it).",
-        "The player name is rendered on top of (overlapping) the underscore line region and is centered horizontally relative to that underscore region.",
-        "The name overlay is computed at download-time from the entry being downloaded (i.e., it works for different names without rebuilding the app)."
+        "frontend/index.html contains <title>Barnabus, The Undeterred</title>.",
+        "After reload, the browser tab title displays \"Barnabus, The Undeterred\"."
       ],
       "file_operations": [
         {
-          "path": "frontend/public/assets/certificate-of-achievament.pdf",
-          "operation": "create",
-          "description": "Add the provided certificate PDF template to the public assets so it can be fetched at runtime for template-based certificate generation."
-        },
-        {
-          "path": "frontend/src/features/hall-of-fame/certificatePdf.ts",
+          "path": "frontend/index.html",
           "operation": "modify",
-          "description": "Replace the current manual-PDF-string generation with logic that loads the template PDF from frontend/public/assets/certificate-of-achievament.pdf at download-time, then overlays the provided player name as text on the first template page positioned to overlap the underscore region and centered horizontally within that region."
-        },
-        {
-          "path": "frontend/package.json",
-          "operation": "modify",
-          "description": "Add/update any required frontend PDF manipulation dependency used to load the template PDF, draw the name overlay, and output a valid application/pdf Blob for download."
+          "description": "Replace the existing <title> text so it is exactly \"Barnabus, The Undeterred\"."
         }
       ]
     },
     {
-      "id": "REQ-12",
-      "summary": "Keep Key Takeaways as an additional page appended after the template PDF pages.",
+      "id": "REQ-21",
+      "summary": "Remove Wall of Fame testing behavior so the certificate download button only appears for completed players.",
       "acceptanceCriteria": [
-        "The downloaded PDF contains the template-based certificate page with the name overlay plus the existing Key Takeaways page content.",
-        "Key Takeaways page continues to list all takeaways with their body content and link text/URL when present."
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/features/hall-of-fame/certificatePdf.ts",
-          "operation": "modify",
-          "description": "Update PDF assembly so that after loading the template PDF (which may contain multiple pages), the existing Key Takeaways content is rendered into a new page and appended after all template pages, preserving titles, body text, and link text/URL when present."
-        },
-        {
-          "path": "frontend/src/features/outro/takeawaysContent.ts",
-          "operation": "modify",
-          "description": "Ensure the Key Takeaways data structure remains compatible with certificate PDF rendering (titles, body, optional link text/URL) and adjust only if needed to support consistent PDF output without changing user-facing English text."
-        }
-      ]
-    },
-    {
-      "id": "REQ-13",
-      "summary": "Center Wall of Fame entry text horizontally within each of the three existing columns.",
-      "acceptanceCriteria": [
-        "Wall of Fame entries remain displayed in three columns at desktop widths as they are currently.",
-        "Within each column cell, the rendered entry text (including the number and the name) is horizontally centered."
+        "If hasCompleted is false, HallOfFameView does not render the \"Download Your Certificate\" button at all.",
+        "If hasCompleted is true, HallOfFameView renders the \"Download Your Certificate\" button."
       ],
       "file_operations": [
         {
           "path": "frontend/src/features/hall-of-fame/HallOfFameView.tsx",
           "operation": "modify",
-          "description": "Adjust the Wall of Fame entry cell styling so each item’s number+name text is horizontally centered within its column while preserving the existing responsive 3-column grid layout at desktop widths."
+          "description": "Remove the testing logic that always shows the download button; conditionally render the \"Download Your Certificate\" Button only when hasCompleted === true (using the local completion flag from usePersistentPlayerId)."
+        }
+      ]
+    },
+    {
+      "id": "REQ-22",
+      "summary": "Generate certificates from the completed player's own Wall of Fame entry and disable download when no matching entry exists.",
+      "acceptanceCriteria": [
+        "When hasCompleted is true and the player’s entry exists in the fetched entries, clicking the button downloads a certificate for that player’s name.",
+        "When hasCompleted is true but no playerEntry is found, the button is rendered but disabled."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/features/hall-of-fame/HallOfFameView.tsx",
+          "operation": "modify",
+          "description": "Update certificate download behavior to use playerEntry (matched by playerId) instead of the last entry; wire the button disabled state to !playerEntry while still rendering it when hasCompleted === true; update the click handler to no-op unless playerEntry exists and generateCertificatePdf is called with playerEntry.name."
         }
       ]
     }

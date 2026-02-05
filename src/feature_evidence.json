@@ -2,10 +2,10 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-update-certificate-generation-so-the-downloaded-certificate-uses-the-user-provided-pdf-template-as-the-base-certificate-page-and-dynamically-overlays-the-player-s-name-centered-horizontally-over-the-underscore-area-at-the-top-of-that-pdf",
-      "featureTitle": "Update certificate generation so the downloaded certificate uses the user-provided PDF template as the base certificate page, and dynamically overlays the player’s name centered horizontally over the underscore area at the top of that PDF.",
+      "featureId": "feature-update-the-html-document-title-in-frontend-index-html-so-the-title-content-is-exactly-barnabus-the-undeterred",
+      "featureTitle": "Update the HTML document title in frontend/index.html so the <title> content is exactly \"Barnabus, The Undeterred\".",
       "files": [
-        "frontend/src/features/hall-of-fame/certificatePdf.ts"
+        "frontend/index.html"
       ],
       "components": [
         "core-infrastructure@1.0.2",
@@ -15,31 +15,13 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-11"
+        "REQ-20"
       ],
       "confidence": "high"
     },
     {
-      "featureId": "feature-preserve-the-existing-key-takeaways-certificate-behavior-by-keeping-the-key-takeaways-content-included-as-an-additional-page-after-the-template-based-certificate-page-unless-the-provided-template-pdf-already-includes-its-own-additional-pages-in-which-case-append-the-key-takeaways-page-after-the-template-s-pages",
-      "featureTitle": "Preserve the existing Key Takeaways certificate behavior by keeping the Key Takeaways content included as an additional page after the template-based certificate page (unless the provided template PDF already includes its own additional pages, in which case append the Key Takeaways page after the template’s pages).",
-      "files": [
-        "frontend/src/features/hall-of-fame/certificatePdf.ts"
-      ],
-      "components": [
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-12"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-in-the-wall-of-fame-list-center-player-names-horizontally-within-each-of-the-three-columns-while-keeping-the-existing-3-column-layout-unchanged",
-      "featureTitle": "In the Wall of Fame list, center player names horizontally within each of the three columns while keeping the existing 3-column layout unchanged.",
+      "featureId": "feature-remove-the-wall-of-fame-testing-behavior-that-allows-downloading-a-certificate-without-completing-the-game-only-render-the-download-your-certificate-button-when-the-local-completion-flag-indicates-the-player-has-completed-the-game-hascompleted-true",
+      "featureTitle": "Remove the Wall of Fame testing behavior that allows downloading a certificate without completing the game: only render the \"Download Your Certificate\" button when the local completion flag indicates the player has completed the game (hasCompleted === true).",
       "files": [
         "frontend/src/features/hall-of-fame/HallOfFameView.tsx"
       ],
@@ -51,7 +33,25 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-13"
+        "REQ-21"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-when-the-certificate-download-button-is-shown-player-has-completed-generate-the-certificate-using-the-completed-player-s-wall-of-fame-entry-playerentry-rather-than-the-last-entry-in-the-list-if-no-matching-player-entry-is-found-keep-the-button-disabled",
+      "featureTitle": "When the certificate download button is shown (player has completed), generate the certificate using the completed player's Wall of Fame entry (playerEntry) rather than the last entry in the list; if no matching player entry is found, keep the button disabled.",
+      "files": [
+        "frontend/src/features/hall-of-fame/HallOfFameView.tsx"
+      ],
+      "components": [
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-22"
       ],
       "confidence": "high"
     }

@@ -1,1209 +1,404 @@
 {
   "schemaVersion": "1.0.0",
-  "projectStateVersion": 227,
-  "summary": "Completed the final post-takeaways completion flow: after the 7 takeaways list, a Continue reveals a final timed message sequence, then a name-entry modal submits a finisher to a persisted shared \"Wall of Fame\" (Hall of Fame view), stores the player’s generated ID for ownership, enables proper PDF certificate generation/download for the owning player, and updates narrative copy across intro/game/outro with new gated blocks and revised prompts.",
+  "projectStateVersion": 3,
+  "summary": "A React + TypeScript single-page narrative experience/game titled “Barnabus, The Undeterred”. The app runs a timed, stage-based intro story with dynamic OKLCH gradient transitions, then a top-down 2D Canvas corridor exploration mini-game where the player moves Barnabus, triggers an action spin, collects 7 star collectibles (showing a per-pickup modal and a completion trigger on the 7th), and can press J to display random jokes in a speech balloon. After completion, an outro narrative reveals 7 takeaways (with modal details) and optionally prompts for the player’s name to submit to an ICP (Motoko) backend “Wall of Fame”. The Wall of Fame view fetches and displays entries with loading/error/empty states and allows downloading a client-side generated certificate PDF based on a template.",
   "existing_features": [
     {
       "id": "IF-1",
-      "title": "Intro-to-game app flow switch",
+      "title": "Phase-based SPA flow (intro → game → outro → Wall of Fame)",
       "synonyms": [
-        "gameStarted toggle",
-        "IntroFlow onComplete",
-        "App conditional rendering"
+        "AppPhase state machine",
+        "phase navigation"
       ],
-      "description": "The top-level App component initially shows the IntroFlow narrative sequence and switches to the canvas GameView after IntroFlow calls onComplete.",
+      "description": "Top-level App component switches between IntroFlow, GameView, OutroFlow, and HallOfFameView using internal state and callbacks to advance between phases or return to start.",
       "reqIds": [],
       "version": 1
     },
     {
       "id": "IF-2",
-      "title": "Centralized typed story content model",
+      "title": "Structured intro story content module",
       "synonyms": [
-        "StoryStep model",
         "content/story.ts",
-        "story configuration"
+        "StoryStep model"
       ],
-      "description": "Intro narrative copy and step metadata (opening lines, goal blocks, slider prompt, statistic step, Donald narrative blocks) are centralized in typed exports for consistent sequencing and rendering.",
+      "description": "Intro narrative copy is organized into typed story steps/blocks (opening, goals blocks, negativity block, slider question, stat, Barnabus blocks, pre-game block) for consistent staged rendering.",
       "reqIds": [],
       "version": 1
     },
     {
       "id": "IF-3",
-      "title": "Stage-based intro state machine with gated progression",
+      "title": "Timed intro narrative with staged progression and gated CTAs",
       "synonyms": [
-        "FlowStage union",
-        "Continue gates",
-        "Start stage"
+        "IntroFlow stages",
+        "line-by-line reveal"
       ],
-      "description": "IntroFlow drives the intro via an explicit stage union, showing Continue/Start actions at specific points rather than auto-advancing the whole sequence.",
+      "description": "IntroFlow reveals narrative lines on timers, progresses through explicit stages, includes a slider interaction step, and gates progression via Continue/Start actions.",
       "reqIds": [],
       "version": 1
     },
     {
       "id": "IF-4",
-      "title": "Timed line-by-line narrative reveal with entrance animations",
+      "title": "Dynamic intro/outro background gradients with smooth crossfade transitions",
       "synonyms": [
-        "sequential reveal",
-        "LINE_REVEAL_DELAY",
-        "fade-in + slide-in"
+        "getBackgroundGradient",
+        "darkening/lightening index",
+        "layered gradient crossfade"
       ],
-      "description": "Intro text is revealed one line at a time using timers (1000ms cadence) and animated in using Tailwind animation classes to emphasize progression.",
+      "description": "Background uses computed OKLCH gradients that darken during intro and lighten during outro, with layered div opacity transitions for smooth crossfades.",
       "reqIds": [],
       "version": 1
     },
     {
       "id": "IF-5",
-      "title": "Progressive intro background mood darkening via gradient crossfade",
+      "title": "Intro Wall of Fame quick link",
       "synonyms": [
-        "OKLCH gradient progression",
-        "darkeningIndex",
-        "getBackgroundGradient"
+        "WallOfFameLink",
+        "top-right link"
       ],
-      "description": "As story steps marked with darkening are revealed, the background transitions from a light/fun gradient to darker, colder hues using a computed OKLCH gradient and a crossfaded two-layer background.",
+      "description": "A fixed-position “Wall of Fame” link appears only on the earliest intro stage and navigates directly to the Wall of Fame view.",
       "reqIds": [],
       "version": 1
     },
     {
       "id": "IF-6",
-      "title": "Goal stickiness slider question with conditional feedback and delayed Continue",
+      "title": "Goal stickiness slider question with feedback and delayed continue",
       "synonyms": [
         "GoalStickinessQuestion",
-        "1–100 slider",
-        "feedback gating"
+        "range slider prompt"
       ],
-      "description": "A slider question accepts a 1–100% guess, shows conditional feedback (\"correct\" if 5–10%), then reveals a Continue button after a short delay; advancing requires explicit Continue.",
+      "description": "A 1–100 slider captures a guess, shows conditional feedback text, and reveals a Continue button after a fixed delay to match narrative pacing.",
       "reqIds": [],
       "version": 1
     },
     {
       "id": "IF-7",
-      "title": "Emphasized statistic stage with timed Continue gate",
+      "title": "Top-down 2D Canvas gameplay with world-space camera transform",
       "synonyms": [
-        "8% statistic",
-        "stat emphasis"
+        "GameView",
+        "Canvas2D camera follow"
       ],
-      "description": "Displays an emphasized statistic message and then reveals a Continue button after the standard delay.",
+      "description": "Renders a corridor world on a canvas using camera translation so the player moves in world coordinates while the camera follows smoothly.",
       "reqIds": [],
       "version": 1
     },
     {
       "id": "IF-8",
-      "title": "Stage-specific Donald sprite in intro",
+      "title": "Frame-independent game loop (requestAnimationFrame + delta time)",
       "synonyms": [
-        "donald-block-a image",
-        "pixelated sprite"
+        "useGameLoop",
+        "deltaTime updates"
       ],
-      "description": "Shows the Donald pixel sprite only during the first Donald narrative block stages, using a pixelated rendering style for crisp pixel art.",
+      "description": "A custom hook runs a requestAnimationFrame loop and supplies deltaTime in seconds to update movement, animation, and camera consistently across frame rates.",
       "reqIds": [],
       "version": 1
     },
     {
       "id": "IF-9",
-      "title": "Consistent CTA button styling across intro stages",
+      "title": "Global keyboard controls with modal gating and Space repeat prevention",
       "synonyms": [
-        "pill-outline Continue buttons",
-        "animated Start button"
+        "useKeyboardControls",
+        "Arrow movement / Space action / J joke"
       ],
-      "description": "Continue/Submit CTAs share a pill-outline style while the \"Start now!\" CTA is presented as a distinct animated gradient button.",
+      "description": "Window-level keyboard handling supports arrow movement, Space action, and J for jokes; input is disabled and movement state is cleared while modals are open; Space repeat events are ignored to prevent rapid firing.",
       "reqIds": [],
       "version": 1
     },
     {
       "id": "IF-10",
-      "title": "Centered canvas game view with instructions and footer",
+      "title": "Procedural corridor world generation with passability guarantees",
       "synonyms": [
-        "GameView layout",
-        "game HUD text"
+        "worldMap corridor path",
+        "guaranteed channel",
+        "BFS validation"
       ],
-      "description": "Renders a 500×600 canvas in a centered layout with instruction text that changes based on whether the canvas is engaged, plus descriptive text and a footer link.",
+      "description": "Generates a random corridor composed of 90° segments; walls and interior obstacles are placed while preserving a guaranteed-clearance channel and validated for traversability via grid-based BFS.",
       "reqIds": [],
       "version": 1
     },
     {
       "id": "IF-11",
-      "title": "Canvas-scoped keyboard controls with focus indicator",
+      "title": "World bounds clamping, obstacle collision, and wall sliding",
       "synonyms": [
-        "useKeyboardControls",
-        "arrow keys movement",
-        "Space action",
-        "focus border"
+        "clampToWorldBounds",
+        "checkCollision",
+        "axis-separated sliding"
       ],
-      "description": "Arrow keys move the character and Space triggers an action only when the canvas is considered focused; the canvas shows a highlighted border when active and movement resets on blur.",
+      "description": "Player movement is clamped to computed world bounds and uses AABB collision checks; on collision it attempts axis-only movement to slide along obstacles for better feel.",
       "reqIds": [],
       "version": 1
     },
     {
       "id": "IF-12",
-      "title": "DeltaTime requestAnimationFrame game loop hook",
+      "title": "World rendering of tiles, grid lines, and obstacle styling",
       "synonyms": [
-        "useGameLoop",
-        "RAF loop",
-        "frame-independent update"
+        "TILE_REGIONS",
+        "OBSTACLES rendering"
       ],
-      "description": "Runs a requestAnimationFrame loop, computes deltaTime in seconds, and calls an onUpdate callback for frame-rate-independent simulation and rendering.",
+      "description": "Gameplay draws corridor floor tile regions, subtle grid lines, and styled obstacles (walls as rectangles; rocks/trees as circles with additional detailing).",
       "reqIds": [],
       "version": 1
     },
     {
       "id": "IF-13",
-      "title": "World-space movement clamped to world bounds",
+      "title": "Character sprite loading with fallback rendering",
       "synonyms": [
-        "top-down movement",
-        "clampToWorldBounds"
+        "pixel sprite",
+        "fallback silhouette"
       ],
-      "description": "Moves the character in world coordinates at a constant pixels-per-second speed and clamps position so the player cannot leave the defined world rectangle.",
+      "description": "Attempts to load a pixel-art character image with image smoothing disabled; if loading fails, renders a simple pixel-art fallback silhouette so gameplay remains functional.",
       "reqIds": [],
       "version": 1
     },
     {
       "id": "IF-14",
-      "title": "Collision detection against map obstacles",
+      "title": "Collectibles system (7 stars) with HUD counter",
       "synonyms": [
-        "checkCollision",
-        "OBSTACLES"
+        "getCollectibles",
+        "CollectiblesHud"
       ],
-      "description": "Detects rectangle-vs-obstacle overlap against a set of world obstacles (walls, rocks, trees).",
+      "description": "Generates and tracks seven uniquely-identified collectibles; renders them as gold stars and displays a top-right HUD counter (X / 7).",
       "reqIds": [],
       "version": 1
     },
     {
       "id": "IF-15",
-      "title": "Collision resolution with wall-sliding",
+      "title": "Space action spin animation with proximity-based pickup",
       "synonyms": [
-        "axis-separated resolution",
-        "slide along walls",
-        "reduced hitbox margin"
+        "spin action",
+        "pickup radius"
       ],
-      "description": "Prevents passing through obstacles and attempts to resolve collisions by trying X-only movement then Y-only movement to create a smooth sliding feel.",
+      "description": "Pressing Space triggers a timed spin animation and can collect at most one nearby uncollected star within a tight pickup radius per press.",
       "reqIds": [],
       "version": 1
     },
     {
       "id": "IF-16",
-      "title": "Smooth camera follow with bounds clamping",
+      "title": "Per-star pickup modal and completion trigger on 7th pickup",
       "synonyms": [
-        "Zelda-like camera",
-        "camera smoothing",
-        "camera bounds"
+        "StarPickupModal",
+        "final pickup completion"
       ],
-      "description": "A camera position follows the character with smoothing and is clamped so the visible viewport stays within world bounds; rendering applies a camera transform so the character stays near screen center.",
+      "description": "Collecting a star opens a modal with collectible-specific title/description; the 7th pickup is treated as completion and, on dismissal, triggers transition to the outro (guarded to fire once).",
       "reqIds": [],
       "version": 1
     },
     {
       "id": "IF-17",
-      "title": "Structured world rendering (floor tiles, grid, obstacles)",
+      "title": "Gameplay goals modal shown on entry and blocks input",
       "synonyms": [
-        "TILE_REGIONS",
-        "corridor floor rendering",
-        "grid lines"
+        "GoalsModal",
+        "start-of-game overlay"
       ],
-      "description": "Renders a corridor floor using predefined/generated tile regions, draws subtle horizontal grid lines for structure, and renders obstacles with distinct styles (walls as rectangles; rocks/trees as circles).",
+      "description": "A goals/mission modal is shown immediately on gameplay entry; movement/actions are paused until dismissed (Escape supported).",
       "reqIds": [],
       "version": 1
     },
     {
       "id": "IF-18",
-      "title": "Donald sprite loading with fallback character rendering",
+      "title": "Joke system with speech balloon anchored near the character",
       "synonyms": [
-        "sprite asset loading",
-        "imageLoaded/imageError",
-        "pixel-art fallback silhouette"
+        "SpeechBalloon",
+        "jokes.ts"
       ],
-      "description": "Loads the Donald pixel sprite and renders it with image smoothing disabled; if the asset fails to load, draws a pixel-art-like fallback character so gameplay remains visible.",
+      "description": "Pressing J shows a random joke in a speech balloon positioned above the character (screen space), clamped within canvas bounds, and auto-hides after 3 seconds.",
+      "reqIds": [],
+      "version": 1
+    },
+    {
+      "id": "IF-19",
+      "title": "Gameplay audio: background music with autoplay retry and SFX",
+      "synonyms": [
+        "useGameplayAudio",
+        "background.mp3",
+        "star-collected.mp3",
+        "action-space.mp3"
+      ],
+      "description": "Manages looping background music with retry on first user interaction if autoplay is blocked; plays an action SFX on Space; plays a quieter star-collection SFX that pauses background music and resumes deterministically after 4.5s using a token-based last-request-wins timeout approach.",
       "reqIds": [],
       "version": 1
     },
     {
       "id": "IF-20",
-      "title": "Speech balloon UI with within-canvas horizontal clamping",
+      "title": "Timed outro narrative flow with gradient lightening",
       "synonyms": [
-        "SpeechBalloon clamping",
-        "balloon tail"
+        "OutroFlow stages",
+        "TOTAL_INTRO_DARKENING_STEPS reversal"
       ],
-      "description": "Renders an animated speech balloon positioned relative to the canvas and clamps its left offset to stay within the canvas width while keeping a tail aligned to the intended x coordinate.",
+      "description": "Outro reveals narrative blocks line-by-line on timers while gradually lightening the background gradient to mirror/reverse the intro darkening progression.",
       "reqIds": [],
       "version": 1
     },
     {
       "id": "IF-21",
-      "title": "Strictly linear 3-unit-wide downward corridor world map",
+      "title": "Takeaways list reveal and takeaway modal with centralized content",
       "synonyms": [
-        "linear corridor redesign",
-        "3 map units wide (300px)",
-        "downward-only (+Y) progression"
+        "TakeawayModal",
+        "takeawaysContent.ts"
       ],
-      "description": "The world map is redesigned into a narrow corridor of exactly 3 map units (300px) wide that progresses downward with gentle horizontal curves and no branches/side areas, guiding players along one route.",
-      "reqIds": [
-        "REQ-9"
-      ],
+      "description": "Seven takeaways are revealed incrementally; selecting one opens a modal that looks up body text and optional external links from a centralized TAKEAWAYS content module (Escape and overlay click supported).",
+      "reqIds": [],
       "version": 1
     },
     {
       "id": "IF-22",
-      "title": "Procedural corridor map generation (bounds, floor, walls, interior obstacles)",
+      "title": "Name submission modal with validation, loading/error states, and skip flow",
       "synonyms": [
-        "worldMap.ts generation",
-        "WORLD_BOUNDS calculation",
-        "wall segments",
-        "interior rocks/trees placements"
+        "NameSubmissionModal",
+        "skip to Wall of Fame"
       ],
-      "description": "Computes world bounds from the corridor centerline path, generates floor tile regions along the corridor, builds wall obstacles along both edges, and places interior rocks/trees relative to the path for variety.",
-      "reqIds": [
-        "REQ-10"
-      ],
+      "description": "A modal collects a non-empty player name, disables close while submitting, prevents outside interaction, shows errors with a dismiss action, and offers a skip path to the Wall of Fame view.",
+      "reqIds": [],
       "version": 1
     },
     {
       "id": "IF-23",
-      "title": "Internet Identity authentication provider and hook (ICP)",
+      "title": "Persistent player ID and completion flag stored in localStorage",
       "synonyms": [
-        "InternetIdentityProvider",
-        "AuthClient context",
-        "login/logout"
+        "usePersistentPlayerId",
+        "barnabus_player_id",
+        "barnabus_completed"
       ],
-      "description": "Provides a context-based authentication layer using @dfinity/auth-client, supporting identity restoration on reload, login/logout, delegation validity checks, and status flags for UI control.",
+      "description": "Persists a submitted Wall of Fame entry ID (as BigInt) and a completion flag in localStorage for reload survival, with helpers to set/clear and mark completion.",
       "reqIds": [],
       "version": 1
     },
     {
       "id": "IF-24",
-      "title": "Identity-aware backend actor creation and caching via React Query",
+      "title": "Internet Identity authentication context (AuthClient)",
       "synonyms": [
-        "useActor",
-        "actor factory",
-        "principal-keyed caching"
+        "InternetIdentityProvider",
+        "useInternetIdentity"
       ],
-      "description": "Creates an anonymous actor when unauthenticated or an identity-bound actor when authenticated; caches by principal and invalidates/refetches non-actor queries when the actor changes.",
+      "description": "Provides an Internet Identity context that initializes AuthClient, restores a saved delegation if authenticated, and exposes login/logout plus status flags.",
       "reqIds": [],
       "version": 1
     },
     {
       "id": "IF-25",
-      "title": "App bootstrap with React Query + Internet Identity providers",
+      "title": "Identity-aware ICP backend actor creation with query invalidation",
       "synonyms": [
-        "main.tsx",
-        "QueryClientProvider",
-        "provider composition"
+        "useActor",
+        "anonymous vs authenticated actor"
       ],
-      "description": "Initializes a QueryClient and wraps the app with QueryClientProvider and InternetIdentityProvider before rendering the root App component.",
+      "description": "Creates an ICP backend actor either anonymously or with the current Internet Identity; when the actor becomes available/changes, non-actor queries are invalidated and refetched.",
       "reqIds": [],
       "version": 1
     },
     {
       "id": "IF-26",
-      "title": "Tailwind theming with OKLCH tokens and pixel-art utilities",
+      "title": "Wall of Fame React Query hooks (fetch + optimistic add)",
       "synonyms": [
-        "tailwind.config.js",
-        "OKLCH CSS variables",
-        "pixelated utility",
-        "custom bounce animation"
+        "useWallOfFame",
+        "useAddWallOfFameEntry"
       ],
-      "description": "Tailwind is configured with OKLCH CSS-variable tokens for consistent theming, typography/container/animation plugins, and global CSS utilities for pixelated rendering and a custom bounce animation.",
+      "description": "Fetches Wall of Fame entries only after an actor exists (always refetch on mount). Provides a mutation that generates an ID, adds an entry, optimistically updates the cached list, and then invalidates queries for consistency.",
       "reqIds": [],
       "version": 1
     },
     {
       "id": "IF-27",
-      "title": "Always-active keyboard controls in gameplay (no click-to-focus gating)",
+      "title": "Wall of Fame screen with loading/error/empty states, retry, and entry highlighting",
       "synonyms": [
-        "global controls",
-        "remove canvas focus requirement",
-        "always-on arrow keys"
+        "HallOfFameView",
+        "IC0508 stopped-canister messaging"
       ],
-      "description": "Gameplay keyboard input no longer requires clicking the canvas to activate; arrow keys and Space work without a separate focus/engagement gate.",
-      "reqIds": [
-        "AR-4"
-      ],
+      "description": "Displays entries in a responsive grid; highlights the player’s entry when a completed playerId is known; provides back-to-start navigation; shows loading/empty states; and provides a Retry button in error state with friendly messaging when the canister appears stopped/unavailable.",
+      "reqIds": [],
       "version": 1
     },
     {
       "id": "IF-28",
-      "title": "Gameplay view uses intro-style mood gradient background",
+      "title": "Certificate PDF generation from template with sanitized filename",
       "synonyms": [
-        "shared background",
-        "introBackground reuse",
-        "game background gradient"
+        "generateCertificatePdf",
+        "pdf-lib via CDN",
+        "certificate-v2.pdf",
+        "sanitizeCertificateFilename"
       ],
-      "description": "The game screen reuses the same gradient/mood background styling used during the intro, providing a consistent visual backdrop behind the canvas.",
+      "description": "Loads a static certificate template PDF, overlays the player name in white using HelveticaBold centered horizontally and positioned at ~66% page height, then triggers a download using a sanitized filename derived from the player’s name.",
       "reqIds": [
-        "AR-2"
+        "REQ-18",
+        "REQ-19"
       ],
-      "version": 1
+      "version": 2
     },
     {
       "id": "IF-29",
-      "title": "Minimal canvas presentation (border/frame removed)",
+      "title": "Motoko backend API for Wall of Fame entries",
       "synonyms": [
-        "remove canvas border",
-        "no frame"
+        "backend/main.mo",
+        "addEntry/getAllEntries/generateId"
       ],
-      "description": "The game canvas/view no longer renders with a visible border/frame around it.",
+      "description": "Motoko canister stores WallOfFameEntry records in memory and exposes methods to add entries, list entries, count entries, and generate sequential numeric IDs.",
+      "reqIds": [],
+      "version": 1
+    },
+    {
+      "id": "feature-update-the-html-document-title-in-frontend-index-html-so-the-title-content-is-exactly-barnabus-the-undeterred",
+      "title": "Update the HTML document title in frontend/index.html so the <title> content is exactly \"Barnabus, The Undeterred\".",
       "reqIds": [
-        "AR-3"
+        "REQ-20"
       ],
       "version": 1
     },
     {
-      "id": "IF-30",
-      "title": "Gameplay HUD copy cleanup (removed “Follow Donald'y Journey”)",
-      "synonyms": [
-        "remove follow text",
-        "HUD text removal"
-      ],
-      "description": "The extra “Follow Donald'y Journey” text has been removed from the game layout.",
+      "id": "feature-remove-the-wall-of-fame-testing-behavior-that-allows-downloading-a-certificate-without-completing-the-game-only-render-the-download-your-certificate-button-when-the-local-completion-flag-indicates-the-player-has-completed-the-game-hascompleted-true",
+      "title": "Remove the Wall of Fame testing behavior that allows downloading a certificate without completing the game: only render the \"Download Your Certificate\" button when the local completion flag indicates the player has completed the game (hasCompleted === true).",
       "reqIds": [
-        "AR-5"
+        "REQ-21"
       ],
       "version": 1
     },
     {
-      "id": "IF-31",
-      "title": "Controls legend displayed under the canvas",
-      "synonyms": [
-        "controls list",
-        "arrows + space instructions under canvas"
-      ],
-      "description": "The gameplay layout includes a small controls list (arrow keys movement, Space action) under the canvas.",
+      "id": "feature-when-the-certificate-download-button-is-shown-player-has-completed-generate-the-certificate-using-the-completed-player-s-wall-of-fame-entry-playerentry-rather-than-the-last-entry-in-the-list-if-no-matching-player-entry-is-found-keep-the-button-disabled",
+      "title": "When the certificate download button is shown (player has completed), generate the certificate using the completed player's Wall of Fame entry (playerEntry) rather than the last entry in the list; if no matching player entry is found, keep the button disabled.",
       "reqIds": [
-        "AR-6"
-      ],
-      "version": 1
-    },
-    {
-      "id": "IF-32",
-      "title": "Gameplay collision/spawn fix to prevent immediate stuck state",
-      "synonyms": [
-        "fix stuck-on-spawn",
-        "collision resolution fix",
-        "spawn placement fix"
-      ],
-      "description": "Adjusted world/collision/spawn logic to prevent the player from starting overlapped with obstacles/walls and becoming unable to move.",
-      "reqIds": [
-        "AR-1"
-      ],
-      "version": 1
-    },
-    {
-      "id": "IF-34",
-      "title": "Removed gameplay descriptive narrative line under the game",
-      "synonyms": [
-        "remove \"Donald explores the landscape of his ambitions...\"",
-        "game layout text cleanup"
-      ],
-      "description": "The gameplay layout no longer displays the descriptive text line “Donald explores the landscape of his ambitions…”.",
-      "reqIds": [
-        "AR-8"
-      ],
-      "version": 1
-    },
-    {
-      "id": "IF-35",
-      "title": "Rounded corners applied to the full game container (canvas + HUD/controls)",
-      "synonyms": [
-        "rounded game container",
-        "rounded corners around canvas + UI"
-      ],
-      "description": "The game container now has clearly rounded corners applied to the entire module (canvas and accompanying HUD/controls), not just the canvas element.",
-      "reqIds": [
-        "AR-9"
-      ],
-      "version": 1
-    },
-    {
-      "id": "IF-36",
-      "title": "Path-first corridor generation with passability validation",
-      "synonyms": [
-        "passability.ts",
-        "carve/validate lane",
-        "guaranteed continuous path"
-      ],
-      "description": "Corridor generation was reworked to hard-guarantee a continuous passable top-to-bottom lane by generating/validating a walkable path first (passability checks), then decorating with walls/obstacles constrained to never block that guaranteed route.",
-      "reqIds": [
-        "AR-7"
-      ],
-      "version": 1
-    },
-    {
-      "id": "IF-37",
-      "title": "Gameplay controls remap: 'J' for jokes, Space for action animation",
-      "synonyms": [
-        "AR-10 controls update",
-        "joke key J",
-        "Space action/spin"
-      ],
-      "description": "Arrow keys remain movement controls; the random-joke speech balloon is triggered with the 'J' key, and Space is reserved for a character action animation (e.g., spin).",
-      "reqIds": [
-        "AR-10"
-      ],
-      "version": 1
-    },
-    {
-      "id": "IF-39",
-      "title": "Collectibles HUD with unique item tracking (0/7 + stars)",
-      "synonyms": [
-        "CollectiblesHud",
-        "star counter",
-        "unique collectibles"
-      ],
-      "description": "Adds a top-of-container HUD that tracks uniquely collected items (7 total), rendering gold/yellow star indicators and a counter (e.g., \"0 / 7\"). Each collectible can only be collected once.",
-      "reqIds": [
-        "AR-12"
-      ],
-      "version": 1
-    },
-    {
-      "id": "IF-40",
-      "title": "First-movement goals modal (0.2s delayed)",
-      "synonyms": [
-        "GoalsModal delay 0.2s",
-        "first movement trigger timing"
-      ],
-      "description": "In gameplay, after the first detected player movement input, a goals prompt/modal is shown after a 0.2s delay displaying the provided Donald goals title/body text.",
-      "reqIds": [
-        "AR-16"
-      ],
-      "version": 1
-    },
-    {
-      "id": "IF-41",
-      "title": "Collectibles HUD positioned top-right with no border",
-      "synonyms": [
-        "CollectiblesHud top-right",
-        "borderless HUD"
-      ],
-      "description": "The collectibles HUD is rendered in the top-right of the game container and uses a borderless visual style.",
-      "reqIds": [
-        "AR-13"
-      ],
-      "version": 1
-    },
-    {
-      "id": "IF-42",
-      "title": "Space-gated star pickup interaction with proximity requirement",
-      "synonyms": [
-        "press Space to pick up",
-        "near-star pickup",
-        "pickup priority over action"
-      ],
-      "description": "Collectibles/stars are only picked up when the player presses Space while within a close proximity radius of the star; Space still performs the action animation, with pickup handled when in range.",
-      "reqIds": [
-        "AR-15"
-      ],
-      "version": 1
-    },
-    {
-      "id": "IF-43",
-      "title": "World/map scaled to ~2.5× height while keeping corridor width unchanged",
-      "synonyms": [
-        "map scaling 2.5x",
-        "longer corridor"
-      ],
-      "description": "The corridor world height/length is expanded to approximately 2.5× the prior size while keeping the corridor width unchanged.",
-      "reqIds": [
-        "AR-14"
-      ],
-      "version": 1
-    },
-    {
-      "id": "IF-44",
-      "title": "Star pickup sound effect feedback",
-      "synonyms": [
-        "pickup SFX",
-        "useSfx hook"
-      ],
-      "description": "A sound effect is played when a star/collectible is successfully picked up.",
-      "reqIds": [
-        "AR-17"
-      ],
-      "version": 1
-    },
-    {
-      "id": "IF-45",
-      "title": "First collectible star moved further from player start",
-      "synonyms": [
-        "AR-18 first star placement",
-        "starting area spacing",
-        "early pickup spacing"
-      ],
-      "description": "Adjusted the initial collectible/star placement so the first star is positioned further away from the player starting point to avoid immediate pickup at spawn.",
-      "reqIds": [
-        "AR-18"
-      ],
-      "version": 1
-    },
-    {
-      "id": "IF-46",
-      "title": "Controls legend text updated: Space no longer mentions collecting stars",
-      "synonyms": [
-        "AR-19 controls legend copy",
-        "Space to act label",
-        "legend wording update"
-      ],
-      "description": "Updated the on-screen controls legend to change the Space key description from “Space to act & collect stars” to “Space to act”.",
-      "reqIds": [
-        "AR-19"
-      ],
-      "version": 1
-    },
-    {
-      "id": "IF-49",
-      "title": "Collectible placement adjustment: last collectible moved closer to map end",
-      "synonyms": [
-        "move last collectible",
-        "end-of-map placement tweak"
-      ],
-      "description": "Adjusted collectible placement so the last collectible is positioned closer to the end of the corridor/map to better align progression pacing.",
-      "reqIds": [
-        "AR-20"
-      ],
-      "version": 1
-    },
-    {
-      "id": "IF-50",
-      "title": "Per-collectible pickup modals for all 7 stars (unique title/description copy)",
-      "synonyms": [
-        "StarPickupModal",
-        "per-star pickup popup",
-        "7 unique pickup prompts"
-      ],
-      "description": "Each of the 7 star collectibles triggers a pickup modal prompt with its own unique title/description copy; the first-star copy is updated to the new Barnabus-themed text, using the shared gameplay modal system.",
-      "reqIds": [
-        "AR-24"
-      ],
-      "version": 1
-    },
-    {
-      "id": "IF-51",
-      "title": "First collectible reverted from mobile phone back to star",
-      "synonyms": [
-        "revert first collectible type",
-        "remove phone-as-first-collectible"
-      ],
-      "description": "The first collectible item in the corridor is a star again (reverting the prior mobile phone first-collectible behavior).",
-      "reqIds": [
-        "AR-23"
-      ],
-      "version": 1
-    },
-    {
-      "id": "IF-52",
-      "title": "7th (last) star pickup modal includes appended completion message",
-      "synonyms": [
-        "AR-25 last star copy",
-        "completion/congratulations appended text",
-        "7th pickup description update"
-      ],
-      "description": "The 7th/last collectible star’s pickup modal description appends the provided completion/congratulations message to the existing unique copy.",
-      "reqIds": [
-        "AR-25"
-      ],
-      "version": 1
-    },
-    {
-      "id": "IF-53",
-      "title": "Game-to-outro transition after last collectible modal closes",
-      "synonyms": [
-        "AR-26 end gameplay on last modal close",
-        "OutroFlow transition",
-        "post-game narrative"
-      ],
-      "description": "After the player closes the last (7th) star pickup modal, the GameView terminates and the app transitions to an OutroFlow that uses the intro-style timed line-by-line reveal system with gated Continue between narrative blocks.",
-      "reqIds": [
-        "AR-26"
-      ],
-      "version": 1
-    },
-    {
-      "id": "IF-54",
-      "title": "End-game completion triggers on 7th unique collectible (not specific star ID) with specified modal formatting",
-      "synonyms": [
-        "AR-27 completion behavior",
-        "unique-count-based completion",
-        "completion modal formatting"
-      ],
-      "description": "Game completion is determined by the total number of uniquely collected collectibles reaching 7 (regardless of pickup order/star ID). The final pickup modal includes the required formatted completion message (including an empty-line spacing and bolded 'Congratulations!' line) and the game-to-outro transition occurs on closing that modal.",
-      "reqIds": [
-        "AR-27"
-      ],
-      "version": 1
-    },
-    {
-      "id": "IF-55",
-      "title": "Expanded OutroFlow narrative with gated blocks + interactive takeaways list and modal popups",
-      "synonyms": [
-        "AR-29 outro expansion",
-        "OutroFlow takeaways list",
-        "TakeawayModal",
-        "clickable underlined list items"
-      ],
-      "description": "After the game ends, OutroFlow is extended to include an additional gated line (\"That can't be it...\"), followed by a new multi-line narrative block about goals/applications/self-compassion with a Continue gate, and then an underlined, clickable 7-item takeaways list. Clicking a takeaway opens a popup/modal (placeholder/lorem content for now) that includes a link to https://lmt.lv.",
-      "reqIds": [
-        "AR-29"
-      ],
-      "version": 1
-    },
-    {
-      "id": "IF-56",
-      "title": "Final screen line-by-line reveal with centered styling and no leading hyphens",
-      "synonyms": [
-        "AR-30 final screen formatting",
-        "center-aligned final messages",
-        "remove '-' prefix in final copy"
-      ],
-      "description": "The final screen’s messages are revealed line-by-line (matching intro/outro behavior), are center-aligned to match existing narrative text styling, and any leading '-' characters in the displayed lines are removed.",
-      "reqIds": [
-        "AR-30"
-      ],
-      "version": 1
-    },
-    {
-      "id": "IF-57",
-      "title": "OutroFlow takeaways list updated with provided 7 items and links",
-      "synonyms": [
-        "AR-31 takeaways content update",
-        "replace takeaway titles",
-        "replace takeaway modal contents"
-      ],
-      "description": "Updated the OutroFlow final takeaways section to use the provided 7 takeaway titles and corresponding popup/modal contents (including the specified links) instead of placeholder/lorem text.",
-      "reqIds": [
-        "AR-31"
-      ],
-      "version": 1
-    },
-    {
-      "id": "IF-58",
-      "title": "Improved OutroFlow takeaway modal readability (increased contrast)",
-      "synonyms": [
-        "AR-32 contrast fix",
-        "TakeawayModal readability",
-        "modal text/background contrast"
-      ],
-      "description": "Adjusted the takeaways prompt/modal styling to increase contrast between background and font color for improved readability.",
-      "reqIds": [
-        "AR-32"
-      ],
-      "version": 1
-    },
-    {
-      "id": "IF-59",
-      "title": "OutroFlow takeaways list items have no background styling",
-      "synonyms": [
-        "AR-33 remove takeaway background",
-        "borderless takeaway list items",
-        "no item background on final screen"
-      ],
-      "description": "On the final OutroFlow takeaways section, the 7 clickable takeaway list items no longer render with a background fill (background styling removed), leaving the items as plain/unstyled text links per the intended design.",
-      "reqIds": [
-        "AR-33"
-      ],
-      "version": 1
-    },
-    {
-      "id": "IF-60",
-      "title": "Post-takeaways Continue triggers final 4-line timed message sequence",
-      "synonyms": [
-        "AR-34 final messages",
-        "OutroFlow final message reveal",
-        "post-takeaways continue"
-      ],
-      "description": "After the 7-item takeaways list, a bottom Continue clears the screen and reveals a final 4-line message sequence using the same timed line-by-line reveal pattern as intro/outro.",
-      "reqIds": [
-        "AR-34"
-      ],
-      "version": 1
-    },
-    {
-      "id": "IF-61",
-      "title": "Name submission modal after final messages",
-      "synonyms": [
-        "AR-35 name-entry modal",
-        "NameSubmissionModal",
-        "post-final Continue"
-      ],
-      "description": "After the final timed messages, a Continue opens a modal to input the player's name and submit via a Continue action.",
-      "reqIds": [
-        "AR-35"
-      ],
-      "version": 1
-    },
-    {
-      "id": "IF-62",
-      "title": "Persistent player ID generation and storage for ownership checks",
-      "synonyms": [
-        "AR-37 player ID",
-        "usePersistentPlayerId",
-        "local persisted id"
-      ],
-      "description": "Generates a random player ID, persists it (and keeps it in app state) so the Hall of Fame view can recognize the current player’s entry for conditional actions.",
-      "reqIds": [
-        "AR-37"
-      ],
-      "version": 1
-    },
-    {
-      "id": "IF-63",
-      "title": "Wall of Fame persistence API and storage client abstraction",
-      "synonyms": [
-        "AR-36 persistence",
-        "StorageClient",
-        "backend storage API",
-        "migration.mo"
-      ],
-      "description": "Implements persisted storage for Wall of Fame entries (player name + generated ID) backed by the backend canister, with a frontend storage client abstraction to save and fetch finishers.",
-      "reqIds": [
-        "AR-36"
-      ],
-      "version": 1
-    },
-    {
-      "id": "IF-64",
-      "title": "Hall of Fame list view with conditional PDF certificate download",
-      "synonyms": [
-        "HallOfFameView",
-        "AR-37 certificate PDF",
-        "certificatePdf"
-      ],
-      "description": "Navigates to a Hall of Fame view that lists all persisted finishers; if the current player’s stored ID is present, shows a Download button that generates a PDF certificate containing placeholder (lorem ipsum) text plus the player’s name.",
-      "reqIds": [
-        "AR-37"
-      ],
-      "version": 1
-    },
-    {
-      "id": "IF-65",
-      "title": "Hall of Fame certificate download generates a real PDF (application/pdf)",
-      "synonyms": [
-        "AR-38 PDF fix",
-        "real PDF download",
-        "certificatePdf Blob"
-      ],
-      "description": "The Hall of Fame Download button now generates a valid PDF file (not HTML) and downloads it with a proper PDF payload and filename for the current player’s certificate.",
-      "reqIds": [
-        "AR-38"
-      ],
-      "version": 1
-    },
-    {
-      "id": "IF-66",
-      "title": "Narrative copy overhaul across intro/game/outro with new gated blocks",
-      "synonyms": [
-        "AR-39 narrative update",
-        "story.ts copy refresh",
-        "new intro prompts/questions",
-        "negativity-clearing block",
-        "Barnabus journey pre-game block",
-        "outro copy updates"
-      ],
-      "description": "Updated narrative copy and sequencing across IntroFlow, gameplay-adjacent narrative, and OutroFlow: split/replace multiple intro lines and prompts, insert a negativity-clearing gated block before the resolutions question, adjust Donald/Barnabus phrasing, add a pre-game Barnabus journey block with Continue-to-game, and refresh outro/takeaways intro and final congratulatory text.",
-      "reqIds": [
-        "AR-39"
-      ],
-      "version": 1
-    },
-    {
-      "id": "IF-67",
-      "title": "Fixed end-of-flow name submission to complete and transition after submit",
-      "synonyms": [
-        "AR-40 name submission fix",
-        "NameSubmissionModal submit completion",
-        "post-submit navigation/transition"
-      ],
-      "description": "Submitting the player name at the end of the completion flow now performs the expected follow-up action/transition (no longer stalls after brief loading).",
-      "reqIds": [
-        "AR-40"
-      ],
-      "version": 1
-    },
-    {
-      "id": "IF-68",
-      "title": "OutroFlow takeaways modals correctly render configured content",
-      "synonyms": [
-        "AR-43 takeaways modal fix",
-        "TakeawayModal content resolution",
-        "no more 'Content not available.'"
-      ],
-      "description": "All 7 OutroFlow takeaways open modals that display their configured title/body/link content instead of the fallback \"Content not available.\" message.",
-      "reqIds": [
-        "AR-43"
-      ],
-      "version": 1
-    },
-    {
-      "id": "IF-69",
-      "title": "Global theming update: white text + darker purplish gradients with brown tones on darkening",
-      "synonyms": [
-        "AR-45 theming",
-        "white foreground",
-        "darker gradients",
-        "purplish + brown darken tones"
-      ],
-      "description": "Updated global UI theming so primary text is white across screens, backgrounds use darker/purplish gradients, darkening transitions introduce brown tones, and backgrounds remain gradients rather than flat fills.",
-      "reqIds": [
-        "AR-45"
-      ],
-      "version": 1
-    },
-    {
-      "id": "IF-70",
-      "title": "Narrative copy polish: punctuation pass + specific line/title updates",
-      "synonyms": [
-        "AR-41 punctuation",
-        "AR-42 intro line update",
-        "AR-44 takeaway title capitalization"
-      ],
-      "description": "Updated story/narrative copy to add missing terminal punctuation where needed and applied requested copy tweaks (intro line update and the specified takeaway title text/capitalization change).",
-      "reqIds": [
-        "AR-41",
-        "AR-42",
-        "AR-44"
-      ],
-      "version": 1
-    },
-    {
-      "id": "IF-71",
-      "title": "Refined darkening gradient progression stays purple with subtle brown shift (avoids dark blue)",
-      "synonyms": [
-        "AR-46 gradient tuning",
-        "introBackground darkening colors",
-        "purple-to-brown darken"
-      ],
-      "description": "Adjusted the OKLCH-based background gradient progression so darker stages remain predominantly purple while shifting slightly browner at the darkest points, avoiding an unintended dark-blue hue shift.",
-      "reqIds": [
-        "AR-46"
-      ],
-      "version": 1
-    },
-    {
-      "id": "IF-72",
-      "title": "Background transition reverses to lighten on specified mid-outro screens",
-      "synonyms": [
-        "AR-47 lighten transition",
-        "reverse darkening",
-        "return toward initial background"
-      ],
-      "description": "For the narrative screens starting with “Setting goals is good, it gives you a sense of destination and direction.” (and the following screen), newly revealed messages trigger a reversed background transition that becomes lighter again, returning toward the initial background palette.",
-      "reqIds": [
-        "AR-47"
-      ],
-      "version": 1
-    },
-    {
-      "id": "IF-73",
-      "title": "Global Wall of Fame link visible across all screens",
-      "synonyms": [
-        "AR-61 Wall of Fame link",
-        "AR-64 global link",
-        "WallOfFameLink component"
-      ],
-      "description": "Adds a modest \"Wall of Fame\" link in the global layout so it is visible on intro, gameplay, outro, and hall-of-fame screens (positioned above the watermark).",
-      "reqIds": [
-        "AR-61",
-        "AR-64"
-      ],
-      "version": 1
-    },
-    {
-      "id": "IF-74",
-      "title": "NameSubmissionModal: disable backdrop-close and add 'Skip to Wall of Fame' action",
-      "synonyms": [
-        "AR-48 name modal UX",
-        "no backdrop click close",
-        "skip button"
-      ],
-      "description": "Updates the end-of-flow NameSubmissionModal so it cannot be dismissed by clicking the backdrop, and provides an explicit secondary action to skip name entry and go directly to the Wall of Fame.",
-      "reqIds": [
-        "AR-48"
-      ],
-      "version": 1
-    },
-    {
-      "id": "IF-75",
-      "title": "Gameplay audio: background music with star-collected SFX and pause-on-pickup behavior",
-      "synonyms": [
-        "AR-63 gameplay BGM",
-        "useGameplayAudio",
-        "background.mp3",
-        "star-collected.mp3"
-      ],
-      "description": "Implements gameplay background music that starts on game start and stops on completion, and plays a star-collected sound effect on pickup while temporarily pausing the BGM during SFX playback.",
-      "reqIds": [
-        "AR-63"
-      ],
-      "version": 1
-    },
-    {
-      "id": "IF-76",
-      "title": "Joke speech bubble anchored above character with additional vertical offset",
-      "synonyms": [
-        "AR-53 bubble positioning",
-        "AR-58 +70px higher",
-        "SpeechBalloon anchor fix"
-      ],
-      "description": "Fixes the joke speech bubble positioning so it anchors above the character rather than centering in the game field, with an additional ~70px upward offset for better readability.",
-      "reqIds": [
-        "AR-53",
-        "AR-58"
-      ],
-      "version": 1
-    },
-    {
-      "id": "IF-77",
-      "title": "Certificate PDF includes Barnabus signature image asset",
-      "synonyms": [
-        "barnabus-signature-white-transparent PNG",
-        "certificate signature block image",
-        "PDF signature placement"
-      ],
-      "description": "Adds and uses a generated transparent white-ink Barnabus signature PNG in the certificate PDF signature block (for placement on a dark/purplish background).",
-      "reqIds": [
-        "AR-88"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-update-certificate-generation-so-the-downloaded-certificate-uses-the-user-provided-pdf-template-as-the-base-certificate-page-and-dynamically-overlays-the-player-s-name-centered-horizontally-over-the-underscore-area-at-the-top-of-that-pdf",
-      "title": "Update certificate generation so the downloaded certificate uses the user-provided PDF template as the base certificate page, and dynamically overlays the player’s name centered horizontally over the underscore area at the top of that PDF.",
-      "reqIds": [
-        "REQ-11"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-preserve-the-existing-key-takeaways-certificate-behavior-by-keeping-the-key-takeaways-content-included-as-an-additional-page-after-the-template-based-certificate-page-unless-the-provided-template-pdf-already-includes-its-own-additional-pages-in-which-case-append-the-key-takeaways-page-after-the-template-s-pages",
-      "title": "Preserve the existing Key Takeaways certificate behavior by keeping the Key Takeaways content included as an additional page after the template-based certificate page (unless the provided template PDF already includes its own additional pages, in which case append the Key Takeaways page after the template’s pages).",
-      "reqIds": [
-        "REQ-12"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-in-the-wall-of-fame-list-center-player-names-horizontally-within-each-of-the-three-columns-while-keeping-the-existing-3-column-layout-unchanged",
-      "title": "In the Wall of Fame list, center player names horizontally within each of the three columns while keeping the existing 3-column layout unchanged.",
-      "reqIds": [
-        "REQ-13"
+        "REQ-22"
       ],
       "version": 1
     }
   ],
   "new_feature_requests": [
     {
-      "id": "AR-49",
-      "summary": "Rename 'Donald' → 'Barnabus' everywhere throughout the app (copy + identifiers where applicable)",
+      "id": "AR-1",
+      "summary": "Update index.html <title> to \"Barnabus, The Undeterred\"",
       "reqIds": [],
       "status": "pending"
     },
     {
-      "id": "AR-50",
-      "summary": "Fade-in animation when the game view appears",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-51",
-      "summary": "After collecting a star, delay showing the pickup modal by (spin animation duration + 50ms)",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-52",
-      "summary": "Fix missing Barnabus image when Barnabus is introduced before gameplay starts",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-54",
-      "summary": "Add fade animation for prompts/popups/modals across the app",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-55",
-      "summary": "Add background music (Minecraft-like ambient)",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-56",
-      "summary": "Add sound effects for Space press/action and for capturing a star (if separate from existing pickup SFX)",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-57",
-      "summary": "Show the goals/prompt popup immediately when the game starts (not after first movement)",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-59",
-      "summary": "Make narrative/message text container 15% wider",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-60",
-      "summary": "Make game canvas 10% wider and 10% longer (increase width + height)",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-67",
-      "summary": "Fix gameplay background music: should not restart on every keyboard/mouse interaction; pause BGM on star-collection SFX and resume after 4.5s; reduce star-collection SFX volume",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-69",
-      "summary": "Show the \"Wall of Fame\" link only on the first screen (not globally across intro/game/outro/hall-of-fame)",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-70",
-      "summary": "Add extra narrative line \"Also, it's recommended for you to turn on sound.\" at the end of the section starting with \"This particular Barnabus's journey is not that long.\"",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-72",
-      "summary": "Wall of Fame UI: use same background styling as initial landing page",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-75",
-      "summary": "Wall of Fame UI: move \"Back to start\" button/link to the top-left corner (mirroring the Wall of Fame link placement style on landing page)",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-77",
-      "summary": "Copy updates: apply the four requested text changes (lost thinking→lost wondering; mission paragraph rewrite; ends up like that→ends up this way; deep attention→close attention)",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-78",
-      "summary": "Slider UI: add back the 50% label using white font and place it UNDER the slider",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-79",
-      "summary": "Slider UI: make the displayed percentage label reflect the current slider value (not a static \"50%\") while keeping the current visual styling/placement",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-80",
-      "summary": "UI/UX: unify popup/prompt styling between the 7 takeaways modals and the name input modal; keep the stronger background blur from the name modal and make the popup itself use lighter colors",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-82",
-      "summary": "Copy update: change \"Who would've thought there were so many ways to sabotage your goals.\" (use 'were' instead of 'are')",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-83",
-      "summary": "Copy update: change \"That can't be it...\" to \"That can't be right…\"",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-84",
-      "summary": "Wall of Fame UI: remove background/boxes around names and display names in 3 horizontal columns (left-to-right progression)",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-85",
-      "summary": "Style the PDF certificate to match the attached reference design",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-86",
-      "summary": "PDF certificate: circular seal text should read \"ICP ╳ Caffeine\" (using the ╳ symbol), matching the attached reference design otherwise",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-87",
-      "summary": "Wall of Fame: left-align text within columns and change numbering format from \"1 - Name\" to \"1. Name\"",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-88",
-      "summary": "Certificate PDF tweaks: remove top white box; center all text; add \"Presented To\" above player name; replace the completion paragraph copy; increase that paragraph font size by 30%; add bottom-left signature block \"Signed by\\n<Barnabus signature> Barnabus, The Undeterred\"",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-89",
-      "summary": "Certificate PDF: add a new page containing the Key Takeaways content (list of takeaway titles, and for each item include its popup content and article link if present)",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-90",
-      "summary": "Testing-only: always show \"Download your certificate\" and have it download the certificate for the most recent finisher (last player who completed the game)",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-91",
-      "summary": "Support using a user-provided PDF template with form fields and programmatically fill the player's name into the specified field when generating/downloading the certificate",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-92",
-      "summary": "Certificate PDF template (no form field): place the player’s name overlayed on top of the underscore line(s) at the top of the provided PDF",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-93",
-      "summary": "Wall of Fame UI: center player names horizontally within each of the 3 columns",
+      "id": "AR-2",
+      "summary": "Remove testing mode for certificate download; only show Download Certificate button when the player has completed the game",
       "reqIds": [],
       "status": "pending"
     }
   ],
   "architectural_notes": [
-    "React + TypeScript SPA with feature-based organization (src/features/intro, src/features/game) and centralized story content (src/content/story.ts).",
-    "IntroFlow is implemented as an explicit stage/state machine (FlowStage union) coordinated by multiple useEffect timers for line-by-line reveals and gated progression.",
-    "Intro mood progression uses OKLCH-based CSS gradients computed in a helper (getBackgroundGradient) and crossfaded via layered full-screen divs with opacity transitions.",
-    "Gameplay rendering is imperative Canvas2D drawing inside a React component; simulation runs in a requestAnimationFrame loop (useGameLoop) with deltaTime in seconds for frame-rate-independent movement.",
-    "Per-frame gameplay state (character position, camera position) is stored in refs to avoid React re-renders; React state is reserved for UI overlays (joke balloon) and asset-load status.",
-    "World geometry (bounds, floor tile regions, obstacles) and physics helpers (clamping, collision) are separated into a dedicated module (worldMap.ts); corridor floor/walls are generated procedurally from a centerline path definition.",
-    "Styling uses Tailwind CSS with OKLCH token theming, tailwindcss-animate, and shadcn/ui primitives (Button, Slider).",
-    "ICP scaffolding: InternetIdentityProvider wraps @dfinity/auth-client; useActor creates/caches an anonymous or identity-bound backend actor using TanStack React Query and invalidates/refetches non-actor queries when the actor changes.",
-    "Backend canister now exposes persisted storage methods (with migration support) for \"Wall of Fame\" entries, and the frontend uses a StorageClient abstraction to read/write them.",
-    "Completion flow adds a HallOfFameView route plus PDF certificate generation; player ownership is determined via a persisted random playerId (usePersistentPlayerId)."
+    "App navigation is implemented as an App-level phase state machine (intro → game → outro → hall-of-fame) rather than URL routing.",
+    "Feature-oriented frontend structure (intro/game/outro/hall-of-fame) with shared hooks for identity, actor creation, persistence, and queries.",
+    "Canvas2D gameplay uses imperative rendering; fast-changing simulation state (character, camera, collectibles) is stored in refs to avoid React re-render thrash.",
+    "Frame loop is implemented with a custom requestAnimationFrame hook providing deltaTime (seconds) for frame-rate-independent movement/animation.",
+    "Procedural corridor generation is constrained by a guaranteed-clearance channel and validated via grid/BFS passability checks.",
+    "Keyboard input is handled globally via a dedicated hook with modal gating and Space repeat-prevention.",
+    "Gameplay audio is encapsulated in a hook with stable callbacks and deterministic pause/resume logic (token-based last-request-wins).",
+    "ICP integration uses an Internet Identity (AuthClient) context and an identity-aware actor creation hook.",
+    "TanStack React Query manages backend calls, including optimistic cache updates for Wall of Fame mutations and invalidation/refetch when the actor changes.",
+    "Certificate generation is fully client-side: loads a static PDF template and injects text; pdf-lib is loaded dynamically from a CDN at runtime."
   ],
   "known_issues": [
-    "Camera clamping assumes world bounds are larger than the viewport; with a corridor world that can be narrower than the 500px canvas, horizontal camera clamping can collapse to a constant value (camera X becomes effectively fixed).",
-    "Duplicate/global CSS entrypoints exist (frontend/index.css and frontend/src/index.css); only src/index.css is imported by the app, but the extra file can confuse maintenance.",
-    "Gameplay background music restarts after each keyboard/mouse interaction; it should persist and only pause during star-collection SFX (then resume after 4.5s).",
-    "Gameplay BGM sometimes fails to resume after being paused for the star-collection soundtrack/SFX.",
-    "Gameplay audio: if BGM is paused for a star pickup and another star is collected before BGM resumes, BGM may never restart/resume."
+    "Motoko backend stores Wall of Fame entries in a non-stable variable, so entries will not persist across canister upgrades despite the frontend’s persistence verification notes.",
+    "backend.generateId() is derived from current array size and is not concurrency-safe; near-simultaneous submissions can produce duplicate IDs.",
+    "Backend has no validation/auth/rate limiting for Wall of Fame entries (any caller can add arbitrary names, including duplicates).",
+    "HallOfFameView’s certificate download uses the last entry in the list (lastEntry) rather than the detected current player entry (playerEntry).",
+    "GameView accepts an onNavigateToHallOfFame prop but never calls it, leaving no in-game navigation path to the Wall of Fame despite the prop existing.",
+    "frontend/src/features/game/MobilePhoneModal.tsx is empty (placeholder), and some comments/summaries reference a mobile-phone collectible modal that is not implemented in the provided code.",
+    "useGameLoop depends on the callbacks object identity; passing a new object literal can restart the RAF effect on re-renders (potential jitter/perf overhead).",
+    "useKeyboardControls takes a canvasRef parameter but does not use it (leftover API surface).",
+    "PDF generation depends on loading pdf-lib from a public CDN; downloads can fail offline, under strict CSPs, or if the CDN is unavailable.",
+    "Wall of Fame query is configured to always refetch on mount with staleTime: 0, which may increase backend traffic during frequent navigation/mount cycles."
   ],
-  "isFixRequest": false,
-  "generatedImages": [
-    {
-      "filename": "frontend/public/assets/generated/barnabus-signature-white-transparent.dim_800x240.png",
-      "description": "Generated stylized handwritten Barnabus signature (white ink, transparent PNG) for certificate PDF signature block.",
-      "targetWidth": 800,
-      "targetHeight": 240
-    }
-  ],
+  "isFixRequest": true,
   "gameProjectType": "2d",
-  "projectName": "Story-based goal-setting game intro flow + vertical-scrolling 2D segment with jokes",
-  "clarification_mode": "pro",
+  "projectName": "Barnabus, The Undeterred",
+  "clarification_mode": "instant",
   "clarification_rounds": 0
 }

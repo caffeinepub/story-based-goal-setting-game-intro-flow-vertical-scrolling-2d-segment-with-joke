@@ -1,8 +1,6 @@
 import Array "mo:core/Array";
 import Nat "mo:core/Nat";
 
-
-
 actor {
   type WallOfFameEntry = {
     id : Nat;

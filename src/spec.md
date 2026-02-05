@@ -1,11 +1,11 @@
 # Specification
 
 ## Summary
-**Goal:** Update certificate download to use the provided PDF template with a dynamic name overlay, and visually center Wall of Fame entries within their existing 3-column layout.
+**Goal:** Update the app’s browser tab title and ensure certificates can only be downloaded by players who have completed the game, using the correct player’s Wall of Fame entry.
 
 **Planned changes:**
-- Update the “Download Your Certificate” flow to generate a PDF using the provided certificate template PDF as the base page, then overlay the player’s name on top of the underscore region at the top, centered horizontally relative to that underscore area.
-- Preserve the existing Key Takeaways behavior by appending the Key Takeaways content as an additional page after the template’s page(s).
-- Adjust Wall of Fame rendering so each entry’s text (number + name) is horizontally centered within each of the three existing columns.
+- Update `frontend/index.html` so the document `<title>` is exactly `Barnabus, The Undeterred`.
+- In the Hall/Wall of Fame view, only render the “Download Your Certificate” button when the local completion flag indicates completion (`hasCompleted === true`).
+- When the download button is shown, generate the certificate using the completed player’s matching Wall of Fame entry (`playerEntry`) instead of the last list entry; if no matching entry is found, keep the button disabled.
 
-**User-visible outcome:** Downloading a certificate produces a valid PDF that matches the provided template with the player’s name centered over the underscore line, followed by the Key Takeaways page; Wall of Fame names appear centered within each column without changing the 3-column layout.
+**User-visible outcome:** The browser tab shows “Barnabus, The Undeterred”, and players only see (and can use) the certificate download option after completing the game; the downloaded certificate reflects their own Wall of Fame name when available.

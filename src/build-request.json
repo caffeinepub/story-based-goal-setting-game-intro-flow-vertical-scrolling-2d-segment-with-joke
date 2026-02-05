@@ -1,77 +1,70 @@
 {
   "kind": "build_request",
-  "title": "Use provided PDF template for certificate (overlay name on underscores) + center Wall of Fame names in 3 columns",
+  "title": "Update HTML title and restrict certificate download to completed players",
   "priority": "normal",
   "requirements": [
     {
-      "id": "REQ-11",
-      "text": "Update certificate generation so the downloaded certificate uses the user-provided PDF template as the base certificate page, and dynamically overlays the player’s name centered horizontally over the underscore area at the top of that PDF.",
+      "id": "REQ-20",
+      "text": "Update the HTML document title in frontend/index.html so the <title> content is exactly \"Barnabus, The Undeterred\".",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-8",
-          "msg-10"
+          "msg-5",
+          "msg-6"
         ],
         "quotes": [
-          "At the top of the PDF there are multiple _ (underscore) symbols. When preparing the certificate, place player's name right on top of those underscores.",
-          "center horizontally"
+          "In index.html there is title element. Please update it's content to \"Barnabus, The Undeterred\"."
         ]
       },
       "acceptanceCriteria": [
-        "Clicking the existing “Download Your Certificate” button downloads a valid PDF file (application/pdf).",
-        "The downloaded PDF visually matches the provided template for the certificate page (no re-rendered custom background/borders replacing it).",
-        "The player name is rendered on top of (overlapping) the underscore line region and is centered horizontally relative to that underscore region.",
-        "The name overlay is computed at download-time from the entry being downloaded (i.e., it works for different names without rebuilding the app)."
+        "frontend/index.html contains <title>Barnabus, The Undeterred</title>.",
+        "After reload, the browser tab title displays \"Barnabus, The Undeterred\"."
       ]
     },
     {
-      "id": "REQ-12",
-      "text": "Preserve the existing Key Takeaways certificate behavior by keeping the Key Takeaways content included as an additional page after the template-based certificate page (unless the provided template PDF already includes its own additional pages, in which case append the Key Takeaways page after the template’s pages).",
+      "id": "REQ-21",
+      "text": "Remove the Wall of Fame testing behavior that allows downloading a certificate without completing the game: only render the \"Download Your Certificate\" button when the local completion flag indicates the player has completed the game (hasCompleted === true).",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-8",
-          "msg-10"
+          "msg-5",
+          "msg-6"
         ],
         "quotes": [
-          "here's pdf with for the certificate",
-          "dynamically"
+          "We're done testing the certificates, so you can now remove the functionality where I can download the certificate even if I haven't completed the game (don't show the button)."
         ]
       },
       "acceptanceCriteria": [
-        "The downloaded PDF contains the template-based certificate page with the name overlay plus the existing Key Takeaways page content.",
-        "Key Takeaways page continues to list all takeaways with their body content and link text/URL when present."
+        "If hasCompleted is false, HallOfFameView does not render the \"Download Your Certificate\" button at all.",
+        "If hasCompleted is true, HallOfFameView renders the \"Download Your Certificate\" button."
       ]
     },
     {
-      "id": "REQ-13",
-      "text": "In the Wall of Fame list, center player names horizontally within each of the three columns while keeping the existing 3-column layout unchanged.",
+      "id": "REQ-22",
+      "text": "When the certificate download button is shown (player has completed), generate the certificate using the completed player's Wall of Fame entry (playerEntry) rather than the last entry in the list; if no matching player entry is found, keep the button disabled.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-8",
-          "msg-10"
+          "msg-5",
+          "msg-6"
         ],
         "quotes": [
-          "in the Wall of Fame, center the text (player names) horizontally in columns",
-          "yes"
+          "remove the functionality where I can download the certificate even if I haven't completed the game (don't show the button)."
         ]
       },
       "acceptanceCriteria": [
-        "Wall of Fame entries remain displayed in three columns at desktop widths as they are currently.",
-        "Within each column cell, the rendered entry text (including the number and the name) is horizontally centered."
+        "When hasCompleted is true and the player’s entry exists in the fetched entries, clicking the button downloads a certificate for that player’s name.",
+        "When hasCompleted is true but no playerEntry is found, the button is rendered but disabled."
       ]
     }
   ],
   "constraints": [
-    "Do not edit files under frontend/immutablePaths (compose existing UI components instead).",
-    "Respect the existing single-actor backend architecture; no additional backend canisters/services.",
-    "Keep all user-facing text in English."
+    "Do not edit any files under frontend/src/components/ui (Shadcn components are read-only).",
+    "Do not modify frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useInternetIdentity.tsx, frontend/src/hooks/useActor.ts, or frontend/src/main.tsx (immutable paths)."
   ],
   "nonGoals": [
-    "Do not introduce third-party auth providers (only Internet Identity is supported).",
-    "Do not change Wall of Fame persistence behavior or backend schema as part of this request.",
-    "Do not redesign the Wall of Fame layout beyond centering text within the existing three-column grid."
+    "Do not add or change backend (Motoko) APIs or persistence behavior as part of this request.",
+    "Do not address intermittent canister-stopped/service-unavailable errors beyond the existing Wall of Fame error UI."
   ],
   "imageRequirements": {
     "required": [],
